@@ -9,8 +9,6 @@
   * [Dynamic Columns](#dynamic-columns)
 * [Utils](#utils)
   * [XceliteDiff](#xcelitediff)
-* [How To Use?](#how-to-use)
-  * [Using Xcelite in Your Maven Project](#using-xcelite-in-your-maven-project)
 
 ### Introduction
 Xcelite is an ORM-like Java library which allows you to easily serialize and deserialize Java beans to/from Excel sheets
