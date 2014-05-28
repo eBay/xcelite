@@ -11,7 +11,7 @@
   * [XceliteDiff](#xcelitediff)
 
 ### Introduction
-Xcelite is an ORM-like Java library which allows you to easily serialize and deserialize Java beans to/from Excel sheets
+Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel sheets
 
 ### Quick Start
 #### Writing
