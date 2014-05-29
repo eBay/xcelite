@@ -195,7 +195,7 @@ All we have to do now is to register this row post processor in our reader:
 SheetReader<User> reader = sheet.getBeanReader(User.class);
 reader.addRowPostProcessor(new UserPostRowProcessor());
 ```
-Note that you can register as many row post processor as you like. They will be executed in registration order.
+Note that you can register as many row post processor as you like. They will be executed in ordered manner.
 
 ### Utils
 #### XceliteDiff
