@@ -4,7 +4,10 @@
 	<groupId>com.ebay.sd</groupId>
 	<artifactId>xcelite</artifactId>
 	<version>1.0.3</version>
+	<packaging>jar</packaging>
 	<name>xcelite</name>
+	<description>Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets</description>
+	<url>https://github.com/eBay/xcelite</url>
 
 	<licenses>
 		<license>
@@ -13,6 +16,18 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+	<scm>
+		<tag>master</tag>
+		<url>git@github.com:eBay/xcelite.git</url>
+		<connection>scm:git:git@github.com:eBay/xcelite.git</connection>
+		<developerConnection>scm:git:git@github.com:eBay/xcelite.git</developerConnection>
+	</scm>
+
+	<issueManagement>
+		<system>Github issues</system>
+		<url>https://github.com/eBay/xcelite/issues</url>
+	</issueManagement>
 
 	<developers>
 		<developer>
