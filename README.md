@@ -7,6 +7,7 @@
 * [Advanced Stuff](#advanced-stuff)
   * [Using Converters](#using-converters)
   * [Dynamic Columns](#dynamic-columns)
+  * [Row Post Processors](#row-post-processors)
 * [Utils](#utils)
   * [XceliteDiff](#xcelitediff)
 
