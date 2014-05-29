@@ -178,7 +178,7 @@ private Map<String, List<String>> dynamicCols;
 ```
 #### Row Post Processors
 When reading an Excel sheet you sometimes want to manipulate the data while reading. For example, you want to discard some row or object, or change some data in the deserialized object.  
-In order to achieve that you can add a RowPostProcessor to your reader.  
+In order to accomplish that you can add a RowPostProcessor to your reader.  
 A RowPostProcessor is a simple interface which contain a single method process() which gets the deserialized Object as an argument and return boolean whether to keep the Object or not.  
 ```java
 private class UserPostRowProcessor implements RowPostProcessor<User> {
