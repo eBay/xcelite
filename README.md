@@ -177,6 +177,14 @@ For instance, if you want your map to be sorted by column names using a TreeMap,
 @AnyColumn(converter = CSVColumnValueConverter.class, as = TreeMap.class)
 private Map<String, List<String>> dynamicCols;
 ```
+
+In addition, if you want some sheet columns to be skipped from been injected to the map, use:
+
+```java
+@AnyColumn(converter = CSVColumnValueConverter.class, as = TreeMap.class, ignoreCols = { "column_name" })
+private Map<String, List<String>> dynamicCols;
+```
+
 #### Row Post Processors
 When reading an Excel sheet you sometimes want to manipulate the data while reading. For example, you want to discard some row or object, or change some data in the deserialized object.  
 In order to accomplish that you can add a RowPostProcessor to your reader.  
