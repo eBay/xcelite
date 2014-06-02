@@ -181,7 +181,7 @@ private Map<String, List<String>> dynamicCols;
 In addition, if you want some sheet columns to be skipped from been injected to the map, use:
 
 ```java
-@AnyColumn(converter = CSVColumnValueConverter.class, as = TreeMap.class, ignoreCols = { "column1","column2" })
+@AnyColumn(ignoreCols = { "column1", "column2" })
 private Map<String, List<String>> dynamicCols;
 ```
 
