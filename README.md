@@ -10,6 +10,8 @@
   * [Row Post Processors](#row-post-processors)
 * [Utils](#utils)
   * [XceliteDiff](#xcelitediff)
+* [How To Use?](#how-to-use)
+  * [Using Xcelite in Your Maven Project](#using-xcelite-in-your-maven-project)
 
 ### Introduction
 Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
@@ -225,4 +227,14 @@ DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB, new ReportGener
         // return your own report based on the provided info
       }
     });
+```
+### How To Use?
+#### Using Xcelite in Your Maven Project
+Add xcelite as a dependency:
+```xml
+<dependency>
+			<groupId>com.ebay</groupId>
+			<artifactId>xcelite</artifactId>
+			<version>1.0.4</version>
+</dependency>
 ```
