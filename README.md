@@ -172,7 +172,7 @@ private Map<String, List<String>> dynamicCols;
 
 What about reading from Excel sheet using dynamic columns?  
 
-Well, luckily it works both ways. If your bean contains @AnyColumn property, any column in your Excel sheet that is not bounded to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
+Well, luckily it works both ways. If your bean contains @AnyColumn property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
 By default, Xcelite will use HashMap implementation for the Map when deserializing. If you'de prefer a different implementation use the 'as' attribute.  
 For instance, if you want your map to be sorted by column names using a TreeMap, just do:
 ```java
