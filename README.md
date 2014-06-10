@@ -164,7 +164,7 @@ For that purpose you can use the @AnyColumn annotation to annotate a ```Map<Stri
 private Map<String, Object> dynamicCols;
 ```
 
-The map value can be of any type. If the type is not a Number or Date Xcelite will use the toString() of the object. If this is not what you want you can use a converter same way as before:
+The map value can be of any type. If the type is not a Number or Date Xcelite will use the toString() of the object upon serializtion. If this is not what you want you can use a converter same way as before:
 ```java
 @AnyColumn(converter = CSVColumnValueConverter.class)
 private Map<String, List<String>> dynamicCols;
