@@ -40,7 +40,7 @@ public class User {
   private Date birthDate; 
 }
 ```
-How do i bind a collection of this bean to excel?
+How do i serialize a collection of this bean to excel?
 
 First, lets add annotations
 ```java
