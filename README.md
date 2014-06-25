@@ -78,7 +78,7 @@ If you'de prefer that "id" column will be written as Text instead of Number, use
 
 ```java 
 @Column(ignoreType=true)
-private Date birthDate;
+private long id;
 ```
 It is possible to control the data format that will be used when writing. For instance, Xcelite will use a default data format for "birthDate" date. In order to change the format, use
 ```java 
