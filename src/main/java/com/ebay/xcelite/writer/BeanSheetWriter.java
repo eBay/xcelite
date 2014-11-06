@@ -156,19 +156,21 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);
     }
-  }
+  }  
 
   private void addColumns(Set<Col> columnsToAdd, boolean append) {
     int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
     for (Col column : columnsToAdd) {
       if (append && columns.contains(column))
         continue;
-      Cell cell = headerRow.createCell(i);
-      cell.setCellType(Cell.CELL_TYPE_STRING);
-      cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
-      cell.setCellValue(column.getName());
+      if (writeHeader) {
+        Cell cell = headerRow.createCell(i);
+        cell.setCellType(Cell.CELL_TYPE_STRING);
+        cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
+        cell.setCellValue(column.getName());
+        i++;
+      }
       columns.add(column);
-      i++;
     }
   }
 }
