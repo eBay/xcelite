@@ -46,7 +46,7 @@ public class WashOrder implements Serializable {
     /**
      * 支付时间
      */
-    @Column(name = "支付时间", converter = DateValueConverter.class)
+    @Column(name = "支付时间", ignoreType = true, converter = DateValueConverter.class)
     private Long payAt;
 
     public String getId() {
