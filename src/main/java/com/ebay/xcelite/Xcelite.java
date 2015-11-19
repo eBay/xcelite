@@ -15,12 +15,7 @@
 */
 package com.ebay.xcelite;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -124,6 +119,28 @@ public class Xcelite {
     FileOutputStream out = null;
     try {
       out = new FileOutputStream(file, false);
+      workbook.write(out);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      new RuntimeException(e);
+    } finally {
+      if (out != null)
+        try {
+          out.close();
+        } catch (IOException e) {
+          new RuntimeException(e);
+        }
+    }
+  }
+
+  /**
+   * write data to the giving OutputStream
+   *
+   * @param out the OutputStream to write the data into
+   */
+  public void write(OutputStream out) {
+    try {
       workbook.write(out);
     } catch (FileNotFoundException e) {
       throw new RuntimeException(e);
