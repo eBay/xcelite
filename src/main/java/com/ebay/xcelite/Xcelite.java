@@ -21,7 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
+import java.io.InputStream;
+import java.io.OutputStream;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -44,6 +45,16 @@ public class Xcelite {
 
   public Xcelite() {
     workbook = new XSSFWorkbook();
+  }
+  
+  public Xcelite(InputStream inputStream) {
+    try {
+      workbook = new XSSFWorkbook(inputStream);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public Xcelite(File file) {
@@ -136,6 +147,21 @@ public class Xcelite {
         } catch (IOException e) {
           new RuntimeException(e);
         }
+    }
+  }
+  
+  /**
+   * Saves data to a new outputStream.
+   * 
+   * @param out the outputstream to save the data into
+   */
+  public void write(OutputStream out) {
+    try {
+      workbook.write(out);
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      new RuntimeException(e);
     }
   }
   
