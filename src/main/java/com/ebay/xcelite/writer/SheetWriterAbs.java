@@ -15,7 +15,11 @@
 */
 package com.ebay.xcelite.writer;
 
+import java.lang.reflect.Field;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -52,11 +56,49 @@ public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
         || type == Short.class || type == short.class) {
       cell.setCellType(Cell.CELL_TYPE_NUMERIC);
       cell.setCellValue(Double.valueOf(fieldValueObj.toString()));
-    } else {
+    } else if (type == String.class) {
       cell.setCellType(Cell.CELL_TYPE_STRING);
       cell.setCellValue(fieldValueObj.toString());
+    } else {
+    	Entity entity = type.getAnnotation(Entity.class);
+    	if(entity != null) {
+    		try {
+    			Field[] fields = type.getDeclaredFields();
+    			Field idField = getIdField(fields);
+    			Object value = null;
+    			if(idField == null && fields.length > 0) {
+    				// TODO : Maybe We should sorts field by name and pick the first one.
+    				// So that the reverse operation can be easy.
+    				idField = fields[0]; // Pick a random field
+    			}
+    			try {
+					idField.setAccessible(true);
+					value = idField.get(fieldValueObj);
+				} catch (IllegalArgumentException e) {
+			      throw new RuntimeException(e);
+				} catch (IllegalAccessException e) {
+			      throw new RuntimeException(e);
+				}
+    			if(value == null) value = "NOREF";
+				cell.setCellType(Cell.CELL_TYPE_STRING);
+				cell.setCellValue(value.toString());
+			} catch (SecurityException e) {
+		      throw new RuntimeException(e);
+			}
+    	}
     }
   }
+
+private Field getIdField(Field[] fields) {
+	Field idField = null;
+	for (Field field : fields) {
+		if(field.getAnnotation(Id.class) != null) {
+			idField = field;
+			break;
+		}
+	}
+	return idField;
+}
   
   @Override
   public void generateHeaderRow(boolean generateHeaderRow) {

@@ -46,6 +46,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     super(sheet, true);
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
+    extractor.extractJpa();
     columns = extractor.getColumns();
     anyColumn = extractor.getAnyColumn();
   }
