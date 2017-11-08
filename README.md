@@ -238,3 +238,22 @@ Add xcelite as a dependency:
 			<version>1.0.4</version>
 </dependency>
 ```
+### OR
+Add this repository as dependency, if you want support for Jpa data export. 
+```xml
+<repositories>
+	<repository>
+		<id>Github</id>
+		<name>Github repository</name>
+		<url>https://raw.github.com/boriswaguia/xcelite/release</url>
+	</repository>
+</repositories>
+```
+
+```xml
+<dependency>
+	<groupId>com.ebay</groupId>
+	<artifactId>xcelite</artifactId>
+	<version>1.0.5-SNAPSHOT</version>
+</dependency>
+```
