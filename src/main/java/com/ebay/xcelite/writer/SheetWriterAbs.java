@@ -19,7 +19,6 @@ import java.lang.reflect.Field;
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -34,6 +33,7 @@ import com.ebay.xcelite.sheet.XceliteSheet;
  */
 public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
   
+  private static final int MAX_EXCEL_CELL_CARACTERS = 32767;
   protected XceliteSheet sheet;
   protected boolean writeHeader;
   
@@ -58,17 +58,18 @@ public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
       cell.setCellValue(Double.valueOf(fieldValueObj.toString()));
     } else if (type == String.class) {
       cell.setCellType(Cell.CELL_TYPE_STRING);
-      cell.setCellValue(fieldValueObj.toString());
+      String cellValue = extractStringValue(fieldValueObj);
+      cell.setCellValue(cellValue);
     } else {
-    	Entity entity = type.getAnnotation(Entity.class);
+    	Entity entity = type.getAnnotation(javax.persistence.Entity.class);
     	if(entity != null) {
     		try {
     			Field[] fields = type.getDeclaredFields();
     			Field idField = getIdField(fields);
     			Object value = null;
+    			// If no Id field
     			if(idField == null && fields.length > 0) {
-    				// TODO : Maybe We should sorts field by name and pick the first one.
-    				// So that the reverse operation can be easy.
+    				// TODO : Maybe We should sorts field by name and pick the first one. So that the reverse operation can be easy.
     				idField = fields[0]; // Pick a random field
     			}
     			try {
@@ -89,16 +90,31 @@ public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
     }
   }
 
-private Field getIdField(Field[] fields) {
+  /**
+   * Extract the String value, and shrink it to fix excell string size.
+   * @param fieldValueObj
+   * @return
+   */
+  private String extractStringValue(Object fieldValueObj) {
+	String cellValue = fieldValueObj.toString();
+      if(cellValue == null) cellValue = "";
+      if(cellValue.length() > MAX_EXCEL_CELL_CARACTERS) {
+    	  cellValue = cellValue.substring(0, 32764);
+    	  cellValue += "...";
+      }
+	return cellValue;
+  }
+
+  private Field getIdField(Field[] fields) {
 	Field idField = null;
 	for (Field field : fields) {
-		if(field.getAnnotation(Id.class) != null) {
+		if(field.getAnnotation(javax.persistence.Id.class) != null) {
 			idField = field;
 			break;
 		}
 	}
 	return idField;
-}
+  }
   
   @Override
   public void generateHeaderRow(boolean generateHeaderRow) {
