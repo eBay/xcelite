@@ -17,7 +17,6 @@ package com.ebay.xcelite.column;
 
 import static org.reflections.ReflectionUtils.withAnnotation;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -97,13 +96,13 @@ public class ColumnsExtractor {
   public void extractJpa() {    
     Set<Field> idFields = ReflectionUtils.getAllFields(type, withAnnotation(javax.persistence.Id.class));
     Set<Field> columnFields = ReflectionUtils.getAllFields(type, withAnnotation(javax.persistence.Column.class));
-    Set<Field> manyToOneFields = ReflectionUtils.getAllFields(type, withAnnotation(ManyToOne.class));
+    Set<Field> manyToOneFields = ReflectionUtils.getAllFields(type, withAnnotation(javax.persistence.ManyToOne.class));
 
     for (Field columnField : idFields) {
       javax.persistence.Id annotation = columnField.getAnnotation(javax.persistence.Id.class);
       if(annotation == null) continue;
       Col col = null;
-      col = new Col(columnField.getName(), columnField.getName());
+      col = new Col(columnField.getName(), columnField.getName(), columnField.getType());
       columns.add(col);
     }
     
@@ -112,18 +111,18 @@ public class ColumnsExtractor {
       if(annotation == null) continue;
       Col col = null;
       if (annotation.name().isEmpty()) {
-        col = new Col(columnField.getName(), columnField.getName());        
+        col = new Col(columnField.getName(), columnField.getName(),  columnField.getType());        
       } else {
-        col = new Col(annotation.name(), columnField.getName());        
+        col = new Col(annotation.name(), columnField.getName(), columnField.getType());
       }
       columns.add(col);
     }
 
     for (Field columnField : manyToOneFields) {
-      ManyToOne annotation = columnField.getAnnotation(ManyToOne.class);
+      ManyToOne annotation = columnField.getAnnotation(javax.persistence.ManyToOne.class);
       Col col = null;
       if(annotation == null) continue;
-      JoinColumn joinColumn = columnField.getAnnotation(JoinColumn.class);
+      JoinColumn joinColumn = columnField.getAnnotation(javax.persistence.JoinColumn.class);
       if (joinColumn.name().isEmpty()) {
         col = new Col(columnField.getName(), columnField.getName(), columnField.getType());        
       } else {
@@ -154,7 +153,7 @@ public class ColumnsExtractor {
       if (annotation.converter() != NoConverterClass.class) {
         anyColumn.setConverter(annotation.converter());
       }
-    }    
+    }
   }
 
   private void orderColumns() {

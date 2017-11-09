@@ -22,7 +22,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public final class CellStyles {
   
-  private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
+//  private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
+  private final String DEFAULT_DATE_FORMAT = "dd/mm/yyyy hh:mm:ss";
   
   private final Workbook wb;
   private CellStyle boldStyle;

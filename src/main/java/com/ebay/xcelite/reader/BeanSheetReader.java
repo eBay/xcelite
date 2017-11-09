@@ -63,6 +63,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     this.type = type;
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
+    extractor.extractJpa();
     columns = extractor.getColumns(); 
     anyColumn = extractor.getAnyColumn();    
     mapper = new ColumnsMapper(columns);
@@ -171,11 +172,31 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
               .newInstance();
           cellValue = converter.deserialize(cellValue);
         } else {
-          cellValue = convertToFieldType(cellValue, field.getType());
+          cellValue = convertToFieldType(cellValue, field.getType(), column);
         }
       }
-      field.setAccessible(true);
-      field.set(object, cellValue);
+      boolean annotationPresent = field.isAnnotationPresent(javax.persistence.ManyToOne.class);
+      if(!annotationPresent) {
+    	  field.setAccessible(true);
+    	  field.set(object, cellValue);
+      } else {
+		  Object instance = field.getType().newInstance();
+		  Field[] declaredFields = instance.getClass().getDeclaredFields();
+		  Field idField = null;
+		  for (Field f : declaredFields) {
+			if(f.isAnnotationPresent(javax.persistence.Id.class)) {
+				idField = f;
+				break;
+			}
+		  }
+		  if(idField == null) idField = declaredFields[0];
+		  // Set the id field in the instance
+		  idField.setAccessible(true);
+		  idField.set(instance, cellValue);
+		  // Set the object value
+		  field.setAccessible(true);
+		  field.set(object, instance);
+      }
     }
     catch (IllegalAccessException e) {
       throw new RuntimeException(e);
@@ -184,7 +205,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     }
   }
 
-  private Object convertToFieldType(Object cellValue, Class<?> fieldType) {
+  private Object convertToFieldType(Object cellValue, Class<?> fieldType, Col column) {
     String value = String.valueOf(cellValue);
     if (fieldType == Double.class || fieldType == double.class) {
       return Double.valueOf(value);
