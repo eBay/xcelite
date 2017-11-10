@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.ebay</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.0.7-SNAPSHOT</version>
+	<version>1.0.8-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>xcelite</name>
 	<description>Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets</description>
