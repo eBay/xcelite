@@ -38,10 +38,16 @@ public class Col implements Comparable<Col> {
   }
 
   public Col(String name, String fieldName) {
+	  this(name, fieldName, String.class);
+  }
+  
+
+  public Col(String name, String fieldName, Class<?> type) {
     this.name = name;
     this.fieldName = fieldName;
-    type = String.class;
+    this.type = type;
   }
+  
 
   @Override
   public String toString() {

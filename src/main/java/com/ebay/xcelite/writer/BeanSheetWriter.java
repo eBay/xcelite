@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.reflections.ReflectionUtils;
 
 import com.ebay.xcelite.annotate.NoConverterClass;
@@ -46,6 +47,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     super(sheet, true);
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
+    extractor.extractJpa();
     columns = extractor.getColumns();
     anyColumn = extractor.getAnyColumn();
   }
@@ -119,8 +121,9 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     }
 
     if (col.getType() == Date.class) {
-      if (col.getDataFormat() == null) {
-        cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle());
+     if (col.getDataFormat() == null) {
+        CellStyle dateStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle();
+		cell.setCellStyle(dateStyle);
       }
     }
 
