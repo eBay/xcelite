@@ -176,9 +176,9 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
         } else {
           cellValue = convertToFieldType(cellValue, field.getType());
         }
+        field.setAccessible(true);
+        field.set(object, cellValue);
       }
-      field.setAccessible(true);
-      field.set(object, cellValue);
     }
     catch (IllegalAccessException e) {
       throw new RuntimeException(e);
