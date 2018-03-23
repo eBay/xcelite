@@ -126,14 +126,13 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     boolean found = false;
     for (Col c : columns) {
       for(String h : header) {
-          System.out.println("--- " + c.getName() + ":" + h);
         if(c.getName().equals(h)) {
           found = true;
           break;
         }
       }
       if(!found) {
-        throw new ColumnNotFoundException("not found column", c.getName());
+        throw new ColumnNotFoundException("Column not found!", c.getName());
       }
       found = false;
     }
