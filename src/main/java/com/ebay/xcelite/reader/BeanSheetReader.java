@@ -37,6 +37,7 @@ import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.column.ColumnsMapper;
 import com.ebay.xcelite.converters.ColumnValueConverter;
+import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
@@ -72,6 +73,9 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   @Override
   public Collection<T> read() {
     buildHeader();
+    if(anyColumn == null) {
+      validateColumns();
+    }
     List<T> data = Lists.newArrayList();    
     try {
       while (rowIterator.hasNext()) {
@@ -113,6 +117,26 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
       throw new RuntimeException(e1);
     }
     return data;
+  }
+  
+  /**
+   * check that @column is found in header
+   */
+  private void validateColumns() {
+    boolean found = false;
+    for (Col c : columns) {
+      for(String h : header) {
+          System.out.println("--- " + c.getName() + ":" + h);
+        if(c.getName().equals(h)) {
+          found = true;
+          break;
+        }
+      }
+      if(!found) {
+        throw new ColumnNotFoundException("not found column", c.getName());
+      }
+      found = false;
+    }
   }
 
   private boolean isBlankRow(Row row) {
