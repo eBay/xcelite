@@ -18,6 +18,7 @@ package com.ebay.xcelite.reader;
 import static org.reflections.ReflectionUtils.withName;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -55,7 +56,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   private final Col anyColumn;
   private final ColumnsMapper mapper;  
   private final Class<T> type;
-  private LinkedHashSet<String> header;
+  private ArrayList<String> header;
   private Iterator<Row> rowIterator;
 
   public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
@@ -127,7 +128,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     return blankRow;
   }
 
-  private boolean isColumnInIgnoreList(Field anyColumnField, String columnName) {
+  private static boolean isColumnInIgnoreList(Field anyColumnField, String columnName) {
     AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
     Set<String> ignoreCols = Sets.newHashSet(annotation.ignoreCols());    
     return ignoreCols.contains(columnName);
@@ -184,7 +185,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     }
   }
 
-  private Object convertToFieldType(Object cellValue, Class<?> fieldType) {
+  private static Object convertToFieldType(Object cellValue, Class<?> fieldType) {
     String value = String.valueOf(cellValue);
     if (fieldType == Double.class || fieldType == double.class) {
       return Double.valueOf(value);
@@ -211,16 +212,19 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   }
 
   private void buildHeader() {
-    header = Sets.newLinkedHashSet();
+    header = Lists.newArrayList();
     rowIterator = sheet.getNativeSheet().rowIterator();
     Row row = rowIterator.next();
     if (row == null) {
       throw new XceliteException("First row in sheet is empty. First row must contain header");
     }
-    Iterator<Cell> itr = row.cellIterator();
-    while (itr.hasNext()) {
-      Cell cell = itr.next();
-      header.add(cell.getStringCellValue());
-    }   
+    
+    for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
+    	Cell cell = row.getCell(i);
+        String cellValue = (null != cell) ? cell.getStringCellValue() : null;
+        if ((null == cellValue) || (cellValue.isEmpty()))
+      	  cellValue = null;
+        header.add(cellValue);
+    }
   }
 }
