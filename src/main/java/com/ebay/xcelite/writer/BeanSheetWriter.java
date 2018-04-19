@@ -64,33 +64,33 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
   @SuppressWarnings("unchecked")
   @SneakyThrows
   private void writeData(Collection<T> data) {
-      Set<Col> columnsToAdd = Sets.newTreeSet();
-      for (T t : data) {
-        if (anyColumn != null) {
-          appendAnyColumns(t, columnsToAdd);
-        }
+    Set<Col> columnsToAdd = Sets.newTreeSet();
+    for (T t : data) {
+      if (anyColumn != null) {
+        appendAnyColumns(t, columnsToAdd);
       }
-      addColumns(columnsToAdd, true);
-      for (T t : data) {
-        org.apache.poi.ss.usermodel.Row row = sheet.getNativeSheet().createRow(rowIndex);
-        int i = 0;
-        for (Col col : columns) {
-          Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
-          Field field = fields.iterator().next();
-          field.setAccessible(true);
-          Object fieldValueObj = null;
-          if (col.isAnyColumn()) {
-            Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(t);
-            fieldValueObj = anyColumnMap.get(col.getName());
-          } else {
-            fieldValueObj = field.get(t);
-          }
-          Cell cell = row.createCell(i);
-          writeToCell(cell, col, fieldValueObj);
-          i++;
+    }
+    addColumns(columnsToAdd, true);
+    for (T t : data) {
+      org.apache.poi.ss.usermodel.Row row = sheet.getNativeSheet().createRow(rowIndex);
+      int i = 0;
+      for (Col col : columns) {
+        Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
+        Field field = fields.iterator().next();
+        field.setAccessible(true);
+        Object fieldValueObj = null;
+        if (col.isAnyColumn()) {
+          Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(t);
+          fieldValueObj = anyColumnMap.get(col.getName());
+        } else {
+          fieldValueObj = field.get(t);
         }
-        rowIndex++;
+        Cell cell = row.createCell(i);
+        writeToCell(cell, col, fieldValueObj);
+        i++;
       }
+      rowIndex++;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -101,12 +101,12 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
       return;
     }
     if (col.getConverter() != null) {
-        ColumnValueConverter<?, Object> converter = (ColumnValueConverter<?, Object>) col.getConverter().newInstance();
-        fieldValueObj = converter.serialize(fieldValueObj);
+      ColumnValueConverter<?, Object> converter = (ColumnValueConverter<?, Object>) col.getConverter().newInstance();
+      fieldValueObj = converter.serialize(fieldValueObj);
     }
     if (col.getDataFormat() != null) {
       cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getCustomDataFormatStyle(
-          col.getDataFormat()));
+              col.getDataFormat()));
     }
 
     if (col.getType() == Date.class) {
@@ -127,21 +127,21 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
   @SuppressWarnings("unchecked")
   @SneakyThrows
   private void appendAnyColumns(T t, Set<Col> columnToAdd) throws IllegalAccessException {
-      Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
-      Field anyColumnField = fields.iterator().next();
-      anyColumnField.setAccessible(true);
-      Map<String, Object> fieldValueObj = (Map<String, Object>) anyColumnField.get(t);
-      for (Map.Entry<String, Object> entry : fieldValueObj.entrySet()) {
-        Col column = new Col(entry.getKey(), anyColumnField.getName());
-        column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
-        column.setAnyColumn(true);
-        if (anyColumn.getConverter() != NoConverterClass.class) {
-          column.setConverter(anyColumn.getConverter());
-        }
-        columnToAdd.add(column);
+    Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
+    Field anyColumnField = fields.iterator().next();
+    anyColumnField.setAccessible(true);
+    Map<String, Object> fieldValueObj = (Map<String, Object>) anyColumnField.get(t);
+    for (Map.Entry<String, Object> entry : fieldValueObj.entrySet()) {
+      Col column = new Col(entry.getKey(), anyColumnField.getName());
+      column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
+      column.setAnyColumn(true);
+      if (anyColumn.getConverter() != NoConverterClass.class) {
+        column.setConverter(anyColumn.getConverter());
       }
+      columnToAdd.add(column);
+    }
 
-  }  
+  }
 
   private void addColumns(Set<Col> columnsToAdd, boolean append) {
     int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
