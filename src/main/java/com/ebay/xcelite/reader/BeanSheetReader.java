@@ -165,7 +165,10 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   @SuppressWarnings("unchecked")
   private void writeToField(Field field, T object, Cell cell, Col column) {
     try {   
-      Object cellValue = readValueFromCell(cell);      
+      Object cellValue = readValueFromCell(cell);
+      if (cellValue == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
+        cellValue = Boolean.FALSE;
+      }
       if (cellValue != null) {
         if (column.getConverter() != null) {
           ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) column.getConverter()
@@ -174,9 +177,9 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
         } else {
           cellValue = convertToFieldType(cellValue, field.getType());
         }
+        field.setAccessible(true);
+        field.set(object, cellValue);
       }
-      field.setAccessible(true);
-      field.set(object, cellValue);
     }
     catch (IllegalAccessException e) {
       throw new RuntimeException(e);
@@ -207,6 +210,9 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     }
     if (fieldType == Date.class) {
       return DateUtil.getJavaDate(Double.valueOf(value));
+    }
+    if (fieldType == Boolean.class || fieldType == boolean.class) {
+      return Boolean.valueOf(value);
     }
     return value;
   }
