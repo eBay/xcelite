@@ -235,6 +235,6 @@ Add xcelite as a dependency:
 <dependency>
 			<groupId>com.ebay</groupId>
 			<artifactId>xcelite</artifactId>
-			<version>1.0.4</version>
+			<version>1.0.5</version>
 </dependency>
 ```
