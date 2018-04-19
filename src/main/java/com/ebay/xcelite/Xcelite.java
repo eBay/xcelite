@@ -158,6 +158,8 @@ public class Xcelite {
           new RuntimeException(e);
         }
     }
+    if (null == baos)
+    	return null;
     return baos.toByteArray();
   }
 }
