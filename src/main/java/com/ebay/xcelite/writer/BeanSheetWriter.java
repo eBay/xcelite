@@ -24,7 +24,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ebay.xcelite.exceptions.XceliteException;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.reflections.ReflectionUtils;
 
 import com.ebay.xcelite.annotate.NoConverterClass;
@@ -59,8 +62,8 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
   }
 
   @SuppressWarnings("unchecked")
+  @SneakyThrows
   private void writeData(Collection<T> data) {
-    try {
       Set<Col> columnsToAdd = Sets.newTreeSet();
       for (T t : data) {
         if (anyColumn != null) {
@@ -88,30 +91,18 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
         }
         rowIndex++;
       }
-    } catch (SecurityException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalArgumentException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @SuppressWarnings("unchecked")
+  @SneakyThrows
   private void writeToCell(Cell cell, Col col, Object fieldValueObj) {
     if (fieldValueObj == null) {
       cell.setCellValue((String) null);
       return;
     }
     if (col.getConverter() != null) {
-      try {
         ColumnValueConverter<?, Object> converter = (ColumnValueConverter<?, Object>) col.getConverter().newInstance();
         fieldValueObj = converter.serialize(fieldValueObj);
-      } catch (InstantiationException e) {
-        throw new RuntimeException(e);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
     }
     if (col.getDataFormat() != null) {
       cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getCustomDataFormatStyle(
@@ -134,8 +125,8 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private void appendAnyColumns(T t, Set<Col> columnToAdd) {
-    try {
+  @SneakyThrows
+  private void appendAnyColumns(T t, Set<Col> columnToAdd) throws IllegalAccessException {
       Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
       Field anyColumnField = fields.iterator().next();
       anyColumnField.setAccessible(true);
@@ -149,13 +140,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
         }
         columnToAdd.add(column);
       }
-    } catch (SecurityException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalArgumentException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
+
   }  
 
   private void addColumns(Set<Col> columnsToAdd, boolean append) {
@@ -164,8 +149,10 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
       if (append && columns.contains(column))
         continue;
       if (writeHeader) {
+        if (headerRow == null)
+          throw new XceliteException("Cannot write header; header row is null");
         Cell cell = headerRow.createCell(i);
-        cell.setCellType(Cell.CELL_TYPE_STRING);
+        cell.setCellType(CellType.STRING);
         cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
         cell.setCellValue(column.getName());
         i++;
