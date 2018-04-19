@@ -82,7 +82,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
         
         int i = 0;
         for (String columnName : header) {
-          Cell cell = row.getCell(i, Row.RETURN_BLANK_AS_NULL);
+          Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
           Col col = mapper.getColumn(columnName);
           if (col == null) {            
             if (anyColumn != null) {
