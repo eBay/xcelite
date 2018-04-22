@@ -21,7 +21,6 @@ import org.apache.poi.ss.usermodel.Cell;
 
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
-import org.apache.poi.ss.usermodel.CellType;
 
 /**
  * Class description...
@@ -55,7 +54,11 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
         cellValue = cell.getNumericCellValue();
         break;
       default:
-        cellValue = cell.getStringCellValue();
+        try {
+          cellValue = cell.getStringCellValue();
+        } catch (Exception ex) {
+          ex.printStackTrace();
+        }
     }
     return cellValue;
   }
