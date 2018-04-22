@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Cell;
 
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
+import org.apache.poi.ss.usermodel.CellType;
 
 /**
  * Class description...
@@ -47,6 +48,8 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
     switch (cell.getCellTypeEnum()) {
       case ERROR:
         break;
+      case FORMULA:
+          break;
       case BOOLEAN:
         cellValue = cell.getBooleanCellValue();
         break;
