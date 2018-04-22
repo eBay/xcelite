@@ -57,6 +57,8 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
         try {
           cellValue = cell.getStringCellValue();
         } catch (Exception ex) {
+          System.err.println(cell.getRowIndex()+" "+cell.getColumnIndex());
+          System.err.println(cell.getCellTypeEnum()+" "+cell.getCellType()+cell.getErrorCellValue());
           ex.printStackTrace();
         }
     }
