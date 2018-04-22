@@ -46,6 +46,8 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
     if (cell == null) return null;
     Object cellValue = null;
     switch (cell.getCellTypeEnum()) {
+      case ERROR:
+        break;
       case BOOLEAN:
         cellValue = cell.getBooleanCellValue();
         break;
