@@ -26,7 +26,7 @@ import org.apache.poi.ss.usermodel.CellType;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 10, 2013
+ * created Nov 10, 2013
  * 
  */
 public abstract class SheetWriterAbs<T> implements SheetWriter<T> {

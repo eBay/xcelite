@@ -126,7 +126,7 @@ public class Xcelite {
 
   /**
    * Saves data to a new file.
-   *  
+   *
    * @param file the file to save the data into
    */
   @SneakyThrows

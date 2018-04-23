@@ -21,13 +21,12 @@ import org.apache.poi.ss.usermodel.Cell;
 
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
-import org.apache.poi.ss.usermodel.CellType;
 
 /**
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 11, 2013
+ * created Nov 11, 2013
  * 
  */
 public abstract class SheetReaderAbs<T> implements SheetReader<T> {
@@ -57,13 +56,7 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
         cellValue = cell.getNumericCellValue();
         break;
       default:
-        try {
           cellValue = cell.getStringCellValue();
-        } catch (Exception ex) {
-          System.err.println(cell.getRowIndex()+" "+cell.getColumnIndex());
-          System.err.println(cell.getCellTypeEnum()+" "+cell.getCellType()+cell.getErrorCellValue());
-          ex.printStackTrace();
-        }
     }
     return cellValue;
   }

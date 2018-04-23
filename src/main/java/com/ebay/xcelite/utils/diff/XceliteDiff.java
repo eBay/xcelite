@@ -34,7 +34,7 @@ import com.ebay.xcelite.utils.diff.report.ReportInfo;
  * Utility which compares two sheets and returns the difference between them.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 1, 2013
+ * created Nov 1, 2013
  * 
  */
 public final class XceliteDiff {

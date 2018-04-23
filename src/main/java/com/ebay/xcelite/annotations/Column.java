@@ -27,7 +27,7 @@ import com.ebay.xcelite.converters.ColumnValueConverter;
  * Annotation to annotate a field to represent a column in excel file.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 29, 2013
+ * created Aug 29, 2013
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)

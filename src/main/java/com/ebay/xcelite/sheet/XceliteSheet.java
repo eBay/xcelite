@@ -27,7 +27,7 @@ import com.ebay.xcelite.writer.SheetWriter;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 9, 2013
+ * created Nov 9, 2013
  * 
  */
 public interface XceliteSheet {

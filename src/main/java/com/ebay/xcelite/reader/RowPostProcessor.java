@@ -20,7 +20,7 @@ package com.ebay.xcelite.reader;
  * processed.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Feb 2, 2014
+ * created Feb 2, 2014
  * 
  */
 public interface RowPostProcessor<T> {
