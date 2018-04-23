@@ -23,6 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -35,7 +37,7 @@ import com.ebay.xcelite.sheet.XceliteSheetImpl;
  * Class description...
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 9, 2013
+ * created Nov 9, 2013
  * 
  */
 public class Xcelite {
@@ -50,8 +52,6 @@ public class Xcelite {
   public Xcelite(InputStream inputStream) {
     try {
       workbook = new XSSFWorkbook(inputStream);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -61,8 +61,6 @@ public class Xcelite {
     try {
       this.file = file;
       workbook = new XSSFWorkbook(new FileInputStream(file));
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -102,9 +100,9 @@ public class Xcelite {
   }
 
   /**
-   * Gets the sheet with the specified index.
+   * Gets the sheet with the specified name.
    * 
-   * @param sheetIndex the sheet name
+   * @param sheetName the sheet name
    * @return XceliteSheet object
    */
   public XceliteSheet getSheet(String sheetName) {
@@ -128,26 +126,19 @@ public class Xcelite {
 
   /**
    * Saves data to a new file.
-   * 
+   *  
    * @param file the file to save the data into
    */
+  @SneakyThrows
   public void write(File file) {
     FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(file, false);
-      workbook.write(out);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (out != null)
-        try {
-          out.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
-        }
-    }
+    out = new FileOutputStream(file, false);
+    write(out);
+      try {
+        out.close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
   }
   
   /**
@@ -155,14 +146,9 @@ public class Xcelite {
    * 
    * @param out the outputstream to save the data into
    */
+  @SneakyThrows
   public void write(OutputStream out) {
-    try {
       workbook.write(out);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      new RuntimeException(e);
-    }
   }
   
   /**
@@ -170,22 +156,15 @@ public class Xcelite {
    * 
    * @return byte array which represents the excel file
    */
+  @SneakyThrows
   public byte[] getBytes() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    write(baos);
     try {
-      workbook.write(baos);
+      baos.close();
     } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (baos != null)
-        try {
-          baos.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
-        }
+      throw new RuntimeException(e);
     }
-    if (null == baos)
-    	return null;
     return baos.toByteArray();
   }
 }

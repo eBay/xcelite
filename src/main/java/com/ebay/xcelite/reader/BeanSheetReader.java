@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -47,12 +48,11 @@ import com.google.common.collect.Sets;
  * Class description...
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 9, 2013
+ * created Sep 9, 2013
  * 
  */
 public class BeanSheetReader<T> extends SheetReaderAbs<T> {
 
-  private final LinkedHashSet<Col> columns;
   private final Col anyColumn;
   private final ColumnsMapper mapper;  
   private final Class<T> type;
@@ -64,55 +64,47 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     this.type = type;
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
-    columns = extractor.getColumns(); 
+    LinkedHashSet<Col> columns = extractor.getColumns();
     anyColumn = extractor.getAnyColumn();    
     mapper = new ColumnsMapper(columns);
   }
 
   @SuppressWarnings("unchecked")
   @Override
+  @SneakyThrows
   public Collection<T> read() {
     buildHeader();
-    List<T> data = Lists.newArrayList();    
-    try {
-      while (rowIterator.hasNext()) {
-        Row row = rowIterator.next();
-        if (isBlankRow(row)) continue;
-        T object = type.newInstance();
-        
-        int i = 0;
-        for (String columnName : header) {
-          Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-          Col col = mapper.getColumn(columnName);
-          if (col == null) {            
-            if (anyColumn != null) {
-              Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
-              Field field = fields.iterator().next();
-              if (!isColumnInIgnoreList(field, columnName)) {
-                writeToAnyColumnField(field, object, cell, columnName);
-              }
-            }           
-          } else {
-            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
+    List<T> data = Lists.newArrayList();
+
+    while (rowIterator.hasNext()) {
+      Row row = rowIterator.next();
+      if (isBlankRow(row)) continue;
+      T object = type.newInstance();
+
+      int i = 0;
+      for (String columnName : header) {
+        Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+        Col col = mapper.getColumn(columnName);
+        if (col == null) {
+          if (anyColumn != null) {
+            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
             Field field = fields.iterator().next();
-            writeToField(field, object, cell, col);
+            if (!isColumnInIgnoreList(field, columnName)) {
+              writeToAnyColumnField(field, object, cell, columnName);
+            }
           }
-          i++;
+        } else {
+          Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
+          Field field = fields.iterator().next();
+          writeToField(field, object, cell, col);
         }
-        boolean keepObject = true;
-        for (RowPostProcessor<T> rowPostProcessor : rowPostProcessors) {
-          keepObject = rowPostProcessor.process(object);
-          if (!keepObject) break;
-        }
-        if (keepObject) {
-          data.add(object);
-        }
+        i++;
       }
-    } catch (InstantiationException e1) {
-      throw new RuntimeException(e1);
-    } catch (IllegalAccessException e1) {
-      throw new RuntimeException(e1);
+      if (shouldKeepObject(object, rowPostProcessors)) {
+        data.add(object);
+      }
     }
+
     return data;
   }
 
@@ -135,57 +127,55 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   }
 
   @SuppressWarnings("unchecked")
+  @SneakyThrows
   private void writeToAnyColumnField(Field field, T object, Cell cell, String columnName) {
-    try {
-      field.setAccessible(true);
-      Object value = readValueFromCell(cell);
-      if (value != null) {
-        AnyColumn annotation = field.getAnnotation(AnyColumn.class);
-        if (field.get(object) == null) {
-          Map<String, Object> map = (Map<String, Object>) annotation.as().newInstance();
-          field.set(object, map);
-        }
-        Map<String, Object> map = (Map<String, Object>) field.get(object);        
-        if (annotation.converter() != NoConverterClass.class) {
-          ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) annotation.converter()
-              .newInstance();
-          value = converter.deserialize(value);
-        }       
-        map.put(columnName, value);
+    field.setAccessible(true);
+    Object value = readValueFromCell(cell);
+    if (value != null) {
+      AnyColumn annotation = field.getAnnotation(AnyColumn.class);
+      if (field.get(object) == null) {
+        Map<String, Object> map = (Map<String, Object>) annotation.as().newInstance();
+        field.set(object, map);
       }
-    } catch (IllegalArgumentException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InstantiationException e) {
-      throw new RuntimeException(e);
-    } 
+      Map<String, Object> map = (Map<String, Object>) field.get(object);
+      if (annotation.converter() != NoConverterClass.class) {
+        ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) annotation.converter()
+            .newInstance();
+        value = converter.deserialize(value);
+      }
+      map.put(columnName, value);
+    }
   }
 
   @SuppressWarnings("unchecked")
+  @SneakyThrows
   private void writeToField(Field field, T object, Cell cell, Col column) {
-    try {   
-      Object cellValue = readValueFromCell(cell);
-      if (cellValue == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
-        cellValue = Boolean.FALSE;
-      }
-      if (cellValue != null) {
-        if (column.getConverter() != null) {
-          ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) column.getConverter()
-              .newInstance();
-          cellValue = converter.deserialize(cellValue);
-        } else {
-          cellValue = convertToFieldType(cellValue, field.getType());
-        }
-        field.setAccessible(true);
-        field.set(object, cellValue);
-      }
+    Object cellValue = readValueFromCell(cell);
+    if (cellValue == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
+      cellValue = Boolean.FALSE;
     }
-    catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (InstantiationException e) {
-      throw new RuntimeException(e);
+    if (cellValue != null) {
+      if (column.getConverter() != null) {
+        ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) column.getConverter()
+            .newInstance();
+        cellValue = converter.deserialize(cellValue);
+      } else {
+        cellValue = convertToFieldType(cellValue, field.getType());
+      }
+      field.setAccessible(true);
+      field.set(object, cellValue);
     }
+  }
+
+  private boolean shouldKeepObject(T object, List<RowPostProcessor<T>> rowPostProcessors) {
+    boolean keepObject = true;
+
+    for (RowPostProcessor<T> rowPostProcessor : rowPostProcessors) {
+      keepObject = rowPostProcessor.process(object);
+      if (!keepObject) break;
+    }
+
+    return keepObject;
   }
 
   private static Object convertToFieldType(Object cellValue, Class<?> fieldType) {
