@@ -21,7 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation use for configuring the bean class.
+ * Annotation used for configuring the bean class.
  * 
  * @author kharel (kharel@ebay.com)
  * created Aug 20, 2013

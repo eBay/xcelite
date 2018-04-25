@@ -21,7 +21,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 /**
- * An abstraction of delimiter column value converter.
+ * An abstraction of delimiter column value converter. Implemented by
+ * {@link com.ebay.xcelite.converters.CSVColumnValueConverter CSVColumnValueConverter}
  * 
  * @author kharel (kharel@ebay.com)
  * created Sep 14, 2013
@@ -36,8 +37,7 @@ public abstract class DelimiterColumnValueConverter implements ColumnValueConver
 
   @Override
   public Collection<?> deserialize(String value) {
-    String str = (String) value;
-    Iterable<String> split = Splitter.on(getDelimiter()).omitEmptyStrings().trimResults().split(str);
+    Iterable<String> split = Splitter.on(getDelimiter()).omitEmptyStrings().trimResults().split(value);
     return getCollection(split);
   }
 
