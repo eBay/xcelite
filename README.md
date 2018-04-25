@@ -1,5 +1,6 @@
 ## Xcelite
 
+* [Xcelite project site](http://www.xcelite.io/)
 * [Introduction](#introduction)
 * [Quick Start](#quick-start)
   * [Writing](#writing)
@@ -14,7 +15,7 @@
   * [Using Xcelite in Your Maven Project](#using-xcelite-in-your-maven-project)
 
 ### Introduction
-Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+[Xcelite](http://www.xcelite.io/) is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
 
 ### Quick Start
 #### Writing
