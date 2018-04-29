@@ -25,7 +25,7 @@ package com.ebay.xcelite.utils.diff.info;
  */
 public interface Info<T> {
 
-  Files files();
+  StringTuple files();
   Sheets sheets();
   Collections<T> collections();
 }

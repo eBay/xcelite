@@ -37,5 +37,4 @@ public interface XceliteSheet {
   SheetWriter<Collection<Object>> getSimpleWriter();
   SheetReader<Collection<Object>> getSimpleReader();
   Sheet getNativeSheet();
-  File getFile();
 }

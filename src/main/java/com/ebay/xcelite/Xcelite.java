@@ -43,27 +43,19 @@ import com.ebay.xcelite.sheet.XceliteSheetImpl;
 public class Xcelite {
 
   private final Workbook workbook;
-  private File file;
 
   public Xcelite() {
     workbook = new XSSFWorkbook();
   }
-  
+
+  @SneakyThrows
   public Xcelite(InputStream inputStream) {
-    try {
-      workbook = new XSSFWorkbook(inputStream);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    workbook = new XSSFWorkbook(inputStream);
   }
 
+  @SneakyThrows
   public Xcelite(File file) {
-    try {
-      this.file = file;
-      workbook = new XSSFWorkbook(new FileInputStream(file));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    workbook = new XSSFWorkbook(new FileInputStream(file));
   }
 
   /**
@@ -72,7 +64,7 @@ public class Xcelite {
    * @return XceliteSheet object
    */
   public XceliteSheet createSheet() {
-    return new XceliteSheetImpl(workbook.createSheet(), file);
+    return new XceliteSheetImpl(workbook.createSheet());
   }
 
   /**
@@ -82,7 +74,7 @@ public class Xcelite {
    * @return XceliteSheet object
    */
   public XceliteSheet createSheet(String name) {
-    return new XceliteSheetImpl(workbook.createSheet(name), file);
+    return new XceliteSheetImpl(workbook.createSheet(name));
   }
 
   /**
@@ -96,7 +88,7 @@ public class Xcelite {
     if (sheet == null) {
       throw new XceliteException(String.format("Could not find sheet at index %s", sheetIndex));
     }
-    return new XceliteSheetImpl(sheet, file);
+    return new XceliteSheetImpl(sheet);
   }
 
   /**
@@ -110,18 +102,7 @@ public class Xcelite {
     if (sheet == null) {
       throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
     }
-    return new XceliteSheetImpl(sheet, file);
-  }
-
-  /**
-   * Saves data to the same file given in construction. If no such file
-   * specified an exception is thrown.
-   */
-  public void write() {
-    if (file == null) {
-      throw new XceliteException("No file given in Xcelite object construction. Consider using method write(file)");
-    }
-    write(file);
+    return new XceliteSheetImpl(sheet);
   }
 
   /**
@@ -131,8 +112,7 @@ public class Xcelite {
    */
   @SneakyThrows
   public void write(File file) {
-    FileOutputStream out = null;
-    out = new FileOutputStream(file, false);
+    FileOutputStream out = new FileOutputStream(file, false);
     write(out);
       try {
         out.close();

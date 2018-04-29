@@ -22,21 +22,21 @@ package com.ebay.xcelite.utils.diff.info;
  * created Nov 21, 2013
  * 
  */
-public class Files {
+public class StringTuple {
 
-  private final String aFile;
-  private final String bFile;
+  private final String aString;
+  private final String bString;
 
-  public Files(String aFile, String bFile) {
-    this.aFile = aFile;
-    this.bFile = bFile;
+  public StringTuple(String a, String b) {
+    this.aString = a;
+    this.bString = b;
   }
 
-  public String aFile() {
-    return aFile;
+  public String aString() {
+    return aString;
   }
 
-  public String bFile() {
-    return bFile;
+  public String bString() {
+    return bString;
   }  
 }

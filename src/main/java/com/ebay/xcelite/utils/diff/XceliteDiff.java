@@ -19,11 +19,11 @@ import java.util.Collection;
 
 import javax.annotation.Nonnull;
 
+import com.ebay.xcelite.utils.diff.info.StringTuple;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.utils.diff.info.Collections;
-import com.ebay.xcelite.utils.diff.info.Files;
 import com.ebay.xcelite.utils.diff.info.Info;
 import com.ebay.xcelite.utils.diff.info.Sheets;
 import com.ebay.xcelite.utils.diff.report.NewLineDecorator;
@@ -44,17 +44,10 @@ public final class XceliteDiff {
   private XceliteDiff() {
   }
 
-  /**
-   * Returns the difference between two sheets. Note that T must implement
-   * hashCode() and equals() if you wish to have meaningful symmetric difference
-   * results.
-   * 
-   * @param a the first sheet
-   * @param b the second sheet
-   * @return DiffResult object which holds the diff result
-   */
-  public static <T> DiffResult<T> diff(@Nonnull SheetReader<T> a, @Nonnull SheetReader<T> b) {
-    return diff(a, b, null);
+  public static <T> DiffResult<T> diff(
+          @Nonnull SheetReader<T> a,
+          @Nonnull SheetReader<T> b) {
+    return diff(a,b);
   }
 
   /**
@@ -64,18 +57,62 @@ public final class XceliteDiff {
    * 
    * @param a the first sheet
    * @param b the second sheet
+   * @param firstWorkbookName File name of the first workbook
+   * @param secondWorkbookName File name of the second workbook
+   * @return DiffResult object which holds the diff result
+   */
+  public static <T> DiffResult<T> diff(
+          @Nonnull SheetReader<T> a,
+          @Nonnull SheetReader<T> b,
+          String firstWorkbookName,
+          String secondWorkbookName) {
+    return diff(a, b, firstWorkbookName, secondWorkbookName, null);
+  }
+
+  /**
+   * Returns the difference between two sheets. Note that T must implement
+   * hashCode() and equals() if you wish to have meaningful symmetric difference
+   * results.
+   *
+   * @param a the first sheet
+   * @param b the second sheet
    * @param reportGenerator a custom reporter implementation
    * @return DiffResult object which holds the diff result
    */
   @SuppressWarnings("unchecked")
-  public static <T> DiffResult<T> diff(@Nonnull SheetReader<T> a, @Nonnull SheetReader<T> b,
-      ReportGenerator reportGenerator) {
+  public static <T> DiffResult<T> diff(
+          @Nonnull SheetReader<T> a,
+          @Nonnull SheetReader<T> b,
+          ReportGenerator reportGenerator) {
+    return diff(a, b, "first workbook", "second workbook", reportGenerator);
+  }
+
+  /**
+   * Returns the difference between two sheets. Note that T must implement
+   * hashCode() and equals() if you wish to have meaningful symmetric difference
+   * results.
+   * 
+   * @param a the first sheet
+   * @param b the second sheet
+   * @param firstWorkbookName File name of the first workbook
+   * @param secondWorkbookName File name of the second workbook
+   * @param reportGenerator a custom reporter implementation
+   * @return DiffResult object which holds the diff result
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> DiffResult<T> diff(
+          @Nonnull SheetReader<T> a,
+          @Nonnull SheetReader<T> b,
+          String firstWorkbookName,
+          String secondWorkbookName,
+          ReportGenerator reportGenerator) {
     Collection<T> ca = a.read();
     Collection<T> cb = b.read();
     Collection<T> disjunction = CollectionUtils.disjunction(ca, cb);
-    Info<T> info = new ReportInfo<T>(new Files(a.getSheet().getFile().getAbsolutePath(), b.getSheet().getFile()
-        .getAbsolutePath()), new Sheets(a.getSheet().getNativeSheet().getSheetName(), b.getSheet().getNativeSheet()
-        .getSheetName()), new Collections<T>(ca, cb, disjunction));
+    Info<T> info = new ReportInfo<T>(
+            new StringTuple(firstWorkbookName, secondWorkbookName),
+            new Sheets(a.getSheet().getNativeSheet().getSheetName(), b.getSheet().getNativeSheet().getSheetName()),
+            new Collections<T>(ca, cb, disjunction));
     ReportGenerator reporter;
     if (reportGenerator != null) {
       reporter = reportGenerator;
@@ -117,14 +154,14 @@ public final class XceliteDiff {
     @Override
     public <T> String generateReport(Info<T> info) {
       StringBuilder sb = new StringBuilder();
-      sb.append("File " + info.files().aFile() + ", ");
+      sb.append("File " + info.files().aString() + ", ");
       sb.append("Sheet: " + info.sheets().aSheetname() + ", ");
       sb.append(String.format("items (%s):" + NEW_LINE, info.collections().a().size()));
       sb.append(NEW_LINE);
       sb.append(new NewLineDecorator<T>(info.collections().a()));
       sb.append(NEW_LINE);
 
-      sb.append("File " + info.files().bFile() + ", ");
+      sb.append("File " + info.files().bString() + ", ");
       sb.append("Sheet: " + info.sheets().bSheetname() + ", ");
       sb.append(String.format("items (%s):" + NEW_LINE, info.collections().b().size()));
       sb.append(NEW_LINE);
