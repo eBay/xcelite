@@ -43,6 +43,7 @@ import com.ebay.xcelite.sheet.XceliteSheetImpl;
 public class Xcelite {
 
   private final Workbook workbook;
+  private File file;
 
   public Xcelite() {
     workbook = new XSSFWorkbook();
@@ -55,6 +56,7 @@ public class Xcelite {
 
   @SneakyThrows
   public Xcelite(File file) {
+    this.file = file;
     workbook = new XSSFWorkbook(new FileInputStream(file));
   }
 
@@ -103,6 +105,15 @@ public class Xcelite {
       throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
     }
     return new XceliteSheetImpl(sheet);
+  }
+
+  /**
+   * Saves data to the input file.
+   */
+  @SneakyThrows
+  @Deprecated
+  public void write() {
+    write(file);
   }
 
   /**
