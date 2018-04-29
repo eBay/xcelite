@@ -39,6 +39,7 @@ import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.column.ColumnsMapper;
 import com.ebay.xcelite.converters.ColumnValueConverter;
+import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
@@ -53,6 +54,7 @@ import com.google.common.collect.Sets;
  */
 public class BeanSheetReader<T> extends SheetReaderAbs<T> {
 
+  private final LinkedHashSet<Col> columns;
   private final Col anyColumn;
   private final ColumnsMapper mapper;  
   private final Class<T> type;
@@ -64,7 +66,7 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     this.type = type;
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
-    LinkedHashSet<Col> columns = extractor.getColumns();
+    columns = extractor.getColumns();
     anyColumn = extractor.getAnyColumn();    
     mapper = new ColumnsMapper(columns);
   }
@@ -74,29 +76,31 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   @SneakyThrows
   public Collection<T> read() {
     buildHeader();
+    if(anyColumn == null) {
+      validateColumns();
+    }
     List<T> data = Lists.newArrayList();
-
-    while (rowIterator.hasNext()) {
-      Row row = rowIterator.next();
-      if (isBlankRow(row)) continue;
-      T object = type.newInstance();
-
-      int i = 0;
-      for (String columnName : header) {
-        Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-        Col col = mapper.getColumn(columnName);
-        if (col == null) {
-          if (anyColumn != null) {
-            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
+      while (rowIterator.hasNext()) {
+        Row row = rowIterator.next();
+        if (isBlankRow(row)) continue;
+        T object = type.newInstance();
+        
+        int i = 0;
+        for (String columnName : header) {
+          Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+          Col col = mapper.getColumn(columnName);
+          if (col == null) {            
+            if (anyColumn != null) {
+              Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
+              Field field = fields.iterator().next();
+              if (!isColumnInIgnoreList(field, columnName)) {
+                writeToAnyColumnField(field, object, cell, columnName);
+              }
+            }           
+          } else {
+            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
             Field field = fields.iterator().next();
-            if (!isColumnInIgnoreList(field, columnName)) {
-              writeToAnyColumnField(field, object, cell, columnName);
-            }
-          }
-        } else {
-          Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
-          Field field = fields.iterator().next();
-          writeToField(field, object, cell, col);
+            writeToField(field, object, cell, col);
         }
         i++;
       }
@@ -106,6 +110,25 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     }
 
     return data;
+  }
+  
+  /**
+   * check that @column is found in header
+   */
+  private void validateColumns() {
+    boolean found = false;
+    for (Col c : columns) {
+      for(String h : header) {
+        if(c.getName().equals(h)) {
+          found = true;
+          break;
+        }
+      }
+      if(!found) {
+        throw new ColumnNotFoundException("Column not found!", c.getName());
+      }
+      found = false;
+    }
   }
 
   private boolean isBlankRow(Row row) {
