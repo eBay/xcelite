@@ -17,6 +17,8 @@
 package com.ebay.xcelite.model;
 
 import com.ebay.xcelite.annotations.AnyColumn;
+import lombok.Data;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,17 +26,10 @@ import java.util.Map;
  *
  * @author Thanthathon.b
  */
+@Data
 public class AnyColumnBean {
 
     @AnyColumn
     private Map<String,List<String>> columns;
-
-    public Map<String, List<String>> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(Map<String, List<String>> columns) {
-        this.columns = columns;
-    }
     
 }

@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
  * created Nov 8, 2013
  * 
  */
-public class SimpleSheetReader extends SheetReaderAbs<Collection<Object>> {
+public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
   public SimpleSheetReader(XceliteSheet sheet) {
     super(sheet, false);
@@ -45,9 +45,13 @@ public class SimpleSheetReader extends SheetReaderAbs<Collection<Object>> {
     boolean firstRow = true;
     while (rowIterator.hasNext()) {      
       Row excelRow = rowIterator.next();
-      if (firstRow && skipHeader) {
+      if (firstRow && options.getSkipLinesBeforeHeader() > 0) {
+        int rowsToSkip = options.getSkipLinesBeforeHeader();
+        while ((rowsToSkip > 0) && (rowIterator.hasNext())) {
+          rowIterator.next();
+          rowsToSkip--;
+        }
         firstRow = false;
-        continue;
       }
       List<Object> row = Lists.newArrayList();
       Iterator<Cell> cellIterator = excelRow.cellIterator();
@@ -71,4 +75,6 @@ public class SimpleSheetReader extends SheetReaderAbs<Collection<Object>> {
     }
     return rows;
   }
+
+
 }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -51,6 +52,11 @@ public class Xcelite {
 
   @SneakyThrows
   public Xcelite(InputStream inputStream) {
+    workbook = new XSSFWorkbook(inputStream);
+  }
+
+  @SneakyThrows
+  public Xcelite(InputStream inputStream, XceliteOptions options) {
     workbook = new XSSFWorkbook(inputStream);
   }
 

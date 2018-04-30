@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -52,7 +53,7 @@ import com.google.common.collect.Sets;
  * created Sep 9, 2013
  * 
  */
-public class BeanSheetReader<T> extends SheetReaderAbs<T> {
+public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
   private final LinkedHashSet<Col> columns;
   private final Col anyColumn;
@@ -61,13 +62,23 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   private ArrayList<String> header;
   private Iterator<Row> rowIterator;
 
+  public BeanSheetReader(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
+    super(sheet, options);
+    this.type = type;
+    ColumnsExtractor extractor = new ColumnsExtractor(type);
+    extractor.extract();
+    columns = extractor.getColumns();
+    anyColumn = extractor.getAnyColumn();
+    mapper = new ColumnsMapper(columns);
+  }
+
   public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
     super(sheet, false);
     this.type = type;
     ColumnsExtractor extractor = new ColumnsExtractor(type);
     extractor.extract();
     columns = extractor.getColumns();
-    anyColumn = extractor.getAnyColumn();    
+    anyColumn = extractor.getAnyColumn();
     mapper = new ColumnsMapper(columns);
   }
 
@@ -76,31 +87,31 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
   @SneakyThrows
   public Collection<T> read() {
     buildHeader();
-    if(anyColumn == null) {
-      validateColumns();
-    }
+    validateColumns();
+
     List<T> data = Lists.newArrayList();
-      while (rowIterator.hasNext()) {
-        Row row = rowIterator.next();
-        if (isBlankRow(row)) continue;
-        T object = type.newInstance();
-        
-        int i = 0;
-        for (String columnName : header) {
-          Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-          Col col = mapper.getColumn(columnName);
-          if (col == null) {            
-            if (anyColumn != null) {
-              Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
-              Field field = fields.iterator().next();
-              if (!isColumnInIgnoreList(field, columnName)) {
-                writeToAnyColumnField(field, object, cell, columnName);
-              }
-            }           
-          } else {
-            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
+    while (rowIterator.hasNext()) {
+      Row row = rowIterator.next();
+      if (isBlankRow(row))
+        continue;
+      T object = type.newInstance();
+
+      int i = 0;
+      for (String columnName : header) {
+        Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        Col col = mapper.getColumn(columnName);
+        if (col == null) {
+          if (anyColumn != null) {
+            Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
             Field field = fields.iterator().next();
-            writeToField(field, object, cell, col);
+            if (!isColumnInIgnoreList(field, columnName)) {
+              writeToAnyColumnField(field, object, cell, columnName);
+            }
+          }
+        } else {
+          Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
+          Field field = fields.iterator().next();
+          writeToField(field, object, cell, col);
         }
         i++;
       }
@@ -116,6 +127,9 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
    * check that @column is found in header
    */
   private void validateColumns() {
+    if(anyColumn != null) {
+      return;
+    }
     boolean found = false;
     for (Col c : columns) {
       for(String h : header) {
@@ -131,17 +145,6 @@ public class BeanSheetReader<T> extends SheetReaderAbs<T> {
     }
   }
 
-  private boolean isBlankRow(Row row) {
-    Iterator<Cell> cellIterator = row.cellIterator();
-    boolean blankRow = true;
-    while (cellIterator.hasNext()) {  
-      Object value = readValueFromCell(cellIterator.next());
-      if (blankRow && value != null && !String.valueOf(value).isEmpty()) {
-        blankRow = false;
-      }
-    }
-    return blankRow;
-  }
 
   private static boolean isColumnInIgnoreList(Field anyColumnField, String columnName) {
     AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);

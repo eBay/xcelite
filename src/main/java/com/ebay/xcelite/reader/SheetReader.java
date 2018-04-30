@@ -33,6 +33,7 @@ public interface SheetReader<T> {
    * 
    * @param skipHeaderRow true to skip the header row, false otherwise
    */
+  @Deprecated
   void skipHeaderRow(boolean skipHeaderRow);
 
   /**
