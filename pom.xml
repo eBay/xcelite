@@ -1,12 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ebay</groupId>
+
+	<groupId>io.xcelite</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<packaging>jar</packaging>
+
 	<name>xcelite</name>
 	<description>Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets</description>
-	<url>https://github.com/eBay/xcelite</url>
+	<url>http://xcelite.io</url>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -23,20 +25,20 @@
 
     <scm>
         <tag>master</tag>
-        <connection>scm:git:git@github.com:eBay/xcelite.git</connection>
-        <developerConnection>scm:git:git@github.com:eBay/xcelite.git</developerConnection>
-        <url>git@github.com:eBay/xcelite.git</url>
+        <connection>scm:git:git@github.com:xcelite-io/xcelite.git</connection>
+        <developerConnection>scm:git:git@github.com:xcelite-io/xcelite.git</developerConnection>
+        <url>git@github.com:xcelite-io/xcelite.git</url>
     </scm>
 
     <issueManagement>
         <system>Github issues</system>
-        <url>https://github.com/eBay/xcelite/issues</url>
+        <url>https://github.com/xcelite-io/xcelite/issues</url>
     </issueManagement>
 
     <developers>
         <developer>
-            <name>Kfir Harel</name>
-            <email>kharel@ebay.com</email>
+            <name>Johannes Jander</name>
+            <email>xcelite.io@gmail.com</email>
         </developer>
     </developers>
 
