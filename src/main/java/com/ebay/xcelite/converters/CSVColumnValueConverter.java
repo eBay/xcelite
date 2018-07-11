@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
  * override {@link #getCollection(Iterable)} method.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 14, 2013
+ * created Sep 14, 2013
  */
 public class CSVColumnValueConverter extends DelimiterColumnValueConverter {
 

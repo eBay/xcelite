@@ -21,7 +21,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -34,7 +37,7 @@ import com.ebay.xcelite.sheet.XceliteSheetImpl;
  * Class description...
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 9, 2013
+ * created Nov 9, 2013
  * 
  */
 public class Xcelite {
@@ -46,15 +49,15 @@ public class Xcelite {
     workbook = new XSSFWorkbook();
   }
 
+  @SneakyThrows
+  public Xcelite(InputStream inputStream) {
+    workbook = new XSSFWorkbook(inputStream);
+  }
+
+  @SneakyThrows
   public Xcelite(File file) {
-    try {
-      this.file = file;
-      workbook = new XSSFWorkbook(new FileInputStream(file));
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    this.file = file;
+    workbook = new XSSFWorkbook(new FileInputStream(file));
   }
 
   /**
@@ -63,7 +66,7 @@ public class Xcelite {
    * @return XceliteSheet object
    */
   public XceliteSheet createSheet() {
-    return new XceliteSheetImpl(workbook.createSheet(), file);
+    return new XceliteSheetImpl(workbook.createSheet());
   }
 
   /**
@@ -73,7 +76,7 @@ public class Xcelite {
    * @return XceliteSheet object
    */
   public XceliteSheet createSheet(String name) {
-    return new XceliteSheetImpl(workbook.createSheet(name), file);
+    return new XceliteSheetImpl(workbook.createSheet(name));
   }
 
   /**
@@ -87,13 +90,13 @@ public class Xcelite {
     if (sheet == null) {
       throw new XceliteException(String.format("Could not find sheet at index %s", sheetIndex));
     }
-    return new XceliteSheetImpl(sheet, file);
+    return new XceliteSheetImpl(sheet);
   }
 
   /**
-   * Gets the sheet with the specified index.
+   * Gets the sheet with the specified name.
    * 
-   * @param sheetIndex the sheet name
+   * @param sheetName the sheet name
    * @return XceliteSheet object
    */
   public XceliteSheet getSheet(String sheetName) {
@@ -101,42 +104,42 @@ public class Xcelite {
     if (sheet == null) {
       throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
     }
-    return new XceliteSheetImpl(sheet, file);
+    return new XceliteSheetImpl(sheet);
   }
 
   /**
-   * Saves data to the same file given in construction. If no such file
-   * specified an exception is thrown.
+   * Saves data to the input file.
    */
+  @SneakyThrows
+  @Deprecated
   public void write() {
-    if (file == null) {
-      throw new XceliteException("No file given in Xcelite object construction. Consider using method write(file)");
-    }
     write(file);
   }
 
   /**
    * Saves data to a new file.
-   * 
+   *
    * @param file the file to save the data into
    */
+  @SneakyThrows
   public void write(File file) {
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(file, false);
+    FileOutputStream out = new FileOutputStream(file, false);
+    write(out);
+      try {
+        out.close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+  }
+  
+  /**
+   * Saves data to a new outputStream.
+   * 
+   * @param out the outputstream to save the data into
+   */
+  @SneakyThrows
+  public void write(OutputStream out) {
       workbook.write(out);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (out != null)
-        try {
-          out.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
-        }
-    }
   }
   
   /**
@@ -144,19 +147,14 @@ public class Xcelite {
    * 
    * @return byte array which represents the excel file
    */
+  @SneakyThrows
   public byte[] getBytes() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    write(baos);
     try {
-      workbook.write(baos);
+      baos.close();
     } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (baos != null)
-        try {
-          baos.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
-        }
+      throw new RuntimeException(e);
     }
     return baos.toByteArray();
   }

@@ -1,5 +1,6 @@
 ## Xcelite
 
+* [Xcelite project site](http://www.xcelite.io/)
 * [Introduction](#introduction)
 * [Quick Start](#quick-start)
   * [Writing](#writing)
@@ -14,7 +15,7 @@
   * [Using Xcelite in Your Maven Project](#using-xcelite-in-your-maven-project)
 
 ### Introduction
-Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+[Xcelite](http://www.xcelite.io/) is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
 
 ### Quick Start
 #### Writing
@@ -62,7 +63,7 @@ public class User {
 @Column annoatation indicates a property that you want it to be serialized to excel.  
 By default, if no "name" attribute is provided the excel column name will be taken from the property name.
 
-Now same way as before but this time using bean writer instead of simple:
+Now we'll write the same data as before but this time using bean writer instead of simple:
 ```java
 Xcelite xcelite = new Xcelite();    
 XceliteSheet sheet = xcelite.createSheet("users");
@@ -74,7 +75,7 @@ xcelite.write(new File("users_doc.xlsx"));
 ```
 This will create a sheet with 4 columns plus header row: Firstname, Lastname, id and birthDate.  
 Naturally, the excel column types will be Text for FirstName and LastName, Number for id and Date for birthDate.  
-If you'de prefer that "id" column will be written as Text instead of Number, use  
+If you prefer that "id" column should be written as Text instead of Number, use  
 
 ```java 
 @Column(ignoreType=true)
@@ -130,7 +131,7 @@ private List<String> mailAddresses;
 ```
 The CSVColumnValueConverter takes a collection of objects and serializes it to a comma seperated String.  
 Alternately when deserializing, the converter takes a comma seperated String and deserializes it to a collection of Objects.  
-So writing a collection of users will result with a cloumn named "Emails" and the column data will look someting like that:  
+So writing a collection of users will result with a column named "Emails" and the column data will look someting like that:  
 john@mail.com,danny@mail.com,jerry@mail.com  
 
 When reading the sheet to a collection of Users, the column "Emails" will be deserialized to an ArrayList.
@@ -172,7 +173,7 @@ private Map<String, List<String>> dynamicCols;
 
 What about reading from Excel sheet using dynamic columns?  
 
-Well, luckily it works both ways. If your bean contains @AnyColumn property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
+Well, luckily it works both ways. If your bean contains an @AnyColumn property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
 By default, Xcelite will use HashMap implementation for the Map when deserializing. If you'de prefer a different implementation use the 'as' attribute.  
 For instance, if you want your map to be sorted by column names using a TreeMap, just do:
 ```java

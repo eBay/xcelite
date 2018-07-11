@@ -20,12 +20,13 @@ import java.util.Date;
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.ebay.xcelite.sheet.XceliteSheet;
+import org.apache.poi.ss.usermodel.CellType;
 
 /**
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 10, 2013
+ * created Nov 10, 2013
  * 
  */
 public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
@@ -50,10 +51,10 @@ public abstract class SheetWriterAbs<T> implements SheetWriter<T> {
     } else if (type == Double.class || type == double.class || type == Integer.class || type == int.class
         || type == Long.class || type == long.class || type == Float.class || type == float.class
         || type == Short.class || type == short.class) {
-      cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+      cell.setCellType(CellType.NUMERIC);
       cell.setCellValue(Double.valueOf(fieldValueObj.toString()));
     } else {
-      cell.setCellType(Cell.CELL_TYPE_STRING);
+      cell.setCellType(CellType.STRING);
       cell.setCellValue(fieldValueObj.toString());
     }
   }

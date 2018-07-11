@@ -27,7 +27,7 @@ import com.ebay.xcelite.styles.CellStylesBank;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 10, 2013
+ * created Nov 10, 2013
  * 
  */
 public class SimpleSheetWriter extends SheetWriterAbs<Collection<Object>> {

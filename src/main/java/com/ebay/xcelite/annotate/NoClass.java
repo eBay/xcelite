@@ -19,7 +19,7 @@ package com.ebay.xcelite.annotate;
  * Marker class.
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 29, 2013
+ * created Aug 29, 2013
  * 
  */
 public final class NoClass {
