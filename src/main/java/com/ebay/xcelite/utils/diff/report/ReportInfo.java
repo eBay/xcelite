@@ -16,41 +16,40 @@
 package com.ebay.xcelite.utils.diff.report;
 
 import com.ebay.xcelite.utils.diff.info.Collections;
-import com.ebay.xcelite.utils.diff.info.StringTuple;
 import com.ebay.xcelite.utils.diff.info.Info;
 import com.ebay.xcelite.utils.diff.info.Sheets;
+import com.ebay.xcelite.utils.diff.info.StringTuple;
 
 /**
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 21, 2013
- * 
  */
 public class ReportInfo<T> implements Info<T> {
 
-  private final StringTuple stringTuple;
-  private final Sheets sheets;
-  private final Collections<T> collections;   
-  
-  public ReportInfo(StringTuple stringTuple, Sheets sheets, Collections<T> collections) {
-    this.stringTuple = stringTuple;
-    this.sheets = sheets;
-    this.collections = collections;
-  }
+    private final StringTuple stringTuple;
+    private final Sheets sheets;
+    private final Collections<T> collections;
 
-  @Override
-  public StringTuple files() {
-    return stringTuple;
-  } 
+    public ReportInfo(StringTuple stringTuple, Sheets sheets, Collections<T> collections) {
+        this.stringTuple = stringTuple;
+        this.sheets = sheets;
+        this.collections = collections;
+    }
 
-  @Override
-  public Sheets sheets() {
-    return sheets;
-  }
+    @Override
+    public StringTuple files() {
+        return stringTuple;
+    }
 
-  @Override
-  public Collections<T> collections() {
-    return collections;
-  }
+    @Override
+    public Sheets sheets() {
+        return sheets;
+    }
+
+    @Override
+    public Collections<T> collections() {
+        return collections;
+    }
 }

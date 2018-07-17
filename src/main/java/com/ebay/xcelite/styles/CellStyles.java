@@ -21,53 +21,53 @@ import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public final class CellStyles {
-  
-  private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
-  
-  private final Workbook wb;
-  private CellStyle boldStyle;
-  private CellStyle dateStyle;
 
-  public CellStyles(Workbook wb) {
-    this.wb = wb;
-    initStyles();
-  }
+    private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
 
-  private void initStyles() {
-    createBoldStyle();
-    createDateFormatStyle();
-  }
+    private final Workbook wb;
+    private CellStyle boldStyle;
+    private CellStyle dateStyle;
 
-  private void createBoldStyle() {
-    boldStyle = wb.createCellStyle();
-    Font font = wb.createFont();
-    //font.setBoldweight(Font.BOLDWEIGHT_BOLD);
-font.setBold(true);
-    boldStyle.setFont(font);    
-  }
-  
-  private void createDateFormatStyle() {
-    dateStyle = wb.createCellStyle();
-    DataFormat df = wb.createDataFormat();
-    dateStyle.setDataFormat(df.getFormat(DEFAULT_DATE_FORMAT));
-  }
-  
-  public CellStyle getBoldStyle() {
-    return boldStyle;
-  }
+    public CellStyles(Workbook wb) {
+        this.wb = wb;
+        initStyles();
+    }
 
-  public CellStyle getDateStyle() {
-    return dateStyle;
-  }
-  
-  public CellStyle getCustomDataFormatStyle(String dataFormat) {
-    CellStyle cellStyle = wb.createCellStyle();
-    DataFormat df = wb.createDataFormat();
-    cellStyle.setDataFormat(df.getFormat(dataFormat));
-    return cellStyle;
-  }
+    private void initStyles() {
+        createBoldStyle();
+        createDateFormatStyle();
+    }
 
-  public Workbook getWorkbook() {
-    return wb;
-  }
+    private void createBoldStyle() {
+        boldStyle = wb.createCellStyle();
+        Font font = wb.createFont();
+        //font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        font.setBold(true);
+        boldStyle.setFont(font);
+    }
+
+    private void createDateFormatStyle() {
+        dateStyle = wb.createCellStyle();
+        DataFormat df = wb.createDataFormat();
+        dateStyle.setDataFormat(df.getFormat(DEFAULT_DATE_FORMAT));
+    }
+
+    public CellStyle getBoldStyle() {
+        return boldStyle;
+    }
+
+    public CellStyle getDateStyle() {
+        return dateStyle;
+    }
+
+    public CellStyle getCustomDataFormatStyle(String dataFormat) {
+        CellStyle cellStyle = wb.createCellStyle();
+        DataFormat df = wb.createDataFormat();
+        cellStyle.setDataFormat(df.getFormat(dataFormat));
+        return cellStyle;
+    }
+
+    public Workbook getWorkbook() {
+        return wb;
+    }
 }

@@ -15,44 +15,43 @@
 */
 package com.ebay.xcelite.converters;
 
-import java.util.Collection;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+
+import java.util.Collection;
 
 /**
  * An abstraction of delimiter column value converter. Implemented by
  * {@link com.ebay.xcelite.converters.CSVColumnValueConverter CSVColumnValueConverter}
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Sep 14, 2013
- * 
  */
 public abstract class DelimiterColumnValueConverter implements ColumnValueConverter<String, Collection<?>> {
 
-  @Override
-  public String serialize(Collection<?> value) {
-    return Joiner.on(getDelimiter()).skipNulls().join(value);
-  }
+    @Override
+    public String serialize(Collection<?> value) {
+        return Joiner.on(getDelimiter()).skipNulls().join(value);
+    }
 
-  @Override
-  public Collection<?> deserialize(String value) {
-    Iterable<String> split = Splitter.on(getDelimiter()).omitEmptyStrings().trimResults().split(value);
-    return getCollection(split);
-  }
+    @Override
+    public Collection<?> deserialize(String value) {
+        Iterable<String> split = Splitter.on(getDelimiter()).omitEmptyStrings().trimResults().split(value);
+        return getCollection(split);
+    }
 
-  /**
-   * Gets the string separator.
-   * 
-   * @return the delimiter string
-   */
-  protected abstract String getDelimiter();
-  
-  /**
-   * Gets the collection that will be used to store the deserialized delimited string.
-   * 
-   * @param iterable an iteration over the segments split
-   * @return a collection generated from the splitted string iterable
-   */
-  protected abstract Collection<?> getCollection(Iterable<?> iterable);
+    /**
+     * Gets the string separator.
+     *
+     * @return the delimiter string
+     */
+    protected abstract String getDelimiter();
+
+    /**
+     * Gets the collection that will be used to store the deserialized delimited string.
+     *
+     * @param iterable an iteration over the segments split
+     * @return a collection generated from the splitted string iterable
+     */
+    protected abstract Collection<?> getCollection(Iterable<?> iterable);
 }

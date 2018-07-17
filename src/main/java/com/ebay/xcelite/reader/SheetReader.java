@@ -15,45 +15,45 @@
  */
 package com.ebay.xcelite.reader;
 
-import java.util.Collection;
-
 import com.ebay.xcelite.sheet.XceliteSheet;
+
+import java.util.Collection;
 
 public interface SheetReader<T> {
 
-  /**
-   * Reads the sheet and returns a collection of the specified type.
-   * 
-   * @return collection of the specified type
-   */
-  Collection<T> read();
+    /**
+     * Reads the sheet and returns a collection of the specified type.
+     *
+     * @return collection of the specified type
+     */
+    Collection<T> read();
 
-  /**
-   * Whether to skip the first row or not when reading the sheet.
-   * 
-   * @param skipHeaderRow true to skip the header row, false otherwise
-   */
-  void skipHeaderRow(boolean skipHeaderRow);
+    /**
+     * Whether to skip the first row or not when reading the sheet.
+     *
+     * @param skipHeaderRow true to skip the header row, false otherwise
+     */
+    void skipHeaderRow(boolean skipHeaderRow);
 
-  /**
-   * Gets the sheet.
-   * 
-   * @return the sheet
-   */
-  XceliteSheet getSheet();
+    /**
+     * Gets the sheet.
+     *
+     * @return the sheet
+     */
+    XceliteSheet getSheet();
 
-  /**
-   * Adds a row post processor. The row post processors will be executed in
-   * insertion order.
-   * 
-   * @param rowPostProcessor the post row processor to add
-   */
-  void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor);
-  
-  /**
-   * Removes a row post processor.
-   * 
-   * @param rowPostProcessor the post row processor to remove
-   */
-  void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor);
+    /**
+     * Adds a row post processor. The row post processors will be executed in
+     * insertion order.
+     *
+     * @param rowPostProcessor the post row processor to add
+     */
+    void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor);
+
+    /**
+     * Removes a row post processor.
+     *
+     * @param rowPostProcessor the post row processor to remove
+     */
+    void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor);
 }

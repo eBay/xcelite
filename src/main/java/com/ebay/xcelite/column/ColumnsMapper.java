@@ -15,30 +15,29 @@
 */
 package com.ebay.xcelite.column;
 
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Maps;
-
 /**
  * Class description...
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 5, 2013
- * 
  */
 public class ColumnsMapper {
 
-  private final Map<String, Col> columnsMap;
+    private final Map<String, Col> columnsMap;
 
-  public ColumnsMapper(Set<Col> columns) {
-    columnsMap = Maps.newHashMap();
-    for (Col col : columns) {
-      columnsMap.put(col.getName(), col);
+    public ColumnsMapper(Set<Col> columns) {
+        columnsMap = Maps.newHashMap();
+        for (Col col: columns) {
+            columnsMap.put(col.getName(), col);
+        }
     }
-  } 
-  
-  public Col getColumn(String name) {
-    return columnsMap.get(name);
-  }
+
+    public Col getColumn(String name) {
+        return columnsMap.get(name);
+    }
 }

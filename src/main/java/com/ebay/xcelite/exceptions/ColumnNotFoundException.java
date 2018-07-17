@@ -17,7 +17,6 @@
 package com.ebay.xcelite.exceptions;
 
 /**
- *
  * @author Thanthathon.b
  */
 public class ColumnNotFoundException extends RuntimeException {

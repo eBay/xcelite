@@ -17,26 +17,25 @@ package com.ebay.xcelite.converters;
 
 /**
  * Abstraction of generic column value converter.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Sep 12, 2013
- * 
  */
 public interface ColumnValueConverter<T, V> {
 
-  /**
-   * Serializes given value to a different type.
-   * 
-   * @param value the value to serialize
-   * @return the serialized value
-   */
-  T serialize(V value);
-  
-  /**
-   * Deserializes given value to a different type.
-   * 
-   * @param value the value to deserialize
-   * @return the deserialized value
-   */
-  V deserialize(T value);
+    /**
+     * Serializes given value to a different type.
+     *
+     * @param value the value to serialize
+     * @return the serialized value
+     */
+    T serialize(V value);
+
+    /**
+     * Deserializes given value to a different type.
+     *
+     * @param value the value to deserialize
+     * @return the deserialized value
+     */
+    V deserialize(T value);
 }
