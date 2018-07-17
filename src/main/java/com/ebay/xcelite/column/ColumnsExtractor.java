@@ -22,12 +22,14 @@ import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.withAnnotation;
 
 
 public class ColumnsExtractor {
@@ -54,10 +56,10 @@ public class ColumnsExtractor {
 
     @SuppressWarnings("unchecked")
     public void extract() {
-        Set<Field> columnFields = ReflectionUtils.getAllFields(type, withAnnotation(Column.class));
+        Set<Field> columnFields = getAllFields(type, withAnnotation(Column.class));
         for (Field columnField: columnFields) {
             Column annotation = columnField.getAnnotation(Column.class);
-            Col col = null;
+            Col col;
             if (annotation.name().isEmpty()) {
                 col = new Col(columnField.getName(), columnField.getName());
             } else {
@@ -87,7 +89,7 @@ public class ColumnsExtractor {
 
     @SuppressWarnings("unchecked")
     private void extractAnyColumn() {
-        Set<Field> anyColumnFields = ReflectionUtils.getAllFields(type, withAnnotation(AnyColumn.class));
+        Set<Field> anyColumnFields = getAllFields(type, withAnnotation(AnyColumn.class));
         if (anyColumnFields.size() > 0) {
             if (anyColumnFields.size() > 1) {
                 throw new XceliteException("Multiple AnyColumn fields are not allowed");
@@ -125,7 +127,7 @@ public class ColumnsExtractor {
         }
 
         if (colsOrdering.size() != columns.size()) {
-            throw new RuntimeException(String.format("Not all columns are specified in Row columns ordering"));
+            throw new RuntimeException("Not all columns are specified in Row columns ordering");
         }
         columns = colsOrdering;
     }
