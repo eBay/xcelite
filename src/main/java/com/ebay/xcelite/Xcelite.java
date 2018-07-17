@@ -24,6 +24,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class description...
@@ -96,6 +98,27 @@ public class Xcelite {
             throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
         }
         return new XceliteSheetImpl(sheet);
+    }
+
+    /**
+     * Gets all sheets.
+     *
+     * @return the list of sheets (a list of {@link XceliteSheet} objects.)
+     */
+    public List<XceliteSheet> getSheets() {
+        final int numberOfSheets = workbook.getNumberOfSheets();
+
+        if (numberOfSheets == 0) {
+            throw new XceliteException("Could not find any sheet");
+        }
+
+        List<XceliteSheet> xceliteSheets = new ArrayList<>();
+
+        for (int i = 0; i < numberOfSheets; i++) {
+            xceliteSheets.add(new XceliteSheetImpl(workbook.getSheetAt(i)));
+        }
+
+        return xceliteSheets;
     }
 
     /**
