@@ -46,6 +46,15 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
             case ERROR:
                 break;
             case FORMULA:
+                // Get the type of Formula
+                switch (cell.getCachedFormulaResultTypeEnum()) {
+                    case STRING:
+                        cellValue = cell.getStringCellValue();
+                        break;
+                    case NUMERIC:
+                        cellValue = cell.getNumericCellValue();
+                        break;
+                }
                 break;
             case BOOLEAN:
                 cellValue = cell.getBooleanCellValue();
