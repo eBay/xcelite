@@ -31,31 +31,20 @@ import com.ebay.xcelite.writer.SimpleSheetWriter;
  * Class description...
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 9, 2013
+ * created Nov 9, 2013
  * 
  */
 public class XceliteSheetImpl implements XceliteSheet {
 
   private final Sheet sheet;
-  private final File file;
 
   public XceliteSheetImpl(Sheet sheet) {
-    this(sheet, null);
-  }
-  
-  public XceliteSheetImpl(Sheet sheet, File file) {
     this.sheet = sheet;
-    this.file = file;
   }
-  
+
   @Override
   public Sheet getNativeSheet() {
     return sheet;
-  }
-
-  @Override
-  public File getFile() {
-    return file;
   }
 
   @Override

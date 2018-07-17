@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
  * Class description...
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 5, 2013
+ * created Nov 5, 2013
  * 
  */
 public class ColumnsMapper {

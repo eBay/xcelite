@@ -21,7 +21,7 @@ import com.ebay.xcelite.converters.ColumnValueConverter;
  * Marker class.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 12, 2013
+ * created Sep 12, 2013
  * 
  */
 public final class NoConverterClass implements ColumnValueConverter<Object, Object> {

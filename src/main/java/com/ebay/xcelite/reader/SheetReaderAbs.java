@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 11, 2013
+ * created Nov 11, 2013
  * 
  */
 public abstract class SheetReaderAbs<T> implements SheetReader<T> {
@@ -44,15 +44,19 @@ public abstract class SheetReaderAbs<T> implements SheetReader<T> {
   protected Object readValueFromCell(Cell cell) {
     if (cell == null) return null;
     Object cellValue = null;
-    switch (cell.getCellType()) {
-      case Cell.CELL_TYPE_BOOLEAN:
+    switch (cell.getCellTypeEnum()) {
+      case ERROR:
+        break;
+      case FORMULA:
+          break;
+      case BOOLEAN:
         cellValue = cell.getBooleanCellValue();
         break;
-      case Cell.CELL_TYPE_NUMERIC:
+      case NUMERIC:
         cellValue = cell.getNumericCellValue();
         break;
       default:
-        cellValue = cell.getStringCellValue();
+          cellValue = cell.getStringCellValue();
     }
     return cellValue;
   }

@@ -33,7 +33,7 @@ Copyright 2009 The Apache Software Foundation
 
       "Source" form shall mean the preferred form for making modifications,
       including but not limited to software source code, documentation
-      source, and configuration files.
+      source, and configuration stringTuple.
 
       "Object" form shall mean any form resulting from mechanical
       transformation or translation of a Source form, including but
@@ -102,8 +102,8 @@ Copyright 2009 The Apache Software Foundation
       (a) You must give any other recipients of the Work or
           Derivative Works a copy of this License; and
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+      (b) You must cause any modified stringTuple to carry prominent notices
+          stating that You changed the stringTuple; and
 
       (c) You must retain, in the Source form of any Derivative Works
           that You distribute, all copyright, patent, trademark, and

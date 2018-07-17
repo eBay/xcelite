@@ -25,7 +25,7 @@ import com.google.common.collect.Lists;
  * other than {@link java.util.ArrayList}, extend this class to override {@link #getCollection(Iterable)} method.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 14, 2013
+ * created Sep 14, 2013
  * 
  */
 public class VTColumnValueConverter extends DelimiterColumnValueConverter {

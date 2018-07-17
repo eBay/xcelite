@@ -19,7 +19,7 @@ package com.ebay.xcelite.exceptions;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 9, 2013
+ * created Sep 9, 2013
  * 
  */
 public class XceliteException extends RuntimeException {

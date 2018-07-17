@@ -21,10 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation use for configuring the bean class.
+ * Annotation used for configuring the bean class.
  * 
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 20, 2013
+ * created Aug 20, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
