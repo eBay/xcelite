@@ -30,13 +30,16 @@ import java.util.List;
 public abstract class SheetReaderAbs<T> implements SheetReader<T> {
 
     protected final XceliteSheet sheet;
-    protected final List<RowPostProcessor<T>> rowPostProcessors;
+    protected final List<RowPostProcessor<T>> rowPostProcessors = Lists.newArrayList();
     protected boolean skipHeader;
+
+    public SheetReaderAbs(XceliteSheet sheet) {
+        this.sheet = sheet;
+    }
 
     public SheetReaderAbs(XceliteSheet sheet, boolean skipHeader) {
         this.sheet = sheet;
         this.skipHeader = skipHeader;
-        rowPostProcessors = Lists.newArrayList();
     }
 
     protected Object readValueFromCell(Cell cell) {

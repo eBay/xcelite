@@ -41,12 +41,6 @@ public final class XceliteDiff {
     private XceliteDiff() {
     }
 
-    public static <T> DiffResult<T> diff(
-            @Nonnull SheetReader<T> a,
-            @Nonnull SheetReader<T> b) {
-        return diff(a, b);
-    }
-
     /**
      * Returns the difference between two sheets. Note that T must implement
      * hashCode() and equals() if you wish to have meaningful symmetric difference
@@ -151,15 +145,15 @@ public final class XceliteDiff {
         @Override
         public <T> String generateReport(Info<T> info) {
             StringBuilder sb = new StringBuilder();
-            sb.append("File " + info.files().aString() + ", ");
-            sb.append("Sheet: " + info.sheets().aSheetname() + ", ");
+            sb.append("File ").append(info.files().aString()).append(", ");
+            sb.append("Sheet: ").append(info.sheets().aSheetname()).append(", ");
             sb.append(String.format("items (%s):" + NEW_LINE, info.collections().a().size()));
             sb.append(NEW_LINE);
             sb.append(new NewLineDecorator<T>(info.collections().a()));
             sb.append(NEW_LINE);
 
-            sb.append("File " + info.files().bString() + ", ");
-            sb.append("Sheet: " + info.sheets().bSheetname() + ", ");
+            sb.append("File ").append(info.files().bString()).append(", ");
+            sb.append("Sheet: ").append(info.sheets().bSheetname()).append(", ");
             sb.append(String.format("items (%s):" + NEW_LINE, info.collections().b().size()));
             sb.append(NEW_LINE);
             sb.append(new NewLineDecorator<T>(info.collections().b()));
