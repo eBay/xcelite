@@ -37,7 +37,7 @@ public class NewLineDecorator<T> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (T t: collection) {
-            sb.append(t + NEW_LINE);
+            sb.append(t).append(NEW_LINE);
         }
         return sb.toString();
     }

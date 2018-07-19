@@ -15,21 +15,23 @@
 */
 package com.ebay.xcelite.styles;
 
+import lombok.Getter;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 
+@Getter
 public final class CellStyles {
 
     private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
 
-    private final Workbook wb;
+    private final Workbook workbook;
     private CellStyle boldStyle;
     private CellStyle dateStyle;
 
-    public CellStyles(Workbook wb) {
-        this.wb = wb;
+    public CellStyles(Workbook workbook) {
+        this.workbook = workbook;
         initStyles();
     }
 
@@ -39,35 +41,22 @@ public final class CellStyles {
     }
 
     private void createBoldStyle() {
-        boldStyle = wb.createCellStyle();
-        Font font = wb.createFont();
-        //font.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        boldStyle = workbook.createCellStyle();
+        Font font = workbook.createFont();
         font.setBold(true);
         boldStyle.setFont(font);
     }
 
     private void createDateFormatStyle() {
-        dateStyle = wb.createCellStyle();
-        DataFormat df = wb.createDataFormat();
+        dateStyle = workbook.createCellStyle();
+        DataFormat df = workbook.createDataFormat();
         dateStyle.setDataFormat(df.getFormat(DEFAULT_DATE_FORMAT));
     }
 
-    public CellStyle getBoldStyle() {
-        return boldStyle;
-    }
-
-    public CellStyle getDateStyle() {
-        return dateStyle;
-    }
-
     public CellStyle getCustomDataFormatStyle(String dataFormat) {
-        CellStyle cellStyle = wb.createCellStyle();
-        DataFormat df = wb.createDataFormat();
+        CellStyle cellStyle = workbook.createCellStyle();
+        DataFormat df = workbook.createDataFormat();
         cellStyle.setDataFormat(df.getFormat(dataFormat));
         return cellStyle;
-    }
-
-    public Workbook getWorkbook() {
-        return wb;
     }
 }

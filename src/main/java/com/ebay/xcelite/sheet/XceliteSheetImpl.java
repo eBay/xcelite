@@ -46,12 +46,12 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     @Override
     public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
-        return new BeanSheetWriter<T>(this, type);
+        return new BeanSheetWriter<>(this, type);
     }
 
     @Override
     public <T> SheetReader<T> getBeanReader(Class<T> type) {
-        return new BeanSheetReader<T>(this, type);
+        return new BeanSheetReader<>(this, type);
     }
 
     @Override

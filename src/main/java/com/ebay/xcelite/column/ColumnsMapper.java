@@ -15,10 +15,9 @@
 */
 package com.ebay.xcelite.column;
 
-import com.google.common.collect.Maps;
-
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Class description...
@@ -31,10 +30,8 @@ public class ColumnsMapper {
     private final Map<String, Col> columnsMap;
 
     public ColumnsMapper(Set<Col> columns) {
-        columnsMap = Maps.newHashMap();
-        for (Col col: columns) {
-            columnsMap.put(col.getName(), col);
-        }
+        columnsMap = columns.stream()
+                .collect(Collectors.toMap(Col::getName, col -> col));
     }
 
     public Col getColumn(String name) {

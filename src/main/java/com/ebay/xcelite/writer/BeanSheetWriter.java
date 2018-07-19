@@ -73,7 +73,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
                 Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
                 Field field = fields.iterator().next();
                 field.setAccessible(true);
-                Object fieldValueObj = null;
+                Object fieldValueObj;
                 if (col.isAnyColumn()) {
                     Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(t);
                     fieldValueObj = anyColumnMap.get(col.getName());
@@ -121,7 +121,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private void appendAnyColumns(T t, Set<Col> columnToAdd) throws IllegalAccessException {
+    private void appendAnyColumns(T t, Set<Col> columnToAdd) {
         Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
         Field anyColumnField = fields.iterator().next();
         anyColumnField.setAccessible(true);
