@@ -32,7 +32,7 @@ public class ThaiCase implements Serializable {
     private String name;
     @Column(name = "นามสกุล")
     private String surname;
-    @Column(dataFormat = DateConverter.DATE_PATTERN, name = "วันเกิด", converter = DateConverter.class)
+    @Column(name = "วันเกิด", converter = UsStringCellDateConverter.class, dataFormat = UsStringCellDateConverter.DATE_PATTERN)
     private Date birthDate;
     @Column(name = "เพศ")
     private String sex;

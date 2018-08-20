@@ -20,17 +20,11 @@ package com.ebay.xcelite.exceptions;
  *
  * @author Thanthathon.b
  */
-public class ColumnNotFoundException extends RuntimeException {
+public class ColumnNotFoundException extends XceliteException {
 
-    private String columnName;
-
-    public ColumnNotFoundException(String message, String columnName) {
-        super(message);
-        this.columnName = columnName;
+    public ColumnNotFoundException(String columnName) {
+        super(columnName + " not found");
     }
 
-    public String getColumnName() {
-        return columnName;
-    }
 
 }

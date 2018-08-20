@@ -18,6 +18,7 @@ package com.ebay.xcelite.column;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -42,14 +43,14 @@ public class ColumnsExtractor {
 
   public ColumnsExtractor(Class<?> type) {
     this.type = type;
-    columns = Sets.newLinkedHashSet();
+    columns = new LinkedHashSet<>();
     columnsOrdering();
   }
 
   private void columnsOrdering() {
     Row rowAnnotation = type.getAnnotation(Row.class);
     if (rowAnnotation == null || rowAnnotation.colsOrder() == null || rowAnnotation.colsOrder().length == 0) return;
-    colsOrdering = Sets.newLinkedHashSet();
+    colsOrdering = new LinkedHashSet<>();
     for (String column : rowAnnotation.colsOrder()) {
       colsOrdering.add(new Col(column));
     }
@@ -60,7 +61,7 @@ public class ColumnsExtractor {
     Set<Field> columnFields = ReflectionUtils.getAllFields(type, withAnnotation(Column.class));
     for (Field columnField : columnFields) {
       Column annotation = columnField.getAnnotation(Column.class);
-      Col col = null;
+      Col col;
       if (annotation.name().isEmpty()) {
         col = new Col(columnField.getName(), columnField.getName());        
       } else {
@@ -113,7 +114,7 @@ public class ColumnsExtractor {
 
   private void orderColumns() {
     // build temporary columns map and then use it to fill fieldName in colsOrdering set
-    Map<String, Col> map = Maps.newHashMap();
+    Map<String, Col> map = new HashMap<>();
     for (Col col : columns) {
       map.put(col.getName(), col);
     }

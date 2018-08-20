@@ -32,7 +32,7 @@ public class CamelCase implements Serializable {
     private String name;
     @Column(name = "Surname")
     private String surname;
-    @Column(dataFormat = DateConverter.DATE_PATTERN, name = "BirthDate", converter = DateConverter.class)
+    @Column(dataFormat = UsStringCellDateConverter.DATE_PATTERN, name = "BirthDate", converter = UsStringCellDateConverter.class)
     private Date birthDate;
     @Column(name = "Sex")
     private String sex;

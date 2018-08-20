@@ -35,7 +35,9 @@ import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
 
 /**
- * Class description...
+ * Main class of the Xcelite package. A Xcelite object wraps a POI
+ * {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
+ * operations on its sheets.
  * 
  * @author kharel (kharel@ebay.com)
  * created Nov 9, 2013
@@ -44,6 +46,7 @@ import com.ebay.xcelite.sheet.XceliteSheetImpl;
 public class Xcelite {
 
   private final Workbook workbook;
+  //TODO Version 2.0: remove this member variable together with write();
   private File file;
 
   public Xcelite() {
@@ -56,18 +59,13 @@ public class Xcelite {
   }
 
   @SneakyThrows
-  public Xcelite(InputStream inputStream, XceliteOptions options) {
-    workbook = new XSSFWorkbook(inputStream);
-  }
-
-  @SneakyThrows
   public Xcelite(File file) {
     this.file = file;
     workbook = new XSSFWorkbook(new FileInputStream(file));
   }
 
   /**
-   * Creates new sheet.
+   * Creates a new sheet.
    * 
    * @return XceliteSheet object
    */
@@ -115,6 +113,10 @@ public class Xcelite {
 
   /**
    * Saves data to the input file.
+   *
+   * @deprecated since 1.2. When reading the Workbook from an {@link java.io.InputStream},
+   * eg. from a web service, member file will be null. Use the explicit methods
+   * to write to a {@link java.io.File} or {@link java.io.OutputStream}
    */
   @SneakyThrows
   @Deprecated
@@ -123,9 +125,9 @@ public class Xcelite {
   }
 
   /**
-   * Saves data to a new file.
+   * Saves data to a new {@link java.io.File}.
    *
-   * @param file the file to save the data into
+   * @param file the {@link java.io.File} to save the data into
    */
   @SneakyThrows
   public void write(File file) {
@@ -139,9 +141,9 @@ public class Xcelite {
   }
   
   /**
-   * Saves data to a new outputStream.
+   * Saves data to a new {@link java.io.OutputStream}.
    * 
-   * @param out the outputstream to save the data into
+   * @param out the {@link java.io.OutputStream} to save the data into
    */
   @SneakyThrows
   public void write(OutputStream out) {
@@ -157,11 +159,7 @@ public class Xcelite {
   public byte[] getBytes() {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     write(baos);
-    try {
-      baos.close();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    baos.close();
     return baos.toByteArray();
   }
 }

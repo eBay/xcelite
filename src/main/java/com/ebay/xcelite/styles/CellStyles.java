@@ -41,8 +41,7 @@ public final class CellStyles {
   private void createBoldStyle() {
     boldStyle = wb.createCellStyle();
     Font font = wb.createFont();
-    //font.setBoldweight(Font.BOLDWEIGHT_BOLD);
-font.setBold(true);
+    font.setBold(true);
     boldStyle.setFont(font);    
   }
   

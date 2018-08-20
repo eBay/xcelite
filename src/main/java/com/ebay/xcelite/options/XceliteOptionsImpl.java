@@ -1,40 +1,40 @@
 package com.ebay.xcelite.options;
 
 public class XceliteOptionsImpl implements XceliteOptions {
-    /**
-     * if set, contains the number of lines to skip before
-     * the header line is read.
-     */
-    private Integer skipLinesBeforeHeader = 0;
 
-    /**
-     * if set, contains the number of lines to skip after
-     * the header line is read and before the first data
-     * line is read.
-     */
-    private Integer skipLinesAfterHeader = 0;
+    private Integer skipRowsBeforeColDefinitionRow = 0;
+    private Integer skipRowsAfterColDefinitionRow = 0;
+    private boolean skipBlankRows = true;
 
-    public XceliteOptionsImpl() {
+
+    @Override
+    public Integer getSkipRowsBeforeColumnDefinitionRow() {
+        return skipRowsBeforeColDefinitionRow;
     }
 
     @Override
-    public Integer getSkipLinesBeforeHeader() {
-        return this.skipLinesBeforeHeader;
+    public void setSkipRowsBeforeColumnDefinitionRow(Integer skipRowsBeforeColumnDefinitionRow) {
+        this.skipRowsBeforeColDefinitionRow = skipRowsBeforeColumnDefinitionRow;
     }
 
     @Override
-    public Integer getSkipLinesAfterHeader() {
-        return this.skipLinesAfterHeader;
+    public Integer getSkipRowsAfterColumnDefinitionRow() {
+        return skipRowsAfterColDefinitionRow;
     }
 
     @Override
-    public void setSkipLinesBeforeHeader(Integer skipLinesBeforeHeader) {
-        this.skipLinesBeforeHeader = skipLinesBeforeHeader;
+    public void setSkipRowsAfterColumnDefinitionRow(Integer skipRowsAfterColumnDefinitionRow) {
+        this.skipRowsAfterColDefinitionRow = skipRowsAfterColumnDefinitionRow;
     }
 
     @Override
-    public void setSkipLinesAfterHeader(Integer skipLinesAfterHeader) {
-        this.skipLinesAfterHeader = skipLinesAfterHeader;
+    public boolean isSkipBlankRows() {
+        return skipBlankRows;
+    }
+
+    @Override
+    public void setSkipBlankRows(boolean skipBlankRows) {
+        this.skipBlankRows = skipBlankRows;
     }
 
 }

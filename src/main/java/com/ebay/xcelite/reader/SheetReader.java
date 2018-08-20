@@ -17,6 +17,7 @@ package com.ebay.xcelite.reader;
 
 import java.util.Collection;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 public interface SheetReader<T> {
@@ -30,11 +31,21 @@ public interface SheetReader<T> {
 
   /**
    * Whether to skip the first row or not when reading the sheet.
+   * @deprecated since 1.2. Use {@link #getOptions()} instead and set
+   * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+   * to 1
    * 
    * @param skipHeaderRow true to skip the header row, false otherwise
    */
   @Deprecated
   void skipHeaderRow(boolean skipHeaderRow);
+
+  /**
+   * Gets the {@link XceliteOptions} object used to configure the reader's
+   * behavior
+   * @return configuration object
+   */
+  XceliteOptions getOptions();
 
   /**
    * Gets the sheet.

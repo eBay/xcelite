@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * Class description...
@@ -45,9 +46,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
 
   public AbstractSheetReader(XceliteSheet sheet) {
-    this.sheet = sheet;
-    this.options = new XceliteOptionsImpl();
-    rowPostProcessors = Lists.newArrayList();
+    this (sheet, new XceliteOptionsImpl());
   }
 
   public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
@@ -56,12 +55,19 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     rowPostProcessors = Lists.newArrayList();
   }
 
+  /**
+   * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
+   * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+   * to 1
+   * @param sheet
+   * @param skipHeaderRow
+   */
   @Deprecated
   public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
     this.sheet = sheet;
     this.options = new XceliteOptionsImpl();
     if (skipHeaderRow)
-      options.setSkipLinesBeforeHeader(1);
+      options.setSkipRowsBeforeColumnDefinitionRow(1);
     rowPostProcessors = Lists.newArrayList();
   }
   
@@ -86,8 +92,8 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
   }
 
   /**
-   * DEPRECATED. Use {@link #getOptions()} instead and set
-   * {@link XceliteOptions#setSkipLinesBeforeHeader(Integer)} setSkipLinesBeforeHeader}
+   * @deprecated since 1.2. Use {@link #getOptions()} instead and set
+   * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
    * to 1
    * @param skipHeaderRow true to skip the header row, false otherwise
    */
@@ -95,7 +101,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
   @Deprecated
   public void skipHeaderRow(boolean skipHeaderRow) {
     if (skipHeaderRow)
-      options.setSkipLinesBeforeHeader(1);
+      options.setSkipRowsBeforeColumnDefinitionRow(1);
   }
   
   @Override
@@ -108,7 +114,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     rowPostProcessors.remove(rowPostProcessor);
   }
 
-  protected boolean isBlankRow(Row row) {
+  boolean isBlankRow(Row row) {
     Iterator<Cell> cellIterator = row.cellIterator();
     boolean blankRow = true;
     while (cellIterator.hasNext()) {
@@ -118,5 +124,22 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
       }
     }
     return blankRow;
+  }
+
+  static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
+    Iterator<Row> rowIterator = nativeSheet.iterator();
+    if (!rowIterator.hasNext())
+      return null;
+    rowIterator.next();
+    if (options.getSkipRowsBeforeColumnDefinitionRow() > 0) {
+      int rowsToSkip = options.getSkipRowsBeforeColumnDefinitionRow();
+      while ((rowsToSkip > 0) && (rowIterator.hasNext())) {
+        rowIterator.next();
+        rowsToSkip--;
+      }
+      if (rowsToSkip > 0)
+        throw new IllegalArgumentException("SkipLinesBeforeHeader cannot be bigger than length of sheet");
+    }
+    return rowIterator;
   }
 }

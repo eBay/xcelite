@@ -1,27 +1,60 @@
 package com.ebay.xcelite.options;
 
-import lombok.Data;
-
 public interface XceliteOptions {
 
     /**
-     * if set, contains the number of lines to skip before
-     * the header line is read.
+     * Returns the number of rows Xcelite should skip before trying
+     * to parse the next one as the row defining the annotated bean
+     * properties
+     *
+     * @return The number of rows
      */
-    Integer skipLinesBeforeHeader = 0;
+    public Integer getSkipRowsBeforeColumnDefinitionRow();
 
     /**
-     * if set, contains the number of lines to skip after
-     * the header line is read and before the first data
-     * line is read.
+     * Sets the number of rows Xcelite should skip before trying
+     * to parse the next one as the row defining the annotated bean
+     * properties
+     *
+     * @param skipRowsBeforeColumnDefinitionRow The number of rows to skip
      */
-    Integer skipLinesAfterHeader = 0;
+    public void setSkipRowsBeforeColumnDefinitionRow (Integer skipRowsBeforeColumnDefinitionRow);
 
-    public Integer getSkipLinesBeforeHeader();
+    /**
+     * Returns the number of rows Xcelite should skip after
+     * the row defining the annotated bean properties is parsed and
+     * before the first data row is read.
+     * Useful eg. for omitting rows containing column filters.
+     *
+     * @return The number of rows
+     */
+    public Integer getSkipRowsAfterColumnDefinitionRow();
 
-    public Integer getSkipLinesAfterHeader();
+    /**
+     * Set the number of rows Xcelite should skip after
+     * the row defining the annotated bean properties is parsed and
+     * before the first data row is read.
+     * Useful eg. for omitting rows containing column filters.
+     *
+     * @param skipRowsAfterColumnDefinitionRow The number of rows
+     */
+    public void setSkipRowsAfterColumnDefinitionRow (Integer skipRowsAfterColumnDefinitionRow);
 
-    public void setSkipLinesBeforeHeader(Integer skipLinesBeforeHeader);
+    /**
+     * Returns whether SheetReaders skip blank rows
+     * or return empty objects for blank rows.
+     * Default is SheetReaders skip blank rows
+     *
+     * @return Do we skip blank rows (Default: true)
+     */
+    public boolean isSkipBlankRows();
 
-    public void setSkipLinesAfterHeader(Integer skipLinesAfterHeader);
+    /**
+     * Determines whether SheetReaders skip blank rows
+     * or return empty objects for blank rows
+     *
+     * @param skipBlankRows Should we skip blank rows
+     */
+    public void setSkipBlankRows(boolean skipBlankRows);
 }
+

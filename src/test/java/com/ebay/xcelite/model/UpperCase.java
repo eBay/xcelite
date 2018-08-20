@@ -30,10 +30,13 @@ public class UpperCase implements Serializable {
 
     @Column(name = "NAME")
     private String name;
+
     @Column(name = "SURNAME")
     private String surname;
-    @Column(dataFormat = DateConverter.DATE_PATTERN, name = "BIRTHDATE", converter = DateConverter.class)
+
+    @Column(name = "BIRTHDATE", converter = UsStringCellDateConverter.class, dataFormat = UsStringCellDateConverter.DATE_PATTERN)
     private Date birthDate;
+
     @Column(name = "SEX")
     private String sex;
 
