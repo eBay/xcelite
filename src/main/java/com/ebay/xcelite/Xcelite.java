@@ -20,6 +20,7 @@ import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import com.ebay.xcelite.options.XceliteOptions;
 
+import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,6 +28,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.util.List;
+
+import static java.util.Optional.ofNullable;
 
 /**
  * Main class of the Xcelite package. A Xcelite object wraps a POI
@@ -83,11 +87,9 @@ public class Xcelite {
      * @return XceliteSheet object
      */
     public XceliteSheet getSheet(int sheetIndex) {
-        Sheet sheet = workbook.getSheetAt(sheetIndex);
-        if (sheet == null) {
-            throw new XceliteException(String.format("Could not find sheet at index %s", sheetIndex));
-        }
-        return new XceliteSheetImpl(sheet);
+        return ofNullable(workbook.getSheetAt(sheetIndex))
+                .map(XceliteSheetImpl::new)
+                .orElseThrow(() -> new XceliteException(String.format("Could not find sheet at index %s", sheetIndex)));
     }
 
     /**
@@ -97,11 +99,27 @@ public class Xcelite {
      * @return XceliteSheet object
      */
     public XceliteSheet getSheet(String sheetName) {
-        Sheet sheet = workbook.getSheet(sheetName);
-        if (sheet == null) {
-            throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
+        return ofNullable(workbook.getSheet(sheetName))
+                .map(XceliteSheetImpl::new)
+                .orElseThrow(() -> new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName)));
+    }
+
+    /**
+     * Gets all sheets.
+     *
+     * @return the list of sheets (a list of {@link XceliteSheet} objects.) or XceliteException
+     */
+    public List<XceliteSheet> getSheets() {
+        if (workbook.getNumberOfSheets() == 0) {
+            throw new XceliteException("Could not find any sheet");
         }
-        return new XceliteSheetImpl(sheet);
+
+        List<XceliteSheet> xceliteSheets = Lists.newArrayList();
+
+        workbook.sheetIterator()
+                .forEachRemaining(sheet -> xceliteSheets.add(new XceliteSheetImpl(sheet)));
+
+        return xceliteSheets;
     }
 
     /**
@@ -124,9 +142,9 @@ public class Xcelite {
      */
     @SneakyThrows
     public void write(File file) {
-        FileOutputStream out = new FileOutputStream(file, false);
-        write(out);
-        out.close();
+        try (FileOutputStream out = new FileOutputStream(file, false)) {
+            write(out);
+        }
     }
 
     /**
@@ -146,9 +164,9 @@ public class Xcelite {
      */
     @SneakyThrows
     public byte[] getBytes() {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        write(baos);
-        baos.close();
-        return baos.toByteArray();
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            write(byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
+        }
     }
 }

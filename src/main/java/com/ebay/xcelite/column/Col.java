@@ -17,13 +17,17 @@ package com.ebay.xcelite.column;
 
 import com.ebay.xcelite.converters.ColumnValueConverter;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Represents a column object which holds all data about the Excel column.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Aug 29, 2013
  */
+@Getter
+@Setter
 @EqualsAndHashCode(of="name")
 public class Col implements Comparable<Col> {
 
@@ -56,52 +60,8 @@ public class Col implements Comparable<Col> {
         col.converter = converter;
     }
 
-    public Class<?> getType() {
-        return type;
+    @Override
+    public int compareTo(Col col) {
+        return this.getName().compareTo(col.getName());
     }
-
-    public void setType(Class<?> type) {
-        this.type = type;
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDataFormat() {
-        return dataFormat;
-    }
-
-    public void setDataFormat(String dataFormat) {
-        this.dataFormat = dataFormat;
-    }
-
-    public Class<? extends ColumnValueConverter<?, ?>> getConverter() {
-        return converter;
-    }
-
-    public void setConverter(Class<? extends ColumnValueConverter<?, ?>> converter) {
-        this.converter = converter;
-    }
-
-    public boolean isAnyColumn() {
-        return isAnyColumn;
-    }
-
-    public void setAnyColumn(boolean isAnyColumn) {
-        this.isAnyColumn = isAnyColumn;
-    }
-
-  @Override
-  public int compareTo(Col o) {
-    return this.getName().compareTo(o.getName());
-  }
 }

@@ -52,7 +52,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final Col anyColumn;
     private final ColumnsMapper mapper;
     private final Class<T> type;
-    private ArrayList<String> header;
+    private ArrayList<String> headers;
     private Iterator<Row> rowIterator;
 
     public BeanSheetReader(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
@@ -72,62 +72,77 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
      */
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
         this(sheet, new XceliteOptionsImpl(), type);
-    }@SuppressWarnings("unchecked")
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     @SneakyThrows
     public Collection<T> read() {
+        List<T> data = new ArrayList<>();
+
         buildHeader();
-        if (anyColumn == null) {
-            validateColumns();
-        }
-        List<T> data = Lists.newArrayList();
-        while (rowIterator.hasNext()) {
-            Row excelRow = rowIterator.next();
-            if (isBlankRow(excelRow) && options.isSkipBlankRows()) continue;
-            T object = type.newInstance();
+        validateColumns();
 
-            int i = 0;
-            for (String columnName : header) {
-                Cell cell = excelRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                Col col = mapper.getColumn(columnName);
-                if (col != null) {
+        rowIterator.forEachRemaining(excelRow -> {
+            if (!(isBlankRow(excelRow) && options.isSkipBlankRows())) {
+                T object = fillObject(excelRow);
 
-                    Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(col.getFieldName()));
-                    Field field = fields.iterator().next();
-                    writeToField(field, object, cell, col);
-
-                }           else {
-                    if (anyColumn != null) {
-                        Set<Field> fields = ReflectionUtils.getAllFields(object.getClass(), withName(anyColumn.getFieldName()));
-                        Field field = fields.iterator().next();
-                        if (!isColumnInIgnoreList(field, columnName)) {
-                            writeToAnyColumnField(field, object, cell, columnName);
-                        }
-                    }
+                if (shouldKeepObject(object, rowPostProcessors)) {
+                    data.add(object);
                 }
-                i++;
             }
-            if (shouldKeepObject(object, rowPostProcessors)) {
-                data.add(object);
-            }
-        }
+        });
 
         return data;
+    }
+
+    @SneakyThrows
+    private T fillObject(Row row) {
+        T object = type.newInstance();
+
+        for (int i = 0; i < headers.size(); i++) {
+            String columnName = headers.get(i);
+            Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+
+            Col col = mapper.getColumn(columnName);
+
+            if (col == null) {
+                if (anyColumn != null) {
+                    Field field = getField(object.getClass(), anyColumn.getFieldName());
+                    if (!isColumnInIgnoreList(field, columnName)) {
+                        writeToAnyColumnField(field, object, cell, columnName);
+                    }
+                }
+            } else {
+                Field field = getField(object.getClass(), col.getFieldName());
+                writeToField(field, object, cell, col);
+            }
+        }
+
+        return object;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Field getField(Class<?> aClass, String name) {
+        return ReflectionUtils.getAllFields(aClass, withName(name)).iterator().next();
     }
 
     /**
      * check that @column is found in header
      */
     private void validateColumns() {
+        if (anyColumn != null) {
+            return;
+        }
         boolean found = false;
-        for (Col c : columns) {
-            for(String h : header) {
-                if(c.getName().equals(h)) {
+        for (Col c: columns) {
+            for (String h: headers) {
+                if (c.getName().equals(h)) {
                     found = true;
                     break;
                 }
             }
-            if(!found) {
+            if (!found) {
                 throw new ColumnNotFoundException(c.getName());
             }
             found = false;
@@ -225,7 +240,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private void buildHeader() {
-        header = Lists.newArrayList();
+        headers = Lists.newArrayList();
         rowIterator = sheet.getNativeSheet().rowIterator();
         Row row = rowIterator.next();
         if (row == null) {
@@ -237,7 +252,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
             String cellValue = (null != cell) ? cell.getStringCellValue() : null;
             if ((null == cellValue) || (cellValue.isEmpty()))
                 cellValue = null;
-            header.add(cellValue);
+            headers.add(cellValue);
         }
     }
 

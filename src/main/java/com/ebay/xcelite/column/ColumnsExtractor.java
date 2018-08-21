@@ -27,9 +27,11 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.Optional.of;
+import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
-
 
 public class ColumnsExtractor {
 
@@ -46,7 +48,11 @@ public class ColumnsExtractor {
 
   private void columnsOrdering() {
     Row rowAnnotation = type.getAnnotation(Row.class);
-    if (rowAnnotation == null || rowAnnotation.colsOrder() == null || rowAnnotation.colsOrder().length == 0) return;
+    if (rowAnnotation == null
+            || rowAnnotation.colsOrder() == null
+            || rowAnnotation.colsOrder().length == 0) {
+        return;
+    }
     colsOrdering = new LinkedHashSet<>();
     for (String column : rowAnnotation.colsOrder()) {
       colsOrdering.add(new Col(column));
@@ -55,29 +61,27 @@ public class ColumnsExtractor {
 
     @SuppressWarnings("unchecked")
     public void extract() {
-        Set<Field> columnFields = ReflectionUtils.getAllFields(type, withAnnotation(Column.class));
-        for (Field columnField: columnFields) {
-            Column annotation = columnField.getAnnotation(Column.class);
-            Col col = null;
-            if (annotation.name().isEmpty()) {
-                col = new Col(columnField.getName(), columnField.getName());
-            } else {
-                col = new Col(annotation.name(), columnField.getName());
-            }
+        getAllFields(type, withAnnotation(Column.class))
+                .forEach(columnField -> {
+                    Column annotation = columnField.getAnnotation(Column.class);
+                    Col col = of(annotation)
+                            .filter(column -> !column.name().isEmpty())
+                            .map(column -> new Col(column.name(), columnField.getName()))
+                            .orElse(new Col(columnField.getName(), columnField.getName()));
 
-            if (annotation.ignoreType()) {
-                col.setType(String.class);
-            } else {
-                col.setType(columnField.getType());
-            }
-            if (!annotation.dataFormat().isEmpty()) {
-                col.setDataFormat(annotation.dataFormat());
-            }
-            if (annotation.converter() != NoConverterClass.class) {
-                col.setConverter(annotation.converter());
-            }
-            columns.add(col);
-        }
+                    if (annotation.ignoreType()) {
+                        col.setType(String.class);
+                    } else {
+                        col.setType(columnField.getType());
+                    }
+                    if (!annotation.dataFormat().isEmpty()) {
+                        col.setDataFormat(annotation.dataFormat());
+                    }
+                    if (annotation.converter() != NoConverterClass.class) {
+                        col.setConverter(annotation.converter());
+                    }
+                    columns.add(col);
+                });
 
         if (colsOrdering != null) {
             orderColumns();
@@ -88,7 +92,7 @@ public class ColumnsExtractor {
 
     @SuppressWarnings("unchecked")
     private void extractAnyColumn() {
-        Set<Field> anyColumnFields = ReflectionUtils.getAllFields(type, withAnnotation(AnyColumn.class));
+        Set<Field> anyColumnFields = getAllFields(type, withAnnotation(AnyColumn.class));
         if (anyColumnFields.size() > 0) {
             if (anyColumnFields.size() > 1) {
                 throw new XceliteException("Multiple AnyColumn fields are not allowed");
@@ -111,22 +115,19 @@ public class ColumnsExtractor {
 
     private void orderColumns() {
         // build temporary columns map and then use it to fill fieldName in colsOrdering set
-        Map<String, Col> map = new HashMap<>();
-        for (Col col: columns) {
-            map.put(col.getName(), col);
-        }
+        Map<String, Col> map = columns.stream().collect(Collectors.toMap(Col::getName, col -> col));
 
-        for (Col col: colsOrdering) {
+        colsOrdering.forEach(col -> {
             if (columns.contains(col)) {
                 Col column = map.get(col.getName());
                 column.copyTo(col);
             } else {
                 throw new RuntimeException(String.format("Unrecognized column \"%s\" in Row columns ordering", col.getName()));
             }
-        }
+        });
 
         if (colsOrdering.size() != columns.size()) {
-            throw new RuntimeException(String.format("Not all columns are specified in Row columns ordering"));
+            throw new RuntimeException("Not all columns are specified in Row columns ordering");
         }
         columns = colsOrdering;
     }
