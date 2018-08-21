@@ -33,7 +33,7 @@ import org.apache.poi.ss.usermodel.Sheet;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 11, 2013
- * 
+ *
  */
 public abstract class AbstractSheetReader<T> implements SheetReader<T> {
   @Getter
@@ -70,7 +70,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
       options.setSkipRowsBeforeColumnDefinitionRow(1);
     rowPostProcessors = Lists.newArrayList();
   }
-  
+
   protected Object readValueFromCell(Cell cell) {
     if (cell == null) return null;
     Object cellValue = null;
@@ -78,7 +78,16 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
       case ERROR:
         break;
       case FORMULA:
-          break;
+        // Get the type of Formula
+        switch (cell.getCachedFormulaResultTypeEnum()) {
+          case STRING:
+            cellValue = cell.getStringCellValue();
+            break;
+          case NUMERIC:
+            cellValue = cell.getNumericCellValue();
+            break;
+        }
+        break;
       case BOOLEAN:
         cellValue = cell.getBooleanCellValue();
         break;
@@ -86,7 +95,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
         cellValue = cell.getNumericCellValue();
         break;
       default:
-          cellValue = cell.getStringCellValue();
+        cellValue = cell.getStringCellValue();
     }
     return cellValue;
   }
@@ -103,12 +112,18 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     if (skipHeaderRow)
       options.setSkipRowsBeforeColumnDefinitionRow(1);
   }
-  
+
+
+  @Override
+  public XceliteSheet getSheet() {
+    return sheet;
+  }
+
   @Override
   public void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
     rowPostProcessors.add(rowPostProcessor);
   }
-  
+
   @Override
   public void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
     rowPostProcessors.remove(rowPostProcessor);
