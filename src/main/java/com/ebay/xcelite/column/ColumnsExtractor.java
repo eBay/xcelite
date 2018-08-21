@@ -20,14 +20,15 @@ import com.ebay.xcelite.annotations.AnyColumn;
 import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.XceliteException;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static org.reflections.ReflectionUtils.withAnnotation;
 
 
 public class ColumnsExtractor {

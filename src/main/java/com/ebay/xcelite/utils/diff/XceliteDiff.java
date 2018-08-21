@@ -23,7 +23,7 @@ import com.ebay.xcelite.utils.diff.info.StringTuple;
 import com.ebay.xcelite.utils.diff.report.NewLineDecorator;
 import com.ebay.xcelite.utils.diff.report.ReportGenerator;
 import com.ebay.xcelite.utils.diff.report.ReportInfo;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.*;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;

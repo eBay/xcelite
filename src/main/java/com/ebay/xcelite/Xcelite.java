@@ -32,19 +32,19 @@ import java.io.*;
  * Main class of the Xcelite package. A Xcelite object wraps a POI
  * {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
  * operations on its sheets.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 9, 2013
  */
 public class Xcelite {
 
-  private final Workbook workbook;
-  //TODO Version 2.0: remove this member variable together with write();
-  private File file;
+    private final Workbook workbook;
+    //TODO Version 2.0: remove this member variable together with write();
+    private File file;
 
-  public Xcelite() {
-    workbook = new XSSFWorkbook();
-  }
+    public Xcelite() {
+        workbook = new XSSFWorkbook();
+    }
 
     @SneakyThrows
     public Xcelite(InputStream inputStream) {
@@ -57,14 +57,14 @@ public class Xcelite {
         workbook = new XSSFWorkbook(new FileInputStream(file));
     }
 
-  /**
-   * Creates a new sheet.
-   * 
-   * @return XceliteSheet object
-   */
-  public XceliteSheet createSheet() {
-    return new XceliteSheetImpl(workbook.createSheet());
-  }
+    /**
+     * Creates a new sheet.
+     *
+     * @return XceliteSheet object
+     */
+    public XceliteSheet createSheet() {
+        return new XceliteSheetImpl(workbook.createSheet());
+    }
 
     /**
      * Creates new sheet with specified name.
@@ -104,55 +104,51 @@ public class Xcelite {
         return new XceliteSheetImpl(sheet);
     }
 
-  /**
-   * Saves data to the input file.
-   *
-   * @deprecated since 1.2. When reading the Workbook from an {@link java.io.InputStream},
-   * eg. from a web service, member file will be null. Use the explicit methods
-   * to write to a {@link java.io.File} or {@link java.io.OutputStream}
-   */
-  @SneakyThrows
-  @Deprecated
-  public void write() {
-    write(file);
-  }
+    /**
+     * Saves data to the input file.
+     *
+     * @deprecated since 1.2. When reading the Workbook from an {@link java.io.InputStream},
+     * eg. from a web service, member file will be null. Use the explicit methods
+     * to write to a {@link java.io.File} or {@link java.io.OutputStream}
+     */
+    @SneakyThrows
+    @Deprecated
+    public void write() {
+        write(file);
+    }
 
-  /**
-   * Saves data to a new {@link java.io.File}.
-   *
-   * @param file the {@link java.io.File} to save the data into
-   */
-  @SneakyThrows
-  public void write(File file) {
-    FileOutputStream out = new FileOutputStream(file, false);
-    write(out);
-      try {
+    /**
+     * Saves data to a new {@link java.io.File}.
+     *
+     * @param file the {@link java.io.File} to save the data into
+     */
+    @SneakyThrows
+    public void write(File file) {
+        FileOutputStream out = new FileOutputStream(file, false);
+        write(out);
         out.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-  }
+    }
 
-  /**
-   * Saves data to a new {@link java.io.OutputStream}.
-   *
-   * @param out the {@link java.io.OutputStream} to save the data into
-   */
-  @SneakyThrows
-  public void write(OutputStream out) {
-      workbook.write(out);
-  }
+    /**
+     * Saves data to a new {@link java.io.OutputStream}.
+     *
+     * @param out the {@link java.io.OutputStream} to save the data into
+     */
+    @SneakyThrows
+    public void write(OutputStream out) {
+        workbook.write(out);
+    }
 
-  /**
-   * Gets the excel file as byte array.
-   *
-   * @return byte array which represents the excel file
-   */
-  @SneakyThrows
-  public byte[] getBytes() {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    write(baos);
-    baos.close();
-    return baos.toByteArray();
-  }
+    /**
+     * Gets the excel file as byte array.
+     *
+     * @return byte array which represents the excel file
+     */
+    @SneakyThrows
+    public byte[] getBytes() {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        write(baos);
+        baos.close();
+        return baos.toByteArray();
+    }
 }
