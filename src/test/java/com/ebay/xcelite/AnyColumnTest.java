@@ -19,7 +19,6 @@ package com.ebay.xcelite;
 import com.ebay.xcelite.model.AnyColumnBean;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import org.apache.poi.ss.usermodel.Row;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
