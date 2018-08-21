@@ -20,21 +20,20 @@ package com.ebay.xcelite.exceptions;
  *
  * @author kharel (kharel@ebay.com)
  * created Sep 9, 2013
- * 
  */
 public class XceliteException extends RuntimeException {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  public XceliteException(String message) {
-    super(message);
-  }
+    public XceliteException(String message) {
+        super(message);
+    }
 
-  public XceliteException(Exception exception) {
-    super(exception);
-  }
+    public XceliteException(Exception exception) {
+        super(exception);
+    }
 
-  public XceliteException(String message, Exception exception) {
-    super(message, exception);
-  }
+    public XceliteException(String message, Exception exception) {
+        super(message, exception);
+    }
 }

@@ -22,9 +22,8 @@ import com.ebay.xcelite.utils.diff.info.Info;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 21, 2013
- * 
  */
 public interface ReportGenerator {
 
-  <T> String generateReport(Info<T> info);
+    <T> String generateReport(Info<T> info);
 }

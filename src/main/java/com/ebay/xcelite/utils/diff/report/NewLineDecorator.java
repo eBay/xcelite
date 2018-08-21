@@ -22,24 +22,23 @@ import java.util.Collection;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 20, 2013
- * 
  */
 public class NewLineDecorator<T> {
-  
-  private static final String NEW_LINE = System.getProperty("line.separator");
-  
-  private final Collection<T> collection;
-  
-  public NewLineDecorator(Collection<T> collection) {
-    this.collection = collection;
-  }
-  
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (T t : collection) {
-      sb.append(t + NEW_LINE);      
+
+    private static final String NEW_LINE = System.getProperty("line.separator");
+
+    private final Collection<T> collection;
+
+    public NewLineDecorator(Collection<T> collection) {
+        this.collection = collection;
     }
-    return sb.toString();
-  }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (T t: collection) {
+            sb.append(t + NEW_LINE);
+        }
+        return sb.toString();
+    }
 }

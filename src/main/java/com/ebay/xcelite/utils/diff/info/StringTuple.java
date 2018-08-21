@@ -20,23 +20,22 @@ package com.ebay.xcelite.utils.diff.info;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 21, 2013
- * 
  */
 public class StringTuple {
 
-  private final String aString;
-  private final String bString;
+    private final String aString;
+    private final String bString;
 
-  public StringTuple(String a, String b) {
-    this.aString = a;
-    this.bString = b;
-  }
+    public StringTuple(String a, String b) {
+        this.aString = a;
+        this.bString = b;
+    }
 
-  public String aString() {
-    return aString;
-  }
+    public String aString() {
+        return aString;
+    }
 
-  public String bString() {
-    return bString;
-  }  
+    public String bString() {
+        return bString;
+    }
 }

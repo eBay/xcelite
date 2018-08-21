@@ -19,26 +19,25 @@ import java.util.Collection;
 
 /**
  * Class description...
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 20, 2013
- * 
  */
 public interface DiffResult<T> {
 
-  /**
-   * Whether or not the two sheets are identical.
-   * 
-   * @return true if both sheets are identical, false otherwise
-   */
-  boolean isIdentical();
+    /**
+     * Whether or not the two sheets are identical.
+     *
+     * @return true if both sheets are identical, false otherwise
+     */
+    boolean isIdentical();
 
-  /**
-   * Gets a collection which represents the difference between two sheets.
-   * 
-   * @return the diff collection. If there is no difference, collection is returned empty
-   */
-  Collection<T> getDifference();
+    /**
+     * Gets a collection which represents the difference between two sheets.
+     *
+     * @return the diff collection. If there is no difference, collection is returned empty
+     */
+    Collection<T> getDifference();
 
-  String getReport();
+    String getReport();
 }

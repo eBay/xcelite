@@ -15,6 +15,9 @@
 */
 package com.ebay.xcelite.annotations;
 
+import com.ebay.xcelite.annotate.NoConverterClass;
+import com.ebay.xcelite.converters.ColumnValueConverter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,38 +25,34 @@ import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ebay.xcelite.annotate.NoConverterClass;
-import com.ebay.xcelite.converters.ColumnValueConverter;
-
 /**
  * Annotation to annotate a {@link java.util.Map Map} field which represents K/V
  * as column and value in excel file.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Oct 24, 2013
- * 
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 public @interface AnyColumn {
-  
-  /**
-   * A converter class to use when serializing/deserializing the date to/from
-   * excel file. Converter class must implement
-   * {@link com.ebay.xcelite.converters.ColumnValueConverter
-   * ColumnValueConverter}. Default is no converter.
-   */
-  Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;  
-  
-  /**
-   * Type to deserialize to. Default is {@link java.util.HashMap HashMap}.
-   */
-  @SuppressWarnings("rawtypes")
-  Class<? extends Map> as() default HashMap.class;
-  
-  /**
-   * Specifies which columns to ignore upon deserializtion. Ignored column will
-   * not be added to the map.
-   */
-  String[] ignoreCols() default {};
+
+    /**
+     * A converter class to use when serializing/deserializing the date to/from
+     * excel file. Converter class must implement
+     * {@link com.ebay.xcelite.converters.ColumnValueConverter
+     * ColumnValueConverter}. Default is no converter.
+     */
+    Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;
+
+    /**
+     * Type to deserialize to. Default is {@link java.util.HashMap HashMap}.
+     */
+    @SuppressWarnings("rawtypes")
+    Class<? extends Map> as() default HashMap.class;
+
+    /**
+     * Specifies which columns to ignore upon deserializtion. Ignored column will
+     * not be added to the map.
+     */
+    String[] ignoreCols() default {};
 }

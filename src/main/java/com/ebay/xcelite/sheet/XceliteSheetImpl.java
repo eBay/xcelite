@@ -15,55 +15,52 @@
 */
 package com.ebay.xcelite.sheet;
 
-import java.io.File;
-import java.util.Collection;
-
+import com.ebay.xcelite.reader.BeanSheetReader;
+import com.ebay.xcelite.reader.SheetReader;
+import com.ebay.xcelite.reader.SimpleSheetReader;
+import com.ebay.xcelite.writer.BeanSheetWriter;
+import com.ebay.xcelite.writer.SheetWriter;
+import com.ebay.xcelite.writer.SimpleSheetWriter;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import com.ebay.xcelite.reader.SheetReader;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SimpleSheetReader;
-import com.ebay.xcelite.writer.SheetWriter;
-import com.ebay.xcelite.writer.BeanSheetWriter;
-import com.ebay.xcelite.writer.SimpleSheetWriter;
+import java.util.Collection;
 
 /**
  * Class description...
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 9, 2013
- * 
  */
 public class XceliteSheetImpl implements XceliteSheet {
 
-  private final Sheet sheet;
+    private final Sheet sheet;
 
-  public XceliteSheetImpl(Sheet sheet) {
-    this.sheet = sheet;
-  }
+    public XceliteSheetImpl(Sheet sheet) {
+        this.sheet = sheet;
+    }
 
-  @Override
-  public Sheet getNativeSheet() {
-    return sheet;
-  }
+    @Override
+    public Sheet getNativeSheet() {
+        return sheet;
+    }
 
-  @Override
-  public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
-    return new BeanSheetWriter<T>(this, type);
-  }
+    @Override
+    public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
+        return new BeanSheetWriter<T>(this, type);
+    }
 
-  @Override
-  public <T> SheetReader<T> getBeanReader(Class<T> type) {
-    return new BeanSheetReader<T>(this, type);
-  } 
+    @Override
+    public <T> SheetReader<T> getBeanReader(Class<T> type) {
+        return new BeanSheetReader<T>(this, type);
+    }
 
-  @Override
-  public SimpleSheetWriter getSimpleWriter() {
-    return new SimpleSheetWriter(this);
-  }
+    @Override
+    public SimpleSheetWriter getSimpleWriter() {
+        return new SimpleSheetWriter(this);
+    }
 
-  @Override
-  public SheetReader<Collection<Object>> getSimpleReader() {
-    return new SimpleSheetReader(this);
-  }
+    @Override
+    public SheetReader<Collection<Object>> getSimpleReader() {
+        return new SimpleSheetReader(this);
+    }
 }
