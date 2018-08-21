@@ -113,12 +113,6 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
       options.setSkipRowsBeforeColumnDefinitionRow(1);
   }
 
-
-  @Override
-  public XceliteSheet getSheet() {
-    return sheet;
-  }
-
   @Override
   public void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
     rowPostProcessors.add(rowPostProcessor);
