@@ -33,20 +33,20 @@ import java.util.List;
  *
  * @author Thanthathon.b
  */
-public class AnyColumnTest {
+ class AnyColumnTest {
 
     private String columnNames[] = new String[]{
             "NAME", "SURNAME", "BIRTHDATE", "SEXID", "SEX"
     };
 
-    private static String testData[][] = {
-            {"Crystal",	"Maiden",	"01/02/1990",	"2",	"Female"},
-            {"Witch",	"Doctor",	"01/01/1990",	"1",	"Male"}
+    private static Object testData[][] = {
+            {"Crystal",	"Maiden",	"01/02/1990",	2.0,	"Female"},
+            {"Witch",	"Doctor",	"01/01/1990",	1.0,	"Male"}
     };
 
     @Test
     @DisplayName("Must correctly parse header row without annotated column headers")
-    public void mustReadColumnHeadersOK() {
+    void mustReadColumnHeadersOK() {
         List<String> testColNames = new ArrayList<>(Arrays.asList(columnNames));
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
@@ -61,15 +61,15 @@ public class AnyColumnTest {
 
     @Test
     @DisplayName("Must correctly parse data without annotated column headers")
-    public void mustReadDataOK() {
+    void mustReadDataOK() {
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<AnyColumnBean> beanReader = sheet.getBeanReader(AnyColumnBean.class);
         Collection<AnyColumnBean> datasets = beanReader.read();
         int cnt = 0;
         for (AnyColumnBean row : datasets) {
-            List<String> testColNames = new ArrayList<>(Arrays.asList(testData[cnt++]));
-            List<String> dataColNames = new ArrayList(row.getColumns().values());
+            List<Object> testColNames = new ArrayList<>(Arrays.asList(testData[cnt++]));
+            List<Object> dataColNames = new ArrayList(row.getColumns().values());
             Assertions.assertEquals(testColNames.size(), dataColNames.size(), "mismatching number of columns");
             Assertions.assertEquals(testColNames, dataColNames, "mismatching columns");
         }
