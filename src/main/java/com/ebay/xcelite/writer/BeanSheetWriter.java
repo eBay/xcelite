@@ -22,22 +22,20 @@ import com.ebay.xcelite.converters.ColumnValueConverter;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
-import com.google.common.collect.Sets;
-import lombok.SneakyThrows;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.*;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
+import lombok.SneakyThrows;
 import static org.reflections.ReflectionUtils.withName;
 
-public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
+public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     private final LinkedHashSet<Col> columns;
     private final Col anyColumn;
-    private org.apache.poi.ss.usermodel.Row headerRow;
+    private Row headerRow;
     private int rowIndex = 0;
 
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
@@ -59,7 +57,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
-        Set<Col> columnsToAdd = Sets.newTreeSet();
+        Set<Col> columnsToAdd = new TreeSet();
         for (T t: data) {
             if (anyColumn != null) {
                 appendAnyColumns(t, columnsToAdd);
@@ -67,7 +65,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
         }
         addColumns(columnsToAdd, true);
         for (T t: data) {
-            org.apache.poi.ss.usermodel.Row row = sheet.getNativeSheet().createRow(rowIndex);
+            Row row = sheet.getNativeSheet().createRow(rowIndex);
             int i = 0;
             for (Col col: columns) {
                 Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
@@ -139,6 +137,8 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
     }
 
     private void addColumns(Set<Col> columnsToAdd, boolean append) {
+        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+
         int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))
@@ -148,7 +148,7 @@ public class BeanSheetWriter<T> extends SheetWriterAbs<T> {
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);
                 cell.setCellType(CellType.STRING);
-                cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
+                cell.setCellStyle(boldStyle);
                 cell.setCellValue(column.getName());
                 i++;
             }

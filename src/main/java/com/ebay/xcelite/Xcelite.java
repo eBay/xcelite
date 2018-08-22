@@ -62,26 +62,26 @@ public class Xcelite {
     }
 
     /**
-     * Creates a new sheet.
+     * Creates a new {@link com.ebay.xcelite.sheet.XceliteSheet} without a name.
      *
-     * @return XceliteSheet object
+     * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
      */
     public XceliteSheet createSheet() {
         return new XceliteSheetImpl(workbook.createSheet());
     }
 
     /**
-     * Creates new sheet with specified name.
+     * Creates a new {@link com.ebay.xcelite.sheet.XceliteSheet} with specified name.
      *
-     * @param name the sheet name   *
-     * @return XceliteSheet object
+     * @param name the sheet name
+     * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
      */
     public XceliteSheet createSheet(String name) {
         return new XceliteSheetImpl(workbook.createSheet(name));
     }
 
     /**
-     * Gets the sheet at the specified index.
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} at the specified index.
      *
      * @param sheetIndex the sheet index
      * @return XceliteSheet object
@@ -93,7 +93,7 @@ public class Xcelite {
     }
 
     /**
-     * Gets the sheet with the specified name.
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} with the specified name.
      *
      * @param sheetName the sheet name
      * @return XceliteSheet object
@@ -115,7 +115,6 @@ public class Xcelite {
         }
 
         List<XceliteSheet> xceliteSheets = Lists.newArrayList();
-
         workbook.sheetIterator()
                 .forEachRemaining(sheet -> xceliteSheets.add(new XceliteSheetImpl(sheet)));
 
@@ -126,8 +125,8 @@ public class Xcelite {
      * Saves data to the input file.
      *
      * @deprecated since 1.2. When reading the Workbook from an {@link java.io.InputStream},
-     * eg. from a web service, member file will be null. Use the explicit methods
-     * to write to a {@link java.io.File} or {@link java.io.OutputStream}
+     * eg. from a web service, member `file` will be null, causing an Exception.
+     * Use the explicit methods to write to a {@link java.io.File} or {@link java.io.OutputStream}
      */
     @SneakyThrows
     @Deprecated

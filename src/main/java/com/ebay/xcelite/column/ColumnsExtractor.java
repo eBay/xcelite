@@ -22,6 +22,7 @@ import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import lombok.Getter;
+import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
@@ -51,8 +52,7 @@ public class ColumnsExtractor {
 
     private void columnsOrdering() {
         Row rowAnnotation = type.getAnnotation(Row.class);
-        if (rowAnnotation == null
-                || rowAnnotation.colsOrder().length == 0) {
+        if (rowAnnotation == null || rowAnnotation.colsOrder().length == 0) {
             return;
         }
         colsOrdering = new LinkedHashSet<>();
