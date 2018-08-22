@@ -16,18 +16,23 @@
 
 package com.ebay.xcelite;
 
+import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.model.AnyColumnBean;
+import com.ebay.xcelite.model.AnyColumnBeanDoneWrong;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
@@ -75,4 +80,28 @@ import java.util.List;
             Assertions.assertEquals(testColNames, dataColNames, "mismatching columns");
         }
     }
+
+    @Test
+    @DisplayName("Must throw an exception because of multiple @AnyColumn annotations")
+    @SuppressWarnings("unchecked")
+    void mustThrowOnInvalidBean() {
+        Executable testClosure = () -> {
+            Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
+            XceliteSheet sheet = xcelite.getSheet(0);
+            SheetReader<AnyColumnBeanDoneWrong> beanReader = sheet.getBeanReader(AnyColumnBeanDoneWrong.class);
+            Collection<AnyColumnBeanDoneWrong> datasets = beanReader.read();
+            int cnt = 0;
+            for (AnyColumnBeanDoneWrong row : datasets) {
+                List<Object> testColNames = new ArrayList<>(Arrays.asList(testData[cnt++]));
+                List<Object> dataColNames = new ArrayList(row.getColumns().values());
+                System.out.println(testColNames);
+                System.out.println(dataColNames);
+            }
+        };
+
+        assertThrows(XceliteException.class, testClosure, "Should have thrown an exception" +
+                " because of multiple @AnyColumn annotations");
+
+    }
+
 }
