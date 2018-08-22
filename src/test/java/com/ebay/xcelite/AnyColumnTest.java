@@ -61,6 +61,7 @@ import java.util.List;
 
     @Test
     @DisplayName("Must correctly parse data without annotated column headers")
+    @SuppressWarnings("unchecked")
     void mustReadDataOK() {
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
