@@ -56,36 +56,6 @@ public class WriterTypesTest {
     }
 
     @Test
-    @DisplayName("Must correctly write Java Integer types")
-    void mustWriteIntegerOK() {
-        Map<String, Object> columnsMap = extractCellValues (workbook);
-        int val = bean.getIntegerObjectType();
-        Object obj = columnsMap.get("integerObjectType");
-        Assertions.assertTrue((obj instanceof Number), "Values of type Integer must be written as numeric");
-        Assertions.assertEquals(val, ((Number)obj).intValue());
-    }
-
-    @Test
-    @DisplayName("Must correctly write Java Long types")
-    void mustWriteLongObjectOK() {
-        Map<String, Object> columnsMap = extractCellValues (workbook);
-        long val = bean.getLongObjectType();
-        Object obj = columnsMap.get("longObjectType");
-        Assertions.assertTrue((obj instanceof Number), "Values of type Long must be written as numeric");
-        Assertions.assertEquals(val, ((Number)obj).longValue());
-    }
-
-    @Test
-    @DisplayName("Must correctly write Java Short types")
-    void mustWriteShortObjectsOK() {
-        Map<String, Object> columnsMap = extractCellValues (workbook);
-        short val = bean.getShortObjectType();
-        Object obj = columnsMap.get("shortObjectType");
-        Assertions.assertTrue((obj instanceof Number), "Values of type Short must be written as numeric");
-        Assertions.assertEquals(val, ((Number)obj).shortValue());
-    }
-
-    @Test
     @DisplayName("Must correctly write Java int types")
     void mustWriteIntOK() {
         Map<String, Object> columnsMap = extractCellValues (workbook);
@@ -103,6 +73,77 @@ public class WriterTypesTest {
         Object obj = columnsMap.get("longSimpleType");
         Assertions.assertTrue((obj instanceof Number), "Values of type long must be written as numeric");
         Assertions.assertEquals(val, ((Number)obj).longValue());
+    }
+
+
+    @Test
+    @DisplayName("Must correctly write Java Integer types")
+    void mustWriteIntegerOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        int val = bean.getIntegerObjectType();
+        Object obj = columnsMap.get("integerObjectType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type Integer must be written as numeric");
+        Assertions.assertEquals(val, ((Number)obj).intValue());
+    }
+
+
+    @Test
+    @DisplayName("Must correctly write Java Long types")
+    void mustWriteLongObjectOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        Long val = bean.getLongObjectType();
+        Object obj = columnsMap.get("longObjectType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type Long must be written as numeric");
+        Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java BigInteger types")
+    void mustWriteBigIntegerTypeOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        BigInteger val = bean.getBigIntegerType();
+        Object obj = columnsMap.get("bigIntegerType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type BigInteger must be written as numeric");
+        Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java AtomicInteger types")
+    void mustWriteAtomicIntegerOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        AtomicInteger val = bean.getIntegerAtomicType();
+        Object obj = columnsMap.get("integerAtomicType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type AtomicInteger must be written as numeric");
+        Assertions.assertEquals(val.intValue(), ((Number)obj).intValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java AtomicLong types")
+    void mustWriteAtomicLongOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        AtomicLong val = bean.getLongAtomicType();
+        Object obj = columnsMap.get("longAtomicType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type AtomicLong must be written as numeric");
+        Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
+    }
+    @Test
+    @DisplayName("Must correctly write Java LongAccumulator types")
+    void mustWriteLongAccumulatorOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        LongAccumulator val = bean.getLongAccumulatorType();
+        Object obj = columnsMap.get("longAccumulatorType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type LongAccumulator must be written as numeric");
+        Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java LongAdder types")
+    void mustWriteLongAdderOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        LongAdder val = bean.getLongAdderType();
+        Object obj = columnsMap.get("longAdderType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type LongAdder must be written as numeric");
+        Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
     }
 
     private Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
