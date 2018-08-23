@@ -208,6 +208,11 @@ reader.addRowPostProcessor(new UserPostRowProcessor());
 ```
 Note that you can register as many row post processors as you like. They will be executed in ordered manner.
 
+
+#### Xcelite Spring web application
+
+Currently work in progress, see https://github.com/iSnow/xcelite-web
+
 ### Utils
 #### XceliteDiff
 Xcelite package provides a simple and easy-to-use utility which takes two `SheetReader` classes and compares them:

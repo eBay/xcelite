@@ -22,12 +22,13 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Annotation to annotate a {@link java.util.Map Map} field which represents K/V
- * as column and value in excel file.
+ * as column and value in excel file. Defaults to {@link java.util.LinkedHashMap LinkedHashMap}
+ * to preserve column order.
  *
  * @author kharel (kharel@ebay.com)
  * created Oct 24, 2013
@@ -45,10 +46,10 @@ public @interface AnyColumn {
     Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;
 
     /**
-     * Type to deserialize to. Default is {@link java.util.HashMap HashMap}.
+     * Type to deserialize to. Default is {@link java.util.LinkedHashMap LinkedHashMap}.
      */
     @SuppressWarnings("rawtypes")
-    Class<? extends Map> as() default HashMap.class;
+    Class<? extends Map> as() default LinkedHashMap.class;
 
     /**
      * Specifies which columns to ignore upon deserializtion. Ignored column will

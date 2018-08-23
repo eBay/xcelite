@@ -19,11 +19,12 @@ import com.ebay.xcelite.annotate.NoConverterClass;
 import com.ebay.xcelite.annotations.AnyColumn;
 import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.annotations.Row;
+import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
+import lombok.Getter;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -35,29 +36,30 @@ import static org.reflections.ReflectionUtils.withAnnotation;
 
 public class ColumnsExtractor {
 
-    private final Class<?> type;
-    private Set<Col> columns;
+    @Getter
+    private LinkedHashSet<Col> columns;
+
+    @Getter
     private Col anyColumn;
-    private Set<Col> colsOrdering;
+    private final Class<?> type;
+    private LinkedHashSet<Col> colsOrdering;
 
-  public ColumnsExtractor(Class<?> type) {
-    this.type = type;
-    columns = new LinkedHashSet<>();
-    columnsOrdering();
-  }
+    public ColumnsExtractor(Class<?> type) {
+        this.type = type;
+        columns = new LinkedHashSet<>();
+        columnsOrdering();
+    }
 
-  private void columnsOrdering() {
-    Row rowAnnotation = type.getAnnotation(Row.class);
-    if (rowAnnotation == null
-            || rowAnnotation.colsOrder() == null
-            || rowAnnotation.colsOrder().length == 0) {
-        return;
+    private void columnsOrdering() {
+        Row rowAnnotation = type.getAnnotation(Row.class);
+        if (rowAnnotation == null || rowAnnotation.colsOrder().length == 0) {
+            return;
+        }
+        colsOrdering = new LinkedHashSet<>();
+        for (String column : rowAnnotation.colsOrder()) {
+            colsOrdering.add(new Col(column));
+        }
     }
-    colsOrdering = new LinkedHashSet<>();
-    for (String column : rowAnnotation.colsOrder()) {
-      colsOrdering.add(new Col(column));
-    }
-  }
 
     @SuppressWarnings("unchecked")
     public void extract() {
@@ -87,16 +89,15 @@ public class ColumnsExtractor {
             orderColumns();
         }
 
-        extractAnyColumn();
+        anyColumn = extractAnyColumn(type);
     }
 
     @SuppressWarnings("unchecked")
-    private void extractAnyColumn() {
+    private static Col extractAnyColumn(final Class<?> type) {
+        Col anyColumn = null;
         Set<Field> anyColumnFields = getAllFields(type, withAnnotation(AnyColumn.class));
-        if (anyColumnFields.size() > 0) {
-            if (anyColumnFields.size() > 1) {
-                throw new XceliteException("Multiple AnyColumn fields are not allowed");
-            }
+
+        if (anyColumnFields.size() == 1) {
             Field anyColumnField = anyColumnFields.iterator().next();
             if (!anyColumnField.getType().isAssignableFrom(Map.class)) {
                 throw new XceliteException(
@@ -110,7 +111,10 @@ public class ColumnsExtractor {
             if (annotation.converter() != NoConverterClass.class) {
                 anyColumn.setConverter(annotation.converter());
             }
+        } else if (anyColumnFields.size() > 1) {
+            throw new XceliteException("Multiple @AnyColumn fields are not allowed");
         }
+        return anyColumn;
     }
 
     private void orderColumns() {
@@ -122,21 +126,13 @@ public class ColumnsExtractor {
                 Col column = map.get(col.getName());
                 column.copyTo(col);
             } else {
-                throw new RuntimeException(String.format("Unrecognized column \"%s\" in Row columns ordering", col.getName()));
+                throw new ColumnNotFoundException(col.getName());
             }
         });
 
         if (colsOrdering.size() != columns.size()) {
-            throw new RuntimeException("Not all columns are specified in Row columns ordering");
+            throw new XceliteException("Not all columns are specified in Row columns ordering");
         }
         columns = colsOrdering;
-    }
-
-    public LinkedHashSet<Col> getColumns() {
-        return (LinkedHashSet<Col>) columns;
-    }
-
-    public Col getAnyColumn() {
-        return anyColumn;
     }
 }

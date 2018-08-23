@@ -16,9 +16,8 @@
 package com.ebay.xcelite.column;
 
 import com.ebay.xcelite.converters.ColumnValueConverter;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Represents a column object which holds all data about the Excel column.
@@ -26,8 +25,7 @@ import lombok.Setter;
  * @author kharel (kharel@ebay.com)
  * created Aug 29, 2013
  */
-@Getter
-@Setter
+@Data
 @EqualsAndHashCode(of="name")
 public class Col implements Comparable<Col> {
 

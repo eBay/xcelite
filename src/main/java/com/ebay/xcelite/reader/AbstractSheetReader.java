@@ -71,7 +71,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     rowPostProcessors = Lists.newArrayList();
   }
 
-  protected Object readValueFromCell(Cell cell) {
+  public static Object readValueFromCell(Cell cell) {
     if (cell == null) return null;
     Object cellValue = null;
     switch (cell.getCellTypeEnum()) {

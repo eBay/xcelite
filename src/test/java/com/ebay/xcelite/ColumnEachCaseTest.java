@@ -67,13 +67,11 @@ public class ColumnEachCaseTest {
         assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
         assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
         assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
-        assertEquals(usTestData[0][3], first.getSex(), "Gender mismatch");
 
         UpperCase second = upper.get(1);
         assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
         assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
         assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
-        assertEquals(usTestData[1][3], first.getSex(), "Gender mismatch");
     }
     
     @Test

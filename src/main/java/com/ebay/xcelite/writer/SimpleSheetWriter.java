@@ -18,9 +18,11 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class description...
@@ -28,7 +30,7 @@ import java.util.Collection;
  * @author kharel (kharel@ebay.com)
  * created Nov 10, 2013
  */
-public class SimpleSheetWriter extends SheetWriterAbs<Collection<Object>> {
+public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet, false);
@@ -36,19 +38,21 @@ public class SimpleSheetWriter extends SheetWriterAbs<Collection<Object>> {
 
     @Override
     public void write(Collection<Collection<Object>> data) {
-        int i = 0;
-        for (Collection<Object> row: data) {
-            Row excelRow = sheet.getNativeSheet().createRow(i);
-            int j = 0;
-            for (Object column: row) {
-                Cell cell = excelRow.createCell(j);
-                if (writeHeader && i == 0) {
-                    cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
+        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+        final AtomicInteger i = new AtomicInteger(0);
+
+        data.forEach(row -> {
+            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+            final AtomicInteger j = new AtomicInteger(0);
+            row.forEach(column -> {
+                Cell cell = excelRow.createCell(j.intValue());
+                if (writeHeader && i.intValue() == 0) {
+                    cell.setCellStyle(boldStyle);
                 }
                 writeToCell(cell, column, null);
-                ++j;
-            }
-            ++i;
-        }
+                j.incrementAndGet();
+            });
+            i.incrementAndGet();
+        });
     }
 }
