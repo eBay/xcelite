@@ -1,5 +1,12 @@
 package com.ebay.xcelite.options;
 
+/**
+ * Configuration class for setting options of a {@link com.ebay.xcelite.Xcelite}
+ * object.
+ *
+ * @since 1.2
+ */
+
 public class XceliteOptionsImpl implements XceliteOptions {
 
     private Integer skipRowsBeforeColDefinitionRow = 0;

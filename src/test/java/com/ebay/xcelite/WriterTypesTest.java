@@ -26,6 +26,14 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.atomic.*;
 
+/**
+ * Test if all of Java's simple numeric types and all subclasses of
+ * {@link java.lang.Number} get written as numeric Excel cells.
+ * Complete based on the Java 1.8 numeric types.
+ *
+ * @since 1.2
+ */
+
 public class WriterTypesTest {
     private static final boolean writeToFile = false;
     private static final WriterTypesBean bean = new WriterTypesBean();
@@ -144,6 +152,89 @@ public class WriterTypesTest {
         Object obj = columnsMap.get("longAdderType");
         Assertions.assertTrue((obj instanceof Number), "Values of type LongAdder must be written as numeric");
         Assertions.assertEquals(val.longValue(), ((Number)obj).longValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java float types")
+    void mustWriteFloatOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        float val = bean.getFloatSimpleType();
+        Object obj = columnsMap.get("floatSimpleType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type float must be written as numeric");
+        Assertions.assertEquals(val, ((Number)obj).floatValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java double types")
+    void mustWriteDoubleOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        double val = bean.getDoubleSimpleType();
+        Object obj = columnsMap.get("doubleSimpleType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type double must be written as numeric");
+        Assertions.assertEquals(val, ((Number)obj).doubleValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java Float types")
+    void mustWriteFloatObjectOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        Float val = bean.getFloatObjectType();
+        Object obj = columnsMap.get("floatObjectType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type Float must be written as numeric");
+        Assertions.assertEquals(val.floatValue(), ((Number)obj).floatValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java Double types")
+    void mustWriteDoubleObjectOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        Double val = bean.getDoubleObjectType();
+        Object obj = columnsMap.get("doubleObjectType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type Double must be written as numeric");
+        Assertions.assertEquals(val.doubleValue(), ((Number)obj).doubleValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java BigDecimal types")
+    void mustWriteBigDecimalOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        BigDecimal val = bean.getBigDecimalType();
+        Object obj = columnsMap.get("bigDecimalType");
+        Assertions.assertTrue((obj instanceof Number), "Values of type BigDecimal must be written as numeric");
+        Assertions.assertEquals(val.doubleValue(), ((Number)obj).doubleValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java DoubleAccumulator types")
+    void mustWritedDoubleAccumulatorTypeOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        DoubleAccumulator val = bean.getDoubleAccumulatorType();
+        Object obj = columnsMap.get("doubleAccumulatorType");
+        Assertions.assertTrue((obj instanceof Number),
+                "Values of type DoubleAccumulator must be written as numeric");
+        Assertions.assertEquals(val.doubleValue(), ((Number)obj).doubleValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java DoubleAdder types")
+    void mustWritedDoubleAdderTypeOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        DoubleAdder val = bean.getDoubleAdderType();
+        Object obj = columnsMap.get("doubleAdderType");
+        Assertions.assertTrue((obj instanceof Number),
+                "Values of type DoubleAdder must be written as numeric");
+        Assertions.assertEquals(val.doubleValue(), ((Number)obj).doubleValue());
+    }
+
+    @Test
+    @DisplayName("Must correctly write Java Number types")
+    void mustWritedNumberTypeOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        Number val = bean.getNumberType();
+        Object obj = columnsMap.get("numberType");
+        Assertions.assertTrue((obj instanceof Number),
+                "Values of type Number must be written as numeric");
+        Assertions.assertEquals(val.doubleValue(), ((Number)obj).doubleValue());
     }
 
     private Map<String, Object> extractCellValues (XSSFWorkbook workbook) {

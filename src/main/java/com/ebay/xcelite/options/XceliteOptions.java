@@ -1,5 +1,12 @@
 package com.ebay.xcelite.options;
 
+/**
+ * Configuration interface for setting options of a {@link com.ebay.xcelite.Xcelite}
+ * object.
+ *
+ * @since 1.2
+ */
+
 public interface XceliteOptions {
 
     /**

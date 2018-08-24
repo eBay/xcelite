@@ -67,13 +67,8 @@ public class WriterTypesBean {
     @Column(name = "numberType")
     Number numberType   = BigDecimal.valueOf(123.678);
 
-    public LongAdder getLongAdderType() {
+    public WriterTypesBean() {
         longAdderType.add(1240L);
-        return longAdderType;
-    }
-
-    public DoubleAdder getDoubleAdderType() {
         doubleAdderType.add(123.89);
-        return doubleAdderType;
     }
 }

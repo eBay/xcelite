@@ -48,9 +48,8 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
             cell.setCellValue((Date) fieldValueObj);
         } else if (type == Boolean.class) {
             cell.setCellValue((Boolean) fieldValueObj);
-        } else if (type == Double.class || type == double.class || type == Integer.class || type == int.class
-                || type == Long.class || type == long.class || type == Float.class || type == float.class
-                || type == Short.class || type == short.class) {
+        } else if ((Number.class.isAssignableFrom(type))
+                || (fieldValueObj instanceof Number))  {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue(Double.valueOf(fieldValueObj.toString()));
         } else {
