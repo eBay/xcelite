@@ -48,11 +48,11 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         if (dataType != null) {
             type = dataType;
         }
-        if (type == Date.class) {
+        if (type.equals(Date.class)) {
             cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Date) fieldValueObj);
-        } else if ((type == Boolean.class)
-                || (type == boolean.class)){
+        } else if ((type.equals(Boolean.class))
+                || (type.equals(boolean.class))){
             cell.setCellType(CellType.BOOLEAN);
             cell.setCellValue((Boolean) fieldValueObj);
         } else if ((Number.class.isAssignableFrom(type))

@@ -8,7 +8,7 @@ import java.math.BigInteger;
 import java.util.concurrent.atomic.*;
 
 @Data
-public class WriterTypesBean {
+public class WriterNumericTypesBean {
 
     @Column(name = "shortSimpleType")
     short   shortSimpleType     = 1231;
@@ -67,7 +67,7 @@ public class WriterTypesBean {
     @Column(name = "numberType")
     Number numberType   = BigDecimal.valueOf(123.678);
 
-    public WriterTypesBean() {
+    public WriterNumericTypesBean() {
         longAdderType.add(1240L);
         doubleAdderType.add(123.89);
     }
