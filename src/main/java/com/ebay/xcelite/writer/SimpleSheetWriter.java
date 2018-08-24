@@ -31,28 +31,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
-
+    private CellStyle boldStyle;
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet, false);
+        boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
     }
 
     @Override
-    public void write(Collection<Collection<Object>> data) {
-        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
-        final AtomicInteger i = new AtomicInteger(0);
-
-        data.forEach(row -> {
-            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
-            final AtomicInteger j = new AtomicInteger(0);
-            row.forEach(column -> {
-                Cell cell = excelRow.createCell(j.intValue());
-                if (writeHeader && i.intValue() == 0) {
-                    cell.setCellStyle(boldStyle);
-                }
-                writeToCell(cell, column, null);
-                j.incrementAndGet();
-            });
-            i.incrementAndGet();
+    public void writeRow(final Collection<Object> row, final Row excelRow, final int rowIndex) {
+        final AtomicInteger j = new AtomicInteger(0);
+        row.forEach(column -> {
+            Cell cell = excelRow.createCell(j.intValue());
+            if (writeHeader && rowIndex == 0) {
+                cell.setCellStyle(boldStyle);
+            }
+            writeToCell(cell, column, null);
+            j.incrementAndGet();
         });
     }
 }

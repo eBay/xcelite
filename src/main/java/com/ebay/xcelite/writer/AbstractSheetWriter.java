@@ -16,11 +16,16 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class description...
@@ -64,6 +69,20 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
             cell.setCellValue(fieldValueObj.toString());
         }
     }
+
+    @Override
+    public void write(final Collection<T> data) {
+        final AtomicInteger i = new AtomicInteger(0);
+        data.forEach(row -> {
+            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+            final AtomicInteger j = new AtomicInteger(0);
+            writeRow(row, excelRow, i.intValue());
+            i.incrementAndGet();
+        });
+    }
+
+    public abstract void writeRow(final T row, final Row excelRow, final int rowIndex);
+
 
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {

@@ -54,13 +54,18 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         writeData(data);
     }
 
+    @Override
+    public void writeRow(T row, Row excelRow, int rowIndex) {
+
+    }
+
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
         Set<Col> columnsToAdd = new TreeSet();
         for (T t: data) {
             if (anyColumn != null) {
-                appendAnyColumns(t, columnsToAdd);
+                columnsToAdd.addAll(createAndReturnAnyColumns(t));
             }
         }
         addColumns(columnsToAdd, true);
@@ -119,7 +124,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private void appendAnyColumns(T t, Set<Col> columnToAdd) {
+    private Set<Col> createAndReturnAnyColumns(T t) {
+        Set<Col> columnToAdd = new LinkedHashSet<>();
         Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
         Field anyColumnField = fields.iterator().next();
         anyColumnField.setAccessible(true);
@@ -133,7 +139,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             }
             columnToAdd.add(column);
         }
-
+        return columnToAdd;
     }
 
     private void addColumns(Set<Col> columnsToAdd, boolean append) {
