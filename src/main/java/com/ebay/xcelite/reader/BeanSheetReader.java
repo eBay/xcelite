@@ -25,8 +25,7 @@ import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.options.XceliteOptionsImpl;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -35,6 +34,7 @@ import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.reflections.ReflectionUtils.withName;
 
@@ -151,7 +151,9 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
     private static boolean isColumnInIgnoreList(Field anyColumnField, String columnName) {
         AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
-        Set<String> ignoreCols = Sets.newHashSet(annotation.ignoreCols());
+        Set<String> ignoreCols = Arrays
+                .stream(annotation.ignoreCols())
+                .collect(Collectors.toSet());
         return ignoreCols.contains(columnName);
     }
 
@@ -240,7 +242,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private void buildHeader() {
-        headers = Lists.newArrayList();
+        headers = new ArrayList<>();
         rowIterator = sheet.getNativeSheet().rowIterator();
         Row row = rowIterator.next();
         if (row == null) {
@@ -260,14 +262,14 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         private final Map<String, Col> columnsMap;
 
-        public ColumnsMapper(Set<Col> columns) {
+        ColumnsMapper(Set<Col> columns) {
             columnsMap = new HashMap<>();
             for (Col col : columns) {
                 columnsMap.put(col.getName(), col);
             }
         }
 
-        public Col getColumn(String name) {
+        Col getColumn(String name) {
             return columnsMap.get(name);
         }
     }

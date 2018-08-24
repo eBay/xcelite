@@ -32,21 +32,22 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
 
     @Getter
     protected XceliteSheet sheet;
-    protected boolean writeHeader;
+    boolean writeHeader;
 
-    public AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
+    AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
         this.sheet = sheet;
         this.writeHeader = writeHeader;
     }
 
-    protected void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
+    void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
         Class<?> type = fieldValueObj.getClass();
         if (dataType != null) {
             type = dataType;
         }
         if (type == Date.class) {
             cell.setCellValue((Date) fieldValueObj);
-        } else if (type == Boolean.class) {
+        } else if ((type == Boolean.class)
+                || (type == boolean.class)){
             cell.setCellValue((Boolean) fieldValueObj);
         } else if ((Number.class.isAssignableFrom(type))
                 || (fieldValueObj instanceof Number))  {

@@ -15,16 +15,16 @@
 */
 package com.ebay.xcelite.reader;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.options.XceliteOptionsImpl;
+import com.ebay.xcelite.sheet.XceliteSheet;
+
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
-
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -39,7 +39,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
   @Getter
   protected final XceliteSheet sheet;
 
-  protected final List<RowPostProcessor<T>> rowPostProcessors;
+  final List<RowPostProcessor<T>> rowPostProcessors;
 
   @Getter
   protected final XceliteOptions options;
@@ -52,15 +52,15 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
   public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
     this.sheet = sheet;
     this.options = options;
-    rowPostProcessors = Lists.newArrayList();
+    rowPostProcessors = new ArrayList<>();
   }
 
   /**
    * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
    * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
    * to 1
-   * @param sheet
-   * @param skipHeaderRow
+   * @param sheet The sheet to read from
+   * @param skipHeaderRow whether or not one header row should be skipped
    */
   @Deprecated
   public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
@@ -68,7 +68,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     this.options = new XceliteOptionsImpl();
     if (skipHeaderRow)
       options.setSkipRowsBeforeColumnDefinitionRow(1);
-    rowPostProcessors = Lists.newArrayList();
+    rowPostProcessors = new ArrayList<>();
   }
 
   public static Object readValueFromCell(Cell cell) {

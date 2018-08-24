@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 class AbstractTestBaseForWriterTests{
-    static final boolean writeToFile = false;
+    private static final boolean writeToFile = false;
     static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -30,9 +30,6 @@ class AbstractTestBaseForWriterTests{
         if (writeToFile)
             writeWorkbookToFile(workbook);
     }
-
-
-
 
     Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
         List<String> columnNames = new ArrayList<>();
@@ -55,7 +52,7 @@ class AbstractTestBaseForWriterTests{
     }
 
     @SneakyThrows
-    static void writeWorkbookToFile(XSSFWorkbook workbook) {
+    private static void writeWorkbookToFile(XSSFWorkbook workbook) {
         File f = new File("gotcha.xlsx");
         FileOutputStream st = new FileOutputStream(f);
         workbook.write(st);
