@@ -20,12 +20,12 @@ class AbstractTestBaseForWriterTests{
     static XSSFWorkbook workbook;
 
     @SneakyThrows
-    static void setup(Object bean, Class beanClass) {
+    static void setup(Object bean) {
         Xcelite xcelite = new Xcelite();
         ArrayList beans = new ArrayList();
         XceliteSheet sheet = xcelite.createSheet("Tests");
         beans.add(bean);
-        SheetWriter bs = sheet.getBeanWriter(beanClass);
+        SheetWriter bs = sheet.getBeanWriter(bean.getClass());
         bs.write(beans);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
         if (writeToFile)

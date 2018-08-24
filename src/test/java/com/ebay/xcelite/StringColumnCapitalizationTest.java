@@ -42,7 +42,7 @@ import java.util.ArrayList;
  *
  * @author Thanthathon.b
  */
-public class ColumnEachCaseTest {
+public class StringColumnCapitalizationTest {
 
     private static String usTestData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	"2",	"Female"},

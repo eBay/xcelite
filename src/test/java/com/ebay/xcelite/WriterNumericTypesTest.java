@@ -22,7 +22,7 @@ class WriterNumericTypesTest extends AbstractTestBaseForWriterTests{
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean, WriterNumericTypesBean.class);
+        setup(bean);
     }
 
     @Test

@@ -48,7 +48,7 @@ public class FormulaCellTest {
     @Test
     @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
     public void model_VLOOKUPCanLookupReferencedCell() {
-        Xcelite xcelite = new Xcelite(new File("src/test/resources/formulaData.xlsx"));
+        Xcelite xcelite = new Xcelite(new File("src/test/resourcqes/formulaData.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<FormulaUserBean> beanReader = sheet.getBeanReader(FormulaUserBean.class);
         ArrayList<FormulaUserBean> upper = new ArrayList<>(beanReader.read());

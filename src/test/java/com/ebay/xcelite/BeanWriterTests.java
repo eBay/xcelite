@@ -21,7 +21,7 @@ public class BeanWriterTests extends AbstractTestBaseForWriterTests {
             sb.append("a");
         }
         bean.setLongString(sb.toString());
-        setup(bean, BeanWriterTestsBean.class);
+        setup(bean);
     }
 
     @Test
