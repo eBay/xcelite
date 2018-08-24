@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * Using this bean causes an exception, as multiple
- * @AnyColumn annotations are not allowed
+ * {@link com.ebay.xcelite.annotations.AnyColumn} annotations are not allowed
  *
  * @author Johannes
  */

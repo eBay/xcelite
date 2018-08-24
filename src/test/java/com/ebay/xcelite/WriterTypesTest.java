@@ -1,14 +1,9 @@
 package com.ebay.xcelite;
 
 import com.ebay.xcelite.model.WriterTypesBean;
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.writer.SheetWriter;
 import lombok.SneakyThrows;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
 import java.math.*;
 import java.util.*;
 import java.util.concurrent.atomic.*;
@@ -21,7 +16,7 @@ import java.util.concurrent.atomic.*;
  * @since 1.2
  */
 
-public class WriterTypesTest extends AbstractTestBaseForWriterTests{
+class WriterTypesTest extends AbstractTestBaseForWriterTests{
     static final WriterTypesBean bean = new WriterTypesBean();
 
     @BeforeAll

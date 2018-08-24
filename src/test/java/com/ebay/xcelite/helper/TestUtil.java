@@ -39,6 +39,8 @@ public class TestUtil {
             case ERROR:
                 retVal = "#ERROR";
                 break;
+            default:
+                ;
         }
         return retVal;
     }

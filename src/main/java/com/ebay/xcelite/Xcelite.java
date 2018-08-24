@@ -18,12 +18,10 @@ package com.ebay.xcelite;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
-import com.ebay.xcelite.options.XceliteOptions;
 
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 

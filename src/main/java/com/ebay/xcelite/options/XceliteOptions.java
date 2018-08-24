@@ -16,7 +16,7 @@ public interface XceliteOptions {
      *
      * @return The number of rows
      */
-    public Integer getSkipRowsBeforeColumnDefinitionRow();
+    Integer getSkipRowsBeforeColumnDefinitionRow();
 
     /**
      * Sets the number of rows Xcelite should skip before trying
@@ -25,7 +25,7 @@ public interface XceliteOptions {
      *
      * @param skipRowsBeforeColumnDefinitionRow The number of rows to skip
      */
-    public void setSkipRowsBeforeColumnDefinitionRow (Integer skipRowsBeforeColumnDefinitionRow);
+    void setSkipRowsBeforeColumnDefinitionRow (Integer skipRowsBeforeColumnDefinitionRow);
 
     /**
      * Returns the number of rows Xcelite should skip after
@@ -35,7 +35,7 @@ public interface XceliteOptions {
      *
      * @return The number of rows
      */
-    public Integer getSkipRowsAfterColumnDefinitionRow();
+    Integer getSkipRowsAfterColumnDefinitionRow();
 
     /**
      * Set the number of rows Xcelite should skip after
@@ -45,7 +45,7 @@ public interface XceliteOptions {
      *
      * @param skipRowsAfterColumnDefinitionRow The number of rows
      */
-    public void setSkipRowsAfterColumnDefinitionRow (Integer skipRowsAfterColumnDefinitionRow);
+    void setSkipRowsAfterColumnDefinitionRow (Integer skipRowsAfterColumnDefinitionRow);
 
     /**
      * Returns whether SheetReaders skip blank rows
@@ -54,7 +54,7 @@ public interface XceliteOptions {
      *
      * @return Do we skip blank rows (Default: true)
      */
-    public boolean isSkipBlankRows();
+    boolean isSkipBlankRows();
 
     /**
      * Determines whether SheetReaders skip blank rows
@@ -62,6 +62,6 @@ public interface XceliteOptions {
      *
      * @param skipBlankRows Should we skip blank rows
      */
-    public void setSkipBlankRows(boolean skipBlankRows);
+    void setSkipBlankRows(boolean skipBlankRows);
 }
 

@@ -22,7 +22,6 @@ import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import lombok.Getter;
-import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;

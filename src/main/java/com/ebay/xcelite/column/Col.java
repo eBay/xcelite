@@ -58,6 +58,7 @@ public class Col implements Comparable<Col> {
         col.converter = converter;
     }
 
+
     @Override
     public int compareTo(Col col) {
         return this.getName().compareTo(col.getName());

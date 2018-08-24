@@ -1,9 +1,7 @@
 package com.ebay.xcelite;
 
 import com.ebay.xcelite.model.AbstractWriterTestsBean;
-import com.ebay.xcelite.model.BeanWriterTestsBean;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.SpreadsheetVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;

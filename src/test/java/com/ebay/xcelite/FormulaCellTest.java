@@ -16,20 +16,15 @@
 package com.ebay.xcelite;
 
 import com.ebay.xcelite.model.FormulaUserBean;
-import com.ebay.xcelite.model.UpperCase;
-import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test if formula cells work

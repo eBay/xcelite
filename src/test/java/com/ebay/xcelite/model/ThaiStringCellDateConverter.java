@@ -28,7 +28,7 @@ import java.util.Locale;
  * @author Thanthathon.b
  */
 public class ThaiStringCellDateConverter implements ColumnValueConverter<String, Date> {
-    static final String DATE_PATTERN = "dd/MM/yyyy";
+    private static final String DATE_PATTERN = "dd/MM/yyyy";
 
     @Override
     public String serialize(Date value) {

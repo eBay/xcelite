@@ -40,19 +40,25 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     }
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
+        if (null == fieldValueObj) {
+            cell.setCellType(CellType.BLANK);
+            return;
+        }
         Class<?> type = fieldValueObj.getClass();
         if (dataType != null) {
             type = dataType;
         }
         if (type == Date.class) {
+            cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Date) fieldValueObj);
         } else if ((type == Boolean.class)
                 || (type == boolean.class)){
+            cell.setCellType(CellType.BOOLEAN);
             cell.setCellValue((Boolean) fieldValueObj);
         } else if ((Number.class.isAssignableFrom(type))
                 || (fieldValueObj instanceof Number))  {
             cell.setCellType(CellType.NUMERIC);
-            cell.setCellValue(Double.valueOf(fieldValueObj.toString()));
+            cell.setCellValue(((Number) fieldValueObj).doubleValue());
         } else {
             cell.setCellType(CellType.STRING);
             cell.setCellValue(fieldValueObj.toString());

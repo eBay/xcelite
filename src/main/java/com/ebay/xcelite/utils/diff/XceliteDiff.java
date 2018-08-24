@@ -100,10 +100,10 @@ public final class XceliteDiff {
         Collection<T> ca = a.read();
         Collection<T> cb = b.read();
         Collection<T> disjunction = CollectionUtils.disjunction(ca, cb);
-        Info<T> info = new ReportInfo<T>(
+        Info<T> info = new ReportInfo<>(
                 new StringTuple(firstWorkbookName, secondWorkbookName),
                 new Sheets(a.getSheet().getNativeSheet().getSheetName(), b.getSheet().getNativeSheet().getSheetName()),
-                new Collections<T>(ca, cb, disjunction));
+                new Collections<>(ca, cb, disjunction));
         ReportGenerator reporter;
         if (reportGenerator != null) {
             reporter = reportGenerator;

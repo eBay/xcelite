@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 class AbstractTestBaseForWriterTests{
+    // set to true to look at the resulting spreadsheet files
     private static final boolean writeToFile = false;
     static XSSFWorkbook workbook;
 
@@ -53,7 +54,8 @@ class AbstractTestBaseForWriterTests{
 
     @SneakyThrows
     private static void writeWorkbookToFile(XSSFWorkbook workbook) {
-        File f = new File("gotcha.xlsx");
+        long tm = System.currentTimeMillis();
+        File f = new File("testresult_"+tm + ".xlsx");
         FileOutputStream st = new FileOutputStream(f);
         workbook.write(st);
         st.close();

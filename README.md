@@ -234,7 +234,7 @@ DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB, new ReportGener
       }
     });
 ```
-### How To Use?
+### How To Use
 #### Using Xcelite in Your Maven Project
 Add xcelite as a dependency:
 ```xml
