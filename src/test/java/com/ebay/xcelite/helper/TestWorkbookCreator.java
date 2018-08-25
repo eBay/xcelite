@@ -1,16 +1,12 @@
 package com.ebay.xcelite.helper;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,8 +14,7 @@ import java.util.List;
  * purposes.
  */
 
-@Getter
-@Setter
+@Data
 public class TestWorkbookCreator {
     private Workbook workbook;
 
@@ -177,7 +172,7 @@ public class TestWorkbookCreator {
     }
 
     private void rememberDataValue(int rowIdx, Object dataVal) {
-        List<Object> rowData = null;
+        List<Object> rowData;
         if ((rowIdx >= data.size()) || (null == data.get(rowIdx))) {
             rowData = new ArrayList<>();
             data.add(rowData);
@@ -207,13 +202,13 @@ public class TestWorkbookCreator {
             Cell cell = row.createCell(colIdx);
             cell.setCellType(CellType.STRING);
             cell.setCellValue("#");
-            curColIdx = (short)(colIdx);
+            curColIdx = colIdx;
         }
 
         short colOffset = 0;
         for (short colIdx = 0; colIdx < numDataColumns; colIdx++) {
             row.createCell(colIdx+curColIdx);
-            colOffset = (short)(colIdx);
+            colOffset = colIdx;
         }
 
         curColIdx = (short) (curColIdx + colOffset);
@@ -229,8 +224,7 @@ public class TestWorkbookCreator {
             Sheet sheet,
             int rowIdx) {
 
-        Row row = sheet.createRow(rowIdx);
-        return row;
+        return sheet.createRow(rowIdx);
     }
 
     private static Row createHeaderRow (
@@ -275,7 +269,7 @@ public class TestWorkbookCreator {
                 if (Math.random() > 0.5) {
                     retVal = Math.random();
                 } else {
-                    retVal = new Double(Math.round(Math.random() * 100));
+                    retVal = (double) Math.round(Math.random() * 100);
                 }
                 cell.setCellValue((Double)retVal);
                 break;

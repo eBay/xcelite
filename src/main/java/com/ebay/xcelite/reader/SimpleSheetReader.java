@@ -15,18 +15,17 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.sheet.XceliteSheet;
+import com.google.common.collect.Lists;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.options.XceliteOptionsImpl;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
-import org.apache.poi.ss.usermodel.Sheet;
+import com.ebay.xcelite.options.*;
 
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
@@ -34,7 +33,6 @@ import org.apache.poi.ss.usermodel.Sheet;
  * 
  * @author kharel (kharel@ebay.com)
  * created Nov 8, 2013
- * 
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
@@ -52,11 +50,11 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
   @Override
   public Collection<Collection<Object>> read() {
-    List<Collection<Object>> rows = Lists.newArrayList();
+    List<Collection<Object>> rows = new ArrayList<>();
     Iterator<Row> rowIterator = moveToFirstRow(sheet.getNativeSheet(), options);
     if (null == rowIterator) return rows;
 
-    while (rowIterator.hasNext()) {      
+    while (rowIterator.hasNext()) {
       Row excelRow = rowIterator.next();
       if (options.isSkipBlankRows() && isBlankRow(excelRow))
         continue;

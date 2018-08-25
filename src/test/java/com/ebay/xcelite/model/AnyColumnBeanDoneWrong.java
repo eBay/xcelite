@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-package com.ebay.xcelite.exceptions;
+package com.ebay.xcelite.model;
+
+import com.ebay.xcelite.annotations.AnyColumn;
+import lombok.Data;
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * @author Thanthathon.b
+ * Using this bean causes an exception, as multiple
+ * {@link com.ebay.xcelite.annotations.AnyColumn} annotations are not allowed
+ *
+ * @author Johannes
  */
-public class ColumnNotFoundException extends XceliteException {
+@Data
+public class AnyColumnBeanDoneWrong {
 
-    public ColumnNotFoundException(String columnName) {
-        super(columnName + " not found");
-    }
+    @AnyColumn
+    private Map<String,List<String>> columns;
 
-
+    @AnyColumn
+    private Map<String,List<String>> moreColumns;
+    
 }

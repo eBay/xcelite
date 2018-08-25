@@ -15,15 +15,15 @@
 */
 package com.ebay.xcelite.writer;
 
-import java.util.Collection;
-
 import com.ebay.xcelite.sheet.XceliteSheet;
+
+import java.util.Collection;
 
 public interface SheetWriter<T> {
 
-  void write(Collection<T> data);
-  
-  void generateHeaderRow(boolean generateHeaderRow);
-  
-  XceliteSheet getSheet();
+    void write(Collection<T> data);
+
+    void generateHeaderRow(boolean generateHeaderRow);
+
+    XceliteSheet getSheet();
 }

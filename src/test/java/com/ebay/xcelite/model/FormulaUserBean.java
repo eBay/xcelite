@@ -13,17 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.ebay.xcelite.model;
 
-package com.ebay.xcelite.exceptions;
+import com.ebay.xcelite.annotations.Column;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- * @author Thanthathon.b
+ *
+ * @author Johannes
  */
-public class ColumnNotFoundException extends XceliteException {
+@Data
+public class FormulaUserBean implements Serializable {
 
-    public ColumnNotFoundException(String columnName) {
-        super(columnName + " not found");
-    }
+    @Column(name = "NAME")
+    private String name;
 
+    @Column(name = "SURNAME")
+    private String surname;
+
+    @Column(name = "BIRTHDATE", converter = UsStringCellDateConverter.class, dataFormat = UsStringCellDateConverter.DATE_PATTERN)
+    private Date birthDate;
+
+    @Column(name = "SEX")
+    private String sex;
 
 }
