@@ -59,4 +59,6 @@ public class FormulaCellTest {
         FormulaUserBean second = upper.get(1);
         assertEquals(testData[1][4], second.getSex(), "Gender mismatch");
     }
+
+    // TODO write test With formula cell containing error
 }
