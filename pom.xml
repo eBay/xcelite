@@ -1,13 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.ebay</groupId>
+
+	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
 	<version>1.1.0</version>
 	<packaging>jar</packaging>
-	<name>xcelite</name>
-	<description>Xcelite is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets</description>
-	<url>https://github.com/eBay/xcelite</url>
 
+	<name>xcelite</name>
+	<description>Xcelite is an ORM like Java library which allows you to easily
+		serialize and deserialize Java beans to/from Excel spreadsheets</description>
+	<url>http://xcelite.io</url>
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
@@ -22,29 +24,35 @@
 		</license>
 	</licenses>
 
+	<!--
+		Release-documentation:
+		- https://medium.com/@nmauti/publishing-a-project-on-maven-central-8106393db2c3
+		- https://dzone.com/articles/publish-your-artifacts-to-maven-central
+	-->
+
 	<scm>
 		<tag>master</tag>
-		<connection>scm:git:git@github.com:eBay/xcelite.git</connection>
-		<developerConnection>scm:git:git@github.com:eBay/xcelite.git</developerConnection>
-		<url>git@github.com:eBay/xcelite.git</url>
+		<connection>scm:git:git://github.com/xcelite-io/xcelite.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:xcelite-io/xcelite.git</developerConnection>
+		<url>https://github.com/xcelite-io/xcelite</url>
 	</scm>
 
 	<issueManagement>
 		<system>Github issues</system>
-		<url>https://github.com/eBay/xcelite/issues</url>
+		<url>https://github.com/xcelite-io/xcelite/issues</url>
 	</issueManagement>
 
 	<developers>
 		<developer>
-			<name>Kfir Harel</name>
-			<email>kharel@ebay.com</email>
+			<name>Johannes Jander</name>
+			<email>xcelite.io@gmail.com</email>
 		</developer>
 	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        	<java.version>1.8</java.version>
-        	<apache-poi.version>3.17</apache-poi.version>
+		<java.version>1.6</java.version>
+		<apache-poi.version>3.17</apache-poi.version>
 	</properties>
 
 	<build>
@@ -52,7 +60,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<configuration>
 					<encoding>utf-8</encoding>
 					<source>${java.version}</source>
@@ -75,10 +83,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.1</version>
 				<configuration>
 					<doclint>none</doclint>
 					<quiet>true</quiet>
+					<encoding>UTF-8</encoding>
 				</configuration>
 				<executions>
 					<execution>
@@ -89,10 +98,24 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-    				<version>1.6</version>
+				<version>1.6</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -103,6 +126,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -112,37 +146,55 @@
 			<artifactId>poi</artifactId>
 			<version>${apache-poi.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>${apache-poi.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.11</version>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.2</version>
 		</dependency>
+
 		<dependency>
-		    <groupId>org.projectlombok</groupId>
-		    <artifactId>lombok</artifactId>
-		    <version>1.16.20</version>
-		    <scope>provided</scope>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.2</version>
+			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-		    <groupId>com.google.code.findbugs</groupId>
-		    <artifactId>jsr305</artifactId>
-		    <version>3.0.2</version>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.2</version>
 		</dependency>
-	 	<dependency>
-		    <groupId>junit</groupId>
-		    <artifactId>junit</artifactId>
-		    <version>4.8.2</version>
-		    <scope>test</scope>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.1.1</version>
+			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.5</version>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
+
