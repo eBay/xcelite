@@ -30,6 +30,7 @@ import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -80,8 +81,14 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
 
+        Sheet s = sheet.getNativeSheet();
+        rowIterator = moveToFirstRow(s, options);
+        if (!rowIterator.hasNext())
+            return data;
+
         buildHeader();
         validateColumns();
+        skipRowsAfterColumnDefinition(s, options);
 
         rowIterator.forEachRemaining(excelRow -> {
             if (!(isBlankRow(excelRow) && options.isSkipBlankRows())) {
@@ -243,7 +250,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
     private void buildHeader() {
         headers = new ArrayList<>();
-        rowIterator = sheet.getNativeSheet().rowIterator();
         Row row = rowIterator.next();
         if (row == null) {
             throw new XceliteException("First row in sheet is empty. First row must contain header");

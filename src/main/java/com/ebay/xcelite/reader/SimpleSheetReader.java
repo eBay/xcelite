@@ -52,7 +52,8 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
     Iterator<Row> rowIterator = moveToFirstRow(sheet.getNativeSheet(), options);
-    if (null == rowIterator) return rows;
+    if (!rowIterator.hasNext())
+      return rows;
 
     while (rowIterator.hasNext()) {
       Row excelRow = rowIterator.next();
