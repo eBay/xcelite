@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.options.XceliteOptionsImpl;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import lombok.Getter;
@@ -46,7 +45,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
 
     public AbstractSheetReader(XceliteSheet sheet) {
-        this (sheet, new XceliteOptionsImpl());
+        this (sheet, new XceliteOptions());
     }
 
     public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
@@ -65,7 +64,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Deprecated
     public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
         this.sheet = sheet;
-        this.options = new XceliteOptionsImpl();
+        this.options = new XceliteOptions();
         if (skipHeaderRow)
             options.setSkipRowsBeforeColumnDefinitionRow(1);
         rowPostProcessors = new ArrayList<>();
@@ -138,6 +137,17 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
             }
         }
         return blankRow;
+    }
+
+    boolean shouldKeepObject(T object, List<RowPostProcessor<T>> rowPostProcessors) {
+        boolean keepObject = true;
+
+        for (RowPostProcessor<T> rowPostProcessor: rowPostProcessors) {
+            keepObject = rowPostProcessor.process(object);
+            if (!keepObject) break;
+        }
+
+        return keepObject;
     }
 
     static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {

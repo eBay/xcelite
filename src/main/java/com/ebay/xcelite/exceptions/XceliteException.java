@@ -16,7 +16,7 @@
 package com.ebay.xcelite.exceptions;
 
 /**
- * Class description...
+ * Base class for Xcelite-specific exceptions
  *
  * @author kharel (kharel@ebay.com)
  * created Sep 9, 2013
