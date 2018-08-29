@@ -91,7 +91,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         buildHeader();
         validateColumns();
-        skipRowsAfterColumnDefinition(s, options);
+        rowIterator = skipRowsAfterColumnDefinition(s, options);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
@@ -243,7 +243,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
     }
 
-
     private static Object convertToFieldType(Object cellValue, Class<?> fieldType) {
         String value = String.valueOf(cellValue);
         if ((fieldType.equals(Double.class)) || (fieldType.equals(double.class))) {
@@ -280,17 +279,15 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
 
-        for (int i = 0; i < row.getLastCellNum(); i++) {
-            Cell cell = row.getCell(i);
+        row.cellIterator().forEachRemaining(cell -> {
             String cellValue = (null != cell) ? cell.getStringCellValue() : null;
             if ((null == cellValue) || (cellValue.isEmpty()))
                 cellValue = null;
             headers.add(cellValue);
-        }
+        });
     }
 
     private class ColumnsMapper {
-
         private final Map<String, Col> columnsMap;
 
         ColumnsMapper(Set<Col> columns) {

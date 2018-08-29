@@ -153,7 +153,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
         if (options.getSkipRowsAfterColumnDefinitionRow() <= 0)
             return nativeSheet.rowIterator();
-        return skipRows (nativeSheet, 0, options.getSkipRowsBeforeColumnDefinitionRow());
+        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow() + 1, options.getSkipRowsAfterColumnDefinitionRow());
     }
 
     static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
