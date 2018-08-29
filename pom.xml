@@ -36,8 +36,14 @@
 
 	<developers>
 		<developer>
+			<name>Xcelite Developers</name>
+			<email>xcelite.io@gmail.com</email>
+		</developer>
+		<developer>
+			<name>Johannes Jander</name>
+		</developer>
+		<developer>
 			<name>Kfir Harel</name>
-			<email>kharel@ebay.com</email>
 		</developer>
 	</developers>
 
