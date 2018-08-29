@@ -30,12 +30,6 @@
 		</license>
 	</licenses>
 
-	<!--
-		Release-documentation:
-		- https://medium.com/@nmauti/publishing-a-project-on-maven-central-8106393db2c3
-		- https://dzone.com/articles/publish-your-artifacts-to-maven-central
-	-->
-
 	<scm>
 		<tag>master</tag>
 		<connection>scm:git:git://github.com/xcelite-io/xcelite.git</connection>
