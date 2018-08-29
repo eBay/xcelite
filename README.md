@@ -236,6 +236,6 @@ Add xcelite as a dependency:
 <dependency>
 			<groupId>io.xcelite.spreadsheet</groupId>
 			<artifactId>xcelite</artifactId>
-			<version>1.0.4</version>
+			<version>1.1.0</version>
 </dependency>
 ```
