@@ -280,7 +280,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
 
-        for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
+        for (int i = 0; i < row.getLastCellNum(); i++) {
             Cell cell = row.getCell(i);
             String cellValue = (null != cell) ? cell.getStringCellValue() : null;
             if ((null == cellValue) || (cellValue.isEmpty()))
