@@ -30,12 +30,6 @@
 		</license>
 	</licenses>
 
-	<!--
-		Release-documentation:
-		- https://medium.com/@nmauti/publishing-a-project-on-maven-central-8106393db2c3
-		- https://dzone.com/articles/publish-your-artifacts-to-maven-central
-	-->
-
 	<scm>
 		<tag>master</tag>
 		<connection>scm:git:git://github.com/xcelite-io/xcelite.git</connection>
@@ -67,12 +61,15 @@
 		<developer>
 			<name>Johannes Jander</name>
 		</developer>
+		<developer>
+			<name>Kfir Harel</name>
+		</developer>
 	</developers>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-        <apache-poi.version>3.17</apache-poi.version>
+        	<java.version>1.8</java.version>
+        	<apache-poi.version>3.17</apache-poi.version>
 	</properties>
 
 	<build>
@@ -168,7 +165,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
+    				<version>1.6</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -231,11 +228,12 @@
 			<version>0.9.11</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>4.2</version>
-		</dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.2</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -298,4 +296,3 @@
 		</profile>
 	</profiles>
 </project>
-
