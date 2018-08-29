@@ -63,11 +63,9 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
      */
     @Deprecated
     public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
-        this.sheet = sheet;
-        this.options = new XceliteOptions();
+        this (sheet);
         if (skipHeaderRow)
             options.setSkipRowsBeforeColumnDefinitionRow(1);
-        rowPostProcessors = new ArrayList<>();
     }
 
     public static Object readValueFromCell(Cell cell) {
@@ -153,25 +151,28 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
         if (options.getSkipRowsAfterColumnDefinitionRow() < 0)
             return nativeSheet.rowIterator();
-        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow() + 1, options.getSkipRowsAfterColumnDefinitionRow());
+        return skipRows (nativeSheet,
+                options.getSkipRowsBeforeColumnDefinitionRow()
+                        + options.getSkipRowsAfterColumnDefinitionRow()
+                        + 1);
     }
 
     static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
         if (options.getSkipRowsBeforeColumnDefinitionRow() <= 0)
             return nativeSheet.rowIterator();
-        return skipRows (nativeSheet, 0, options.getSkipRowsBeforeColumnDefinitionRow());
+        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow());
     }
 
     /*
      Empty rows sadly are returned as null. Therefore, we need to find the  last  logical row
      that corresponds to the last skipped row.
      After that, iterate the row iterator as many times to skip lines and set it to the row
-     before the wanted row.
+     before the wanted row. Seems clumsy, maybe think about a better way.
      */
-    static Iterator<Row> skipRows (Sheet nativeSheet, int startRow, int rowsToSkip) {
+    static Iterator<Row> skipRows (Sheet nativeSheet, int rowsToSkip) {
         int lastRowNum = 0;
         for (int i = 0; i < rowsToSkip; i++) {
-            Row r = nativeSheet.getRow(startRow + i);
+            Row r = nativeSheet.getRow(i);
             if (null != r)
                 lastRowNum = r.getRowNum();
         }
