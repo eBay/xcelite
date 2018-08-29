@@ -7,8 +7,12 @@ import lombok.Data;
 public class AbstractWriterTestsBean {
 
     @Column(name = "booleanSimpleType")
-    boolean   booleanSimpleType     = true;
+    boolean   booleanSimpleType = true;
 
     @Column(name = "booleanObjectType")
-    Boolean   booleanObjectType     = true;
+    Boolean   booleanObjectType = true;
+
+    @Column(name = "stringType")
+    String   stringType         = "abcde";
+
 }

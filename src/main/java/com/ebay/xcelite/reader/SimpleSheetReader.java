@@ -15,8 +15,12 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
+import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -30,7 +34,7 @@ import com.ebay.xcelite.options.*;
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
  * of an Excel sheet as a two-dimensional data structure.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 8, 2013
  */
@@ -45,37 +49,51 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
    * @param sheet the {@link XceliteSheet} to read from
    */
   public SimpleSheetReader(XceliteSheet sheet) {
-    this(sheet, new XceliteOptionsImpl());
+    this(sheet, new XceliteOptions());
   }
 
   @Override
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
     Iterator<Row> rowIterator = moveToFirstRow(sheet.getNativeSheet(), options);
-    if (null == rowIterator) return rows;
+    if (!rowIterator.hasNext())
+      return rows;
 
-    while (rowIterator.hasNext()) {
-      Row excelRow = rowIterator.next();
-      if (options.isSkipBlankRows() && isBlankRow(excelRow))
-        continue;
-
-      List<Object> row = Lists.newArrayList();
-      Iterator<Cell> cellIterator = excelRow.cellIterator();
-
-      while (cellIterator.hasNext()) {
-        Object value = readValueFromCell(cellIterator.next());
-        row.add(value);
+    rowIterator.forEachRemaining(excelRow -> {
+      List<Object> row;
+      if (isBlankRow(excelRow)) {
+        switch (options.getMissingRowPolicy()) {
+          case THROW:
+            throw new EmptyRowException();
+          case RETURN_EMPTY_OBJECT:
+            row = new ArrayList<>();
+            break;
+          case RETURN_NULL:
+            row = null;
+            break;
+          default:
+            row = null;
+        }
+      } else {
+        row = fillObject(excelRow);
       }
 
-      boolean keepRow = true;
-      for (RowPostProcessor<Collection<Object>> rowPostProcessor : rowPostProcessors) {
-        keepRow = rowPostProcessor.process(row);
-        if (!keepRow) break;
-      }
-      if (keepRow) {
+      if (shouldKeepObject(row, rowPostProcessors)) {
         rows.add(row);
       }
-    }
+    });
     return rows;
+  }
+
+  @SneakyThrows
+  private List<Object> fillObject(Row excelRow) {
+    List<Object> row = new ArrayList<>();
+    Iterator<Cell> cellIterator = excelRow.cellIterator();
+
+    while (cellIterator.hasNext()) {
+      Object value = readValueFromCell(cellIterator.next());
+      row.add(value);
+    }
+    return row;
   }
 }

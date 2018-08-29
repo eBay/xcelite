@@ -15,11 +15,11 @@ class AbstractWriterTests extends AbstractTestBaseForWriterTests {
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean, bean.getClass());
+        setup(bean);
     }
 
     @Test
-    @DisplayName("Must correctly write boolean)")
+    @DisplayName("Must correctly write boolean")
     void mustWriteBooleanSimpleTypeOK() {
         Map<String, Object> columnsMap = extractCellValues (workbook);
         boolean val = bean.isBooleanSimpleType();
@@ -29,7 +29,7 @@ class AbstractWriterTests extends AbstractTestBaseForWriterTests {
     }
 
     @Test
-    @DisplayName("Must correctly write Boolean)")
+    @DisplayName("Must correctly write Boolean")
     void mustWriteBooleanObjectTypeOK() {
         Map<String, Object> columnsMap = extractCellValues (workbook);
         Boolean val = bean.getBooleanObjectType();
@@ -38,5 +38,14 @@ class AbstractWriterTests extends AbstractTestBaseForWriterTests {
         Assertions.assertEquals(val, obj);
     }
 
+    @Test
+    @DisplayName("Must correctly write String")
+    void mustWriteStringOK() {
+        Map<String, Object> columnsMap = extractCellValues (workbook);
+        String val = bean.getStringType();
+        Object obj = columnsMap.get("stringType");
+        Assertions.assertEquals(val.getClass(), obj.getClass(), "Values of type String must be written as String");
+        Assertions.assertEquals(val, obj);
+    }
 
 }

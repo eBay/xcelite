@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.options.XceliteOptionsImpl;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import lombok.Getter;
@@ -36,121 +35,153 @@ import org.apache.poi.ss.usermodel.Sheet;
  *
  */
 public abstract class AbstractSheetReader<T> implements SheetReader<T> {
-  @Getter
-  protected final XceliteSheet sheet;
+    @Getter
+    protected final XceliteSheet sheet;
 
-  final List<RowPostProcessor<T>> rowPostProcessors;
+    final List<RowPostProcessor<T>> rowPostProcessors;
 
-  @Getter
-  protected final XceliteOptions options;
+    @Getter
+    protected final XceliteOptions options;
 
 
-  public AbstractSheetReader(XceliteSheet sheet) {
-    this (sheet, new XceliteOptionsImpl());
-  }
+    public AbstractSheetReader(XceliteSheet sheet) {
+        this (sheet, new XceliteOptions());
+    }
 
-  public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
-    this.sheet = sheet;
-    this.options = options;
-    rowPostProcessors = new ArrayList<>();
-  }
+    public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
+        this.sheet = sheet;
+        this.options = options;
+        rowPostProcessors = new ArrayList<>();
+    }
 
-  /**
-   * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
-   * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
-   * to 1
-   * @param sheet The sheet to read from
-   * @param skipHeaderRow whether or not one header row should be skipped
-   */
-  @Deprecated
-  public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
-    this.sheet = sheet;
-    this.options = new XceliteOptionsImpl();
-    if (skipHeaderRow)
-      options.setSkipRowsBeforeColumnDefinitionRow(1);
-    rowPostProcessors = new ArrayList<>();
-  }
+    /**
+     * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
+     * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * to 1
+     * @param sheet The sheet to read from
+     * @param skipHeaderRow whether or not one header row should be skipped
+     */
+    @Deprecated
+    public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
+        this (sheet);
+        if (skipHeaderRow)
+            options.setSkipRowsBeforeColumnDefinitionRow(1);
+    }
 
-  public static Object readValueFromCell(Cell cell) {
-    if (cell == null) return null;
-    Object cellValue = null;
-    switch (cell.getCellTypeEnum()) {
-      case ERROR:
-        break;
-      case FORMULA:
-        // Get the type of Formula
-        switch (cell.getCachedFormulaResultTypeEnum()) {
-          case STRING:
-            cellValue = cell.getStringCellValue();
-            break;
-          case NUMERIC:
-            cellValue = cell.getNumericCellValue();
-            break;
-          default:
-            cellValue = cell.getStringCellValue();
+    public static Object readValueFromCell(Cell cell) {
+        if (cell == null) return null;
+        Object cellValue = null;
+        switch (cell.getCellTypeEnum()) {
+            case ERROR:
+                break;
+            case FORMULA:
+                // Get the type of Formula
+                switch (cell.getCachedFormulaResultTypeEnum()) {
+                    case ERROR:
+                        cellValue = null;
+                        break;
+                    case STRING:
+                        cellValue = cell.getStringCellValue();
+                        break;
+                    case NUMERIC:
+                        cellValue = cell.getNumericCellValue();
+                        break;
+                    default:
+                        cellValue = cell.getStringCellValue();
+                }
+                break;
+            case BOOLEAN:
+                cellValue = cell.getBooleanCellValue();
+                break;
+            case NUMERIC:
+                cellValue = cell.getNumericCellValue();
+                break;
+            default:
+                cellValue = cell.getStringCellValue();
         }
-        break;
-      case BOOLEAN:
-        cellValue = cell.getBooleanCellValue();
-        break;
-      case NUMERIC:
-        cellValue = cell.getNumericCellValue();
-        break;
-      default:
-        cellValue = cell.getStringCellValue();
+        return cellValue;
     }
-    return cellValue;
-  }
 
-  /**
-   * @deprecated since 1.2. Use {@link #getOptions()} instead and set
-   * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
-   * to 1
-   * @param skipHeaderRow true to skip the header row, false otherwise
-   */
-  @Override
-  @Deprecated
-  public void skipHeaderRow(boolean skipHeaderRow) {
-    if (skipHeaderRow)
-      options.setSkipRowsBeforeColumnDefinitionRow(1);
-  }
-
-  @Override
-  public void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
-    rowPostProcessors.add(rowPostProcessor);
-  }
-
-  @Override
-  public void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
-    rowPostProcessors.remove(rowPostProcessor);
-  }
-
-  boolean isBlankRow(Row row) {
-    Iterator<Cell> cellIterator = row.cellIterator();
-    boolean blankRow = true;
-    while (cellIterator.hasNext()) {
-      Object value = readValueFromCell(cellIterator.next());
-      if (blankRow && value != null && !String.valueOf(value).isEmpty()) {
-        blankRow = false;
-      }
+    /**
+     * @deprecated since 1.2. Use {@link #getOptions()} instead and set
+     * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * to 1
+     * @param skipHeaderRow true to skip the header row, false otherwise
+     */
+    @Override
+    @Deprecated
+    public void skipHeaderRow(boolean skipHeaderRow) {
+        if (skipHeaderRow)
+            options.setSkipRowsBeforeColumnDefinitionRow(1);
     }
-    return blankRow;
-  }
 
-  static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
-    Iterator<Row> rowIterator = nativeSheet.iterator();
-    if (!rowIterator.hasNext())
-      return null;
-    rowIterator.next();
-    if (options.getSkipRowsBeforeColumnDefinitionRow() > 0) {
-      int rowsToSkip = options.getSkipRowsBeforeColumnDefinitionRow();
-      while ((rowsToSkip > 0) && (rowIterator.hasNext())) {
-        rowIterator.next();
-        rowsToSkip--;
-      }
-      if (rowsToSkip > 0)
-        throw new IllegalArgumentException("SkipLinesBeforeHeader cannot be bigger than length of sheet");
+    @Override
+    public void addRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
+        rowPostProcessors.add(rowPostProcessor);
     }
-    return rowIterator;
-  }
+
+    @Override
+    public void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor) {
+        rowPostProcessors.remove(rowPostProcessor);
+    }
+
+    boolean isBlankRow(Row row) {
+        Iterator<Cell> cellIterator = row.cellIterator();
+        boolean blankRow = true;
+        while (cellIterator.hasNext()) {
+            Object value = readValueFromCell(cellIterator.next());
+            if (blankRow && value != null && !String.valueOf(value).isEmpty()) {
+                blankRow = false;
+            }
+        }
+        return blankRow;
+    }
+
+    boolean shouldKeepObject(T object, List<RowPostProcessor<T>> rowPostProcessors) {
+        boolean keepObject = true;
+
+        for (RowPostProcessor<T> rowPostProcessor: rowPostProcessors) {
+            keepObject = rowPostProcessor.process(object);
+            if (!keepObject) break;
+        }
+
+        return keepObject;
+    }
+
+    static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
+        if (options.getSkipRowsAfterColumnDefinitionRow() < 0)
+            return nativeSheet.rowIterator();
+        return skipRows (nativeSheet,
+                options.getSkipRowsBeforeColumnDefinitionRow()
+                        + options.getSkipRowsAfterColumnDefinitionRow()
+                        + 1);
+    }
+
+    static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
+        if (options.getSkipRowsBeforeColumnDefinitionRow() <= 0)
+            return nativeSheet.rowIterator();
+        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow());
+    }
+
+    /*
+     Empty rows sadly are returned as null. Therefore, we need to find the  last  logical row
+     that corresponds to the last skipped row.
+     After that, iterate the row iterator as many times to skip lines and set it to the row
+     before the wanted row. Seems clumsy, maybe think about a better way.
+     */
+    static Iterator<Row> skipRows (Sheet nativeSheet, int rowsToSkip) {
+        int lastRowNum = 0;
+        for (int i = 0; i < rowsToSkip; i++) {
+            Row r = nativeSheet.getRow(i);
+            if (null != r)
+                lastRowNum = r.getRowNum();
+        }
+        Iterator<Row> rowIterator= nativeSheet.rowIterator();
+        boolean stop = false;
+        while ((rowIterator.hasNext()) && (!stop)) {
+            Row r = rowIterator.next();
+            stop = (r.getRowNum() >= lastRowNum);
+        }
+        return rowIterator;
+    }
 }

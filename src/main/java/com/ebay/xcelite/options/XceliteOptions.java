@@ -1,13 +1,23 @@
 package com.ebay.xcelite.options;
 
+import com.ebay.xcelite.policies.MissingCellPolicy;
+import com.ebay.xcelite.policies.MissingRowPolicy;
+
 /**
- * Configuration interface for setting options of a {@link com.ebay.xcelite.Xcelite}
+ * Configuration class for setting options of a {@link com.ebay.xcelite.Xcelite}
  * object.
  *
  * @since 1.2
  */
 
-public interface XceliteOptions {
+
+public class XceliteOptions {
+
+    private Integer skipRowsBeforeColDefinitionRow = 0;
+    private Integer skipRowsAfterColDefinitionRow = 0;
+    private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
+    private MissingRowPolicy missingRowPolicy = MissingRowPolicy.SKIP;
+
 
     /**
      * Returns the number of rows Xcelite should skip before trying
@@ -16,7 +26,10 @@ public interface XceliteOptions {
      *
      * @return The number of rows
      */
-    Integer getSkipRowsBeforeColumnDefinitionRow();
+    public Integer getSkipRowsBeforeColumnDefinitionRow() {
+        return skipRowsBeforeColDefinitionRow;
+    }
+
 
     /**
      * Sets the number of rows Xcelite should skip before trying
@@ -25,7 +38,9 @@ public interface XceliteOptions {
      *
      * @param skipRowsBeforeColumnDefinitionRow The number of rows to skip
      */
-    void setSkipRowsBeforeColumnDefinitionRow (Integer skipRowsBeforeColumnDefinitionRow);
+    public void setSkipRowsBeforeColumnDefinitionRow(Integer skipRowsBeforeColumnDefinitionRow) {
+        this.skipRowsBeforeColDefinitionRow = skipRowsBeforeColumnDefinitionRow;
+    }
 
     /**
      * Returns the number of rows Xcelite should skip after
@@ -35,7 +50,9 @@ public interface XceliteOptions {
      *
      * @return The number of rows
      */
-    Integer getSkipRowsAfterColumnDefinitionRow();
+    public Integer getSkipRowsAfterColumnDefinitionRow() {
+        return skipRowsAfterColDefinitionRow;
+    }
 
     /**
      * Set the number of rows Xcelite should skip after
@@ -45,23 +62,40 @@ public interface XceliteOptions {
      *
      * @param skipRowsAfterColumnDefinitionRow The number of rows
      */
-    void setSkipRowsAfterColumnDefinitionRow (Integer skipRowsAfterColumnDefinitionRow);
+    public void setSkipRowsAfterColumnDefinitionRow(Integer skipRowsAfterColumnDefinitionRow) {
+        this.skipRowsAfterColDefinitionRow = skipRowsAfterColumnDefinitionRow;
+    }
 
     /**
-     * Returns whether SheetReaders skip blank rows
-     * or return empty objects for blank rows.
-     * Default is SheetReaders skip blank rows
-     *
-     * @return Do we skip blank rows (Default: true)
+     * Used to specify the different possible policies for the case of null and blank cells
+     * @return currently active policy for null and blank cells
      */
-    boolean isSkipBlankRows();
+    public MissingCellPolicy getMissingCellPolicy() {
+        return missingCellPolicy;
+    }
 
     /**
-     * Determines whether SheetReaders skip blank rows
-     * or return empty objects for blank rows
-     *
-     * @param skipBlankRows Should we skip blank rows
+     * Used to specify the different possible policies for the case of null and blank cells
+     * @param missingCellPolicy set policy for null and blank cells
      */
-    void setSkipBlankRows(boolean skipBlankRows);
+    public void setMissingCellPolicy(MissingCellPolicy missingCellPolicy) {
+        this.missingCellPolicy = missingCellPolicy;
+    }
+
+    /**
+     * Used to specify the different possible policies for the case of null and blank rows
+     * @return currently active policy for null and blank rows
+     */
+    public MissingRowPolicy getMissingRowPolicy() {
+        return missingRowPolicy;
+    }
+
+    /**
+     * Used to specify the different possible policies for the case of null and blank rows
+     * @param missingRowPolicy set policy for null and blank rows
+     */
+    public void setMissingRowPolicy(MissingRowPolicy missingRowPolicy) {
+        this.missingRowPolicy = missingRowPolicy;
+    }
+
 }
-

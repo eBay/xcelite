@@ -21,15 +21,19 @@ import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
+import com.ebay.xcelite.exceptions.EmptyCellException;
+import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.options.XceliteOptionsImpl;
+import com.ebay.xcelite.policies.MissingCellPolicy;
+import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -71,7 +75,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
      * @param type class of the beans
      */
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
-        this(sheet, new XceliteOptionsImpl(), type);
+        this(sheet, new XceliteOptions(), type);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,13 +84,38 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
 
+        Sheet s = sheet.getNativeSheet();
+        rowIterator = moveToFirstRow(s, options);
+        if (!rowIterator.hasNext())
+            return data;
+
         buildHeader();
         validateColumns();
+        rowIterator = skipRowsAfterColumnDefinition(s, options);
 
         rowIterator.forEachRemaining(excelRow -> {
-            if (!(isBlankRow(excelRow) && options.isSkipBlankRows())) {
-                T object = fillObject(excelRow);
+            T object;
 
+            if (isBlankRow(excelRow)) {
+                switch (options.getMissingRowPolicy()) {
+                    case THROW:
+                        throw new EmptyRowException();
+                    case RETURN_EMPTY_OBJECT:
+                        object = fillObject(excelRow);
+                        break;
+                    case RETURN_NULL:
+                        object = null;
+                        break;
+                    default:
+                        object = null;
+                }
+                if (!options.getMissingRowPolicy().equals(MissingRowPolicy.SKIP)) {
+                    if (shouldKeepObject(object, rowPostProcessors)) {
+                        data.add(object);
+                    }
+                }
+            } else {
+                object = fillObject(excelRow);
                 if (shouldKeepObject(object, rowPostProcessors)) {
                     data.add(object);
                 }
@@ -102,10 +131,10 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         for (int i = 0; i < headers.size(); i++) {
             String columnName = headers.get(i);
-            Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            validateCellAgainstMissingCellPolicy(row, i);
+            Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
 
             Col col = mapper.getColumn(columnName);
-
             if (col == null) {
                 if (anyColumn != null) {
                     Field field = getField(object.getClass(), anyColumn.getFieldName());
@@ -121,6 +150,8 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         return object;
     }
+
+
 
     @SuppressWarnings("unchecked")
     private Field getField(Class<?> aClass, String name) {
@@ -149,6 +180,16 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
     }
 
+    private void validateCellAgainstMissingCellPolicy(Row row, int colIdx) {
+        MissingCellPolicy policy = options.getMissingCellPolicy();
+        if (policy.equals(MissingCellPolicy.THROW)) {
+            Cell cell = row.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            if (null == cell) {
+                throw new EmptyCellException(headers.get(colIdx));
+            }
+        }
+    }
+
     private static boolean isColumnInIgnoreList(Field anyColumnField, String columnName) {
         AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
         Set<String> ignoreCols = Arrays
@@ -162,30 +203,31 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private void writeToAnyColumnField(Field field, T object, Cell cell, String columnName) {
         field.setAccessible(true);
         Object cellValue = readValueFromCell(cell);
-        if (cellValue == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
+        if (cellValue == null && (field.getType().equals(Boolean.class) || field.getType().equals(boolean.class))) {
             cellValue = Boolean.FALSE;
         }
+        AnyColumn annotation = field.getAnnotation(AnyColumn.class);
+        if (field.get(object) == null) {
+            Map<String, Object> map = (Map<String, Object>) annotation.as().newInstance();
+            field.set(object, map);
+        }
+        Map<String, Object> map = (Map<String, Object>) field.get(object);
+
         if (cellValue != null) {
-            AnyColumn annotation = field.getAnnotation(AnyColumn.class);
-            if (field.get(object) == null) {
-                Map<String, Object> map = (Map<String, Object>) annotation.as().newInstance();
-                field.set(object, map);
-            }
-            Map<String, Object> map = (Map<String, Object>) field.get(object);
-            if (annotation.converter() != NoConverterClass.class) {
+            if (!annotation.converter().equals(NoConverterClass.class)) {
                 ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) annotation.converter()
                         .newInstance();
                 cellValue = converter.deserialize(cellValue);
             }
-            map.put(columnName, cellValue);
         }
+        map.put(columnName, cellValue);
     }
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeToField(Field field, T object, Cell cell, Col column) {
         Object cellValue = readValueFromCell(cell);
-        if (cellValue == null && (field.getType() == Boolean.class || field.getType() == boolean.class)) {
+        if (cellValue == null && (field.getType().equals(Boolean.class) || field.getType().equals(boolean.class))) {
             cellValue = Boolean.FALSE;
         }
         if (cellValue != null) {
@@ -201,41 +243,30 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
     }
 
-    private boolean shouldKeepObject(T object, List<RowPostProcessor<T>> rowPostProcessors) {
-        boolean keepObject = true;
-
-        for (RowPostProcessor<T> rowPostProcessor: rowPostProcessors) {
-            keepObject = rowPostProcessor.process(object);
-            if (!keepObject) break;
-        }
-
-        return keepObject;
-    }
-
     private static Object convertToFieldType(Object cellValue, Class<?> fieldType) {
         String value = String.valueOf(cellValue);
-        if (fieldType == Double.class || fieldType == double.class) {
+        if ((fieldType.equals(Double.class)) || (fieldType.equals(double.class))) {
             return Double.valueOf(value);
         }
-        if (fieldType == Integer.class || fieldType == int.class) {
+        if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
             return Double.valueOf(value).intValue();
         }
-        if (fieldType == Short.class || fieldType == short.class) {
+        if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
             return Double.valueOf(value).shortValue();
         }
-        if (fieldType == Long.class || fieldType == long.class) {
+        if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
             return Double.valueOf(value).longValue();
         }
-        if (fieldType == Float.class || fieldType == float.class) {
+        if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
             return Double.valueOf(value).floatValue();
         }
-        if (fieldType == Character.class || fieldType == char.class) {
+        if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
             return value.charAt(0);
         }
-        if (fieldType == Date.class) {
+        if (fieldType.equals(Date.class)) {
             return DateUtil.getJavaDate(Double.valueOf(value));
         }
-        if (fieldType == Boolean.class || fieldType == boolean.class) {
+        if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
             return Boolean.valueOf(value);
         }
         return value;
@@ -243,23 +274,20 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
     private void buildHeader() {
         headers = new ArrayList<>();
-        rowIterator = sheet.getNativeSheet().rowIterator();
         Row row = rowIterator.next();
         if (row == null) {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
 
-        for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
-            Cell cell = row.getCell(i);
+        row.cellIterator().forEachRemaining(cell -> {
             String cellValue = (null != cell) ? cell.getStringCellValue() : null;
             if ((null == cellValue) || (cellValue.isEmpty()))
                 cellValue = null;
             headers.add(cellValue);
-        }
+        });
     }
 
     private class ColumnsMapper {
-
         private final Map<String, Col> columnsMap;
 
         ColumnsMapper(Set<Col> columns) {

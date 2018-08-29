@@ -1,6 +1,6 @@
 package com.ebay.xcelite;
 
-import com.ebay.xcelite.model.WriterTypesBean;
+import com.ebay.xcelite.model.WriterNumericTypesBean;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 
@@ -16,13 +16,13 @@ import java.util.concurrent.atomic.*;
  * @since 1.2
  */
 
-class WriterTypesTest extends AbstractTestBaseForWriterTests{
-    static final WriterTypesBean bean = new WriterTypesBean();
+class WriterNumericTypesTest extends AbstractTestBaseForWriterTests{
+    static final WriterNumericTypesBean bean = new WriterNumericTypesBean();
 
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean, WriterTypesBean.class);
+        setup(bean);
     }
 
     @Test
@@ -31,7 +31,7 @@ class WriterTypesTest extends AbstractTestBaseForWriterTests{
         Map<String, Object> columnsMap = extractCellValues (workbook);
         short val = bean.getShortSimpleType();
         Object obj = columnsMap.get("shortSimpleType");
-        Assertions.assertTrue((obj instanceof Number), "Values of type short must be written as numeric");
+        Assertions.assertTrue((obj instanceof Number),  "Values of type short must be written as numeric");
         Assertions.assertEquals(val, ((Number)obj).shortValue());
     }
 

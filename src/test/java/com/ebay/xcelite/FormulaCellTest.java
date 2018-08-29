@@ -59,4 +59,22 @@ public class FormulaCellTest {
         FormulaUserBean second = upper.get(1);
         assertEquals(testData[1][4], second.getSex(), "Gender mismatch");
     }
+
+    // TODO write test With formula cell containing error
+    /*
+    @Test
+    @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
+    public void model_VLOOKUPCanLookupReferencedCellbroken() {
+        Xcelite xcelite = new Xcelite(new File("src/test/resources/formulaDataBroken.xlsx"));
+        XceliteSheet sheet = xcelite.getSheet(0);
+        SheetReader<FormulaUserBean> beanReader = sheet.getBeanReader(FormulaUserBean.class);
+        ArrayList<FormulaUserBean> upper = new ArrayList<>(beanReader.read());
+
+        FormulaUserBean first = upper.get(0);
+        assertEquals(testData[0][4], first.getSex(), "Gender mismatch");
+
+        FormulaUserBean second = upper.get(1);
+        assertEquals(testData[1][4], second.getSex(), "Gender mismatch");
+    }*/
+
 }
