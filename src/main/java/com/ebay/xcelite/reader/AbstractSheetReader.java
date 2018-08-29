@@ -151,7 +151,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     }
 
     static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
-        if (options.getSkipRowsAfterColumnDefinitionRow() <= 0)
+        if (options.getSkipRowsAfterColumnDefinitionRow() < 0)
             return nativeSheet.rowIterator();
         return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow() + 1, options.getSkipRowsAfterColumnDefinitionRow());
     }
