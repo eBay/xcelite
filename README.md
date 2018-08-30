@@ -24,7 +24,7 @@ I simply want to write a two-dimensional collection. How can I do that?
 Xcelite xcelite = new Xcelite();    
 XceliteSheet sheet = xcelite.createSheet("data_sheet");
 SheetWriter<Collection<Object>> simpleWriter = sheet.getSimpleWriter();
-List<Collection<Object>> data = new ArrayList<Collection<Object>>();
+List<Collection<Object>> data = new ArrayList<>();
 // ...fill up data
 simpleWriter.write(data);   
 xcelite.write(new File("data.xlsx"));
@@ -68,7 +68,7 @@ Now we'll write the same data as before but this time using bean writer instead 
 Xcelite xcelite = new Xcelite();    
 XceliteSheet sheet = xcelite.createSheet("users");
 SheetWriter<User> writer = sheet.getBeanWriter(User.class);
-List<User> users = new ArrayList<User>();
+List<User> users = new ArrayList<>();
 // ...fill up users
 writer.write(users); 
 xcelite.write(new File("users_doc.xlsx"));
@@ -122,19 +122,19 @@ Sheet columns which are not mapped to a @Column annotated property will be ignor
 #### Using Converters
 
 Lets say your bean contains a list of values or some object of your own. By default, Xcelite will serialize the toString() of the object or list, and sometimes this might not be what you want.  
-The converter mechanism allows you to serialize/desrialize the object in any way you want.  
+The converter mechanism allows you to serialize/deserialize the object in any way you want.  
 To demostrate lets add a list to our User bean and use the built-in CSVColumnValueConverter converter:
 
 ```java
 @Column(name = "Emails", converter = CSVColumnValueConverter.class)
 private List<String> mailAddresses;
 ```
-The CSVColumnValueConverter takes a collection of objects and serializes it to a comma seperated String.  
-Alternately when deserializing, the converter takes a comma seperated String and deserializes it to a collection of Objects.  
+The CSVColumnValueConverter takes a collection of objects and serializes it to a comma-separated String.  
+Alternately when deserializing, the converter takes a comma-separated and deserializes it to a collection of Objects.  
 So writing a collection of users will result with a column named "Emails" and the column data will look someting like that:  
 john@mail.com,danny@mail.com,jerry@mail.com  
 
-When reading the sheet to a collection of Users, the column "Emails" will be deserialized to an ArrayList.
+When reading the sheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
 If you prefer a different collection implementation rather than the default ArrayList, you can always extend the CSVColumnValueConverter and override the getCollection() method to return your preferred implementation.
 
 ##### Custom Converters
@@ -158,20 +158,20 @@ private String firstName;
 ```
 #### Dynamic Columns
 What if you don't know in advance which columns your Excel sheet will hold? For example when your application reads dynamic content and save it to Excel.  
-Obviously simple bean won't do any good because you don't know what properties and columns to define.  
+Obviously, a bean won't do any good because you don't know what properties and columns to define.  
 For that purpose you can use the @AnyColumn annotation to annotate a ```Map<String, Object>``` property. The map will hold any column you want where the key represents the column name and the value represents the column value.
 ```java
 @AnyColumn
 private Map<String, Object> dynamicCols;
 ```
 
-The map value can be of any type. If the type is not a Number or Date Xcelite will use the toString() of the object upon serializtion. If this is not what you want you can use a converter same way as before:
+The map value can be of any type. If the type is not a `Number` or `Date` Xcelite will use the `toString()` of the object upon serializtion. If this is not what you want you can use a converter same way as before:
 ```java
 @AnyColumn(converter = CSVColumnValueConverter.class)
 private Map<String, List<String>> dynamicCols;
 ```
 
-What about reading from Excel sheet using dynamic columns?  
+What about reading from Excel sheets using dynamic columns?  
 
 Well, luckily it works both ways. If your bean contains an @AnyColumn property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
 By default, Xcelite will use HashMap implementation for the Map when deserializing. If you'de prefer a different implementation use the 'as' attribute.  
@@ -190,8 +190,8 @@ private Map<String, List<String>> dynamicCols;
 
 #### Row Post Processors
 When reading an Excel sheet you sometimes want to manipulate the data while reading. For example, you want to discard some row or object, or change some data in the deserialized object.  
-In order to accomplish that you can add a RowPostProcessor to your reader.  
-A RowPostProcessor is a simple interface which contain a single method process() which gets the deserialized Object as an argument and return boolean whether to keep the Object or not.  
+In order to accomplish that you can add a `RowPostProcessor` to your reader.  
+A `RowPostProcessor` is a simple interface which contain a single method `process()` which gets the deserialized Object as an argument and return boolean whether to keep the Object or not.  
 ```java
 private class UserPostRowProcessor implements RowPostProcessor<User> {
   @Override
@@ -206,11 +206,16 @@ All we have to do now is to register this row post processor in our reader:
 SheetReader<User> reader = sheet.getBeanReader(User.class);
 reader.addRowPostProcessor(new UserPostRowProcessor());
 ```
-Note that you can register as many row post processor as you like. They will be executed in ordered manner.
+Note that you can register as many row post processors as you like. They will be executed in ordered manner.
+
+
+#### Xcelite Spring web application
+
+Currently work in progress, see https://github.com/iSnow/xcelite-web
 
 ### Utils
 #### XceliteDiff
-Xcelite package provides a simple and easy-to-use utility which takes two SheetReader classes and compares them:
+Xcelite package provides a simple and easy-to-use utility which takes two `SheetReader` classes and compares them:
 ```java
 Xcelite xceliteA = new Xcelite(new File("usersA.xlsx"));
 SheetReader<User> readerA = xceliteA.getSheet("users").getBeanReader(User.class);
@@ -219,8 +224,8 @@ SheetReader<User> readerB = xceliteB.getSheet("users").getBeanReader(User.class)
 DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB);
 assertTrue("Sheets are not identical!\n" + diffResult.getReport(), diffResult.isIdentical());
 ```
-Needless to say, your bean must implement hashCode() and equals() if you wish to have meaningful symmetric difference results.  
-If you want to use a different report rather than the one provided by XceliteDiff, it is possible to do:
+Needless to say, your bean must implement `hashCode()` and `equals()` if you wish to have meaningful symmetric difference results.  
+If you want to use a different report rather than the one provided by `XceliteDiff`, it is possible to do:
 ```java
 DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB, new ReportGenerator() {
       @Override
@@ -229,7 +234,7 @@ DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB, new ReportGener
       }
     });
 ```
-### How To Use?
+### How To Use
 #### Using Xcelite in Your Maven Project
 Add xcelite as a dependency:
 ```xml

@@ -15,60 +15,85 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
+import com.ebay.xcelite.exceptions.XceliteException;
+import com.ebay.xcelite.sheet.XceliteSheet;
+import com.google.common.collect.Lists;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
+import com.ebay.xcelite.options.*;
 
 /**
- * Class description...
- * 
+ * Implementation of the {@link SheetReader} interface that returns the contents
+ * of an Excel sheet as a two-dimensional data structure.
+ *
  * @author kharel (kharel@ebay.com)
  * created Nov 8, 2013
- * 
  */
-public class SimpleSheetReader extends SheetReaderAbs<Collection<Object>> {
+public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
+  public SimpleSheetReader(XceliteSheet sheet, XceliteOptions options) {
+    super(sheet, options);
+  }
+
+  /**
+   * Construct a SimpleSheetReader with default options
+   * @param sheet the {@link XceliteSheet} to read from
+   */
   public SimpleSheetReader(XceliteSheet sheet) {
-    super(sheet, false);
+    this(sheet, new XceliteOptions());
   }
 
   @Override
   public Collection<Collection<Object>> read() {
-    List<Collection<Object>> rows = Lists.newArrayList();
-    Iterator<Row> rowIterator = sheet.getNativeSheet().iterator();
-    boolean firstRow = true;
-    while (rowIterator.hasNext()) {      
-      Row excelRow = rowIterator.next();
-      if (firstRow && skipHeader) {
-        firstRow = false;
-        continue;
-      }
-      List<Object> row = Lists.newArrayList();
-      Iterator<Cell> cellIterator = excelRow.cellIterator();
-      boolean blankRow = true;
-      while (cellIterator.hasNext()) {
-        Object value = readValueFromCell(cellIterator.next());
-        if (blankRow && value != null && !String.valueOf(value).isEmpty()) {
-          blankRow = false;
+    List<Collection<Object>> rows = new ArrayList<>();
+    Iterator<Row> rowIterator = moveToFirstRow(sheet.getNativeSheet(), options);
+    if (!rowIterator.hasNext())
+      return rows;
+
+    rowIterator.forEachRemaining(excelRow -> {
+      List<Object> row;
+      if (isBlankRow(excelRow)) {
+        switch (options.getMissingRowPolicy()) {
+          case THROW:
+            throw new EmptyRowException();
+          case RETURN_EMPTY_OBJECT:
+            row = new ArrayList<>();
+            break;
+          case RETURN_NULL:
+            row = null;
+            break;
+          default:
+            row = null;
         }
-        row.add(value);
+      } else {
+        row = fillObject(excelRow);
       }
-      if (blankRow) continue;
-      boolean keepRow = true;
-      for (RowPostProcessor<Collection<Object>> rowPostProcessor : rowPostProcessors) {
-        keepRow = rowPostProcessor.process(row);
-        if (!keepRow) break;
-      }
-      if (keepRow) {
+
+      if (shouldKeepObject(row, rowPostProcessors)) {
         rows.add(row);
       }
-    }
+    });
     return rows;
+  }
+
+  @SneakyThrows
+  private List<Object> fillObject(Row excelRow) {
+    List<Object> row = new ArrayList<>();
+    Iterator<Cell> cellIterator = excelRow.cellIterator();
+
+    while (cellIterator.hasNext()) {
+      Object value = readValueFromCell(cellIterator.next());
+      row.add(value);
+    }
+    return row;
   }
 }

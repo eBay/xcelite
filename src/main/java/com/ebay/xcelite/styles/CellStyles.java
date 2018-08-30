@@ -15,59 +15,48 @@
 */
 package com.ebay.xcelite.styles;
 
+import lombok.Getter;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 
+@Getter
 public final class CellStyles {
-  
-  private final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
-  
-  private final Workbook wb;
-  private CellStyle boldStyle;
-  private CellStyle dateStyle;
 
-  public CellStyles(Workbook wb) {
-    this.wb = wb;
-    initStyles();
-  }
+    private static final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
 
-  private void initStyles() {
-    createBoldStyle();
-    createDateFormatStyle();
-  }
+    private final Workbook workbook;
+    private CellStyle boldStyle;
+    private CellStyle dateStyle;
 
-  private void createBoldStyle() {
-    boldStyle = wb.createCellStyle();
-    Font font = wb.createFont();
-    //font.setBoldweight(Font.BOLDWEIGHT_BOLD);
-font.setBold(true);
-    boldStyle.setFont(font);    
-  }
-  
-  private void createDateFormatStyle() {
-    dateStyle = wb.createCellStyle();
-    DataFormat df = wb.createDataFormat();
-    dateStyle.setDataFormat(df.getFormat(DEFAULT_DATE_FORMAT));
-  }
-  
-  public CellStyle getBoldStyle() {
-    return boldStyle;
-  }
+    public CellStyles(Workbook workbook) {
+        this.workbook = workbook;
+        initStyles();
+    }
 
-  public CellStyle getDateStyle() {
-    return dateStyle;
-  }
-  
-  public CellStyle getCustomDataFormatStyle(String dataFormat) {
-    CellStyle cellStyle = wb.createCellStyle();
-    DataFormat df = wb.createDataFormat();
-    cellStyle.setDataFormat(df.getFormat(dataFormat));
-    return cellStyle;
-  }
+    private void initStyles() {
+        createBoldStyle();
+        createDateFormatStyle();
+    }
 
-  public Workbook getWorkbook() {
-    return wb;
-  }
+    private void createBoldStyle() {
+        boldStyle = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        boldStyle.setFont(font);
+    }
+
+    private void createDateFormatStyle() {
+        dateStyle = workbook.createCellStyle();
+        DataFormat df = workbook.createDataFormat();
+        dateStyle.setDataFormat(df.getFormat(DEFAULT_DATE_FORMAT));
+    }
+
+    public CellStyle getCustomDataFormatStyle(String dataFormat) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        DataFormat df = workbook.createDataFormat();
+        cellStyle.setDataFormat(df.getFormat(dataFormat));
+        return cellStyle;
+    }
 }

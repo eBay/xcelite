@@ -21,11 +21,12 @@ package com.ebay.xcelite.utils.diff.info;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 21, 2013
- * 
  */
 public interface Info<T> {
 
-  Files files();
-  Sheets sheets();
-  Collections<T> collections();
+    StringTuple files();
+
+    Sheets sheets();
+
+    Collections<T> collections();
 }

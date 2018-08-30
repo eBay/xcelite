@@ -15,28 +15,28 @@
 */
 package com.ebay.xcelite.converters;
 
-import java.util.Collection;
-
 import com.google.common.collect.Lists;
+
+import java.util.Collection;
 
 /**
  * Serializes a Collection object to a comma separated String. Deserializes a
  * comma separated String to an ArrayList. If a different Collection is required
  * other than {@link java.util.ArrayList ArrayList}, extend this class to
  * override {@link #getCollection(Iterable)} method.
- * 
+ *
  * @author kharel (kharel@ebay.com)
  * created Sep 14, 2013
  */
 public class CSVColumnValueConverter extends DelimiterColumnValueConverter {
 
-  @Override
-  protected String getDelimiter() {
-    return ",";
-  }
+    @Override
+    protected String getDelimiter() {
+        return ",";
+    }
 
-  @Override
-  protected Collection<?> getCollection(Iterable<?> iterable) {
-    return Lists.newArrayList(iterable);
-  }
+    @Override
+    protected Collection<?> getCollection(Iterable<?> iterable) {
+        return Lists.newArrayList(iterable);
+    }
 }

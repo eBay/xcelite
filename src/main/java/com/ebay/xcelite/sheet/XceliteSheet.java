@@ -15,27 +15,27 @@
 */
 package com.ebay.xcelite.sheet;
 
-import java.io.File;
-import java.util.Collection;
-
-import org.apache.poi.ss.usermodel.Sheet;
-
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.writer.SheetWriter;
+import org.apache.poi.ss.usermodel.Sheet;
+
+import java.util.Collection;
 
 /**
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 9, 2013
- * 
  */
 public interface XceliteSheet {
 
-  <T> SheetWriter<T> getBeanWriter(Class<T> type);
-  <T> SheetReader<T> getBeanReader(Class<T> type);
-  SheetWriter<Collection<Object>> getSimpleWriter();
-  SheetReader<Collection<Object>> getSimpleReader();
-  Sheet getNativeSheet();
-  File getFile();
+    <T> SheetWriter<T> getBeanWriter(Class<T> type);
+
+    <T> SheetReader<T> getBeanReader(Class<T> type);
+
+    SheetWriter<Collection<Object>> getSimpleWriter();
+
+    SheetReader<Collection<Object>> getSimpleReader();
+
+    Sheet getNativeSheet();
 }

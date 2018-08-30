@@ -20,23 +20,22 @@ package com.ebay.xcelite.utils.diff.info;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 21, 2013
- * 
  */
 public class Sheets {
 
-  private final String aSheetname;
-  private final String bSheetname;
+    private final String aSheetname;
+    private final String bSheetname;
 
-  public Sheets(String aSheetname, String bSheetname) {
-    this.aSheetname = aSheetname;
-    this.bSheetname = bSheetname;
-  }
+    public Sheets(String aSheetname, String bSheetname) {
+        this.aSheetname = aSheetname;
+        this.bSheetname = bSheetname;
+    }
 
-  public String aSheetname() {
-    return aSheetname;
-  }
+    public String aSheetname() {
+        return aSheetname;
+    }
 
-  public String bSheetname() {
-    return bSheetname;
-  }  
+    public String bSheetname() {
+        return bSheetname;
+    }
 }
