@@ -8,6 +8,7 @@
 ### Release-documentation:
 - https://medium.com/@nmauti/publishing-a-project-on-maven-central-8106393db2c3
 - https://dzone.com/articles/publish-your-artifacts-to-maven-central
+- https://blog.sonatype.com/2010/01/how-to-generate-pgp-signatures-with-maven/
 
 
 ### .m2/settings.xml has to look like this:

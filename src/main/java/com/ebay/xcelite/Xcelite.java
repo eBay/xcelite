@@ -36,6 +36,7 @@ import static java.util.Optional.ofNullable;
  * operations on its sheets.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 9, 2013
  */
 public class Xcelite {

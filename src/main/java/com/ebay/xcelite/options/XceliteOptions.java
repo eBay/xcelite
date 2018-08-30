@@ -5,14 +5,14 @@ import com.ebay.xcelite.policies.MissingRowPolicy;
 
 /**
  * Configuration class for setting options of a {@link com.ebay.xcelite.Xcelite}
- * object.
+ * object and sheet readers/writers.
  *
  * @since 1.2
  */
 
 
 public class XceliteOptions {
-
+    private boolean generateHeaderRow;
     private Integer skipRowsBeforeColDefinitionRow = 0;
     private Integer skipRowsAfterColDefinitionRow = 0;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;

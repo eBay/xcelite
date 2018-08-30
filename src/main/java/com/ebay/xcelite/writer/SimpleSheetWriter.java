@@ -24,10 +24,20 @@ import org.apache.poi.ss.usermodel.Row;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 /**
- * Class description...
+ * An concrete implementation of the {@link SheetWriter} interface that writes
+ * 2-dimensional collections of simple, unannotated Java beans to Excel sheets.
+ * Each entry in the outer collection represents one row in the spreadsheet
+ * while each entry in the inner collection represents one cell (column) in the row.
+ *
+ * This writer class does not write a header row, as no column names are defined.
+ *
+ * Preferably, this class should not directly be instantiated, but you should
+ * call {@link XceliteSheet#getSimpleWriter()}
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {

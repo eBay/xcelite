@@ -16,6 +16,7 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.annotate.NoConverterClass;
+import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
@@ -30,6 +31,20 @@ import java.util.*;
 
 import lombok.SneakyThrows;
 import static org.reflections.ReflectionUtils.withName;
+
+/**
+ * An concrete implementation of the {@link SheetWriter} interface that writes
+ * collections of annotated Java beans to Excel sheets.
+ *
+ * This writer class writes a header row as the first row in wich each cell
+ * gets its text from the {@link Column} annotations of the Java bean.
+ *
+ * Preferably, this class should not directly be instantiated, but you should
+ * call {@link XceliteSheet#getBeanWriter(Class)}
+ *
+ * @author kharel (kharel@ebay.com)
+ * @since 1.0
+ */
 
 public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
@@ -102,7 +117,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                     col.getDataFormat()));
         }
 
-        if (col.getType() == Date.class) {
+        if (col.getType().equals(Date.class)) {
             if (col.getDataFormat() == null) {
                 cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle());
             }
@@ -128,12 +143,11 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             Col column = new Col(entry.getKey(), anyColumnField.getName());
             column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
             column.setAnyColumn(true);
-            if (anyColumn.getConverter() != NoConverterClass.class) {
+            if (!anyColumn.getConverter().equals(NoConverterClass.class)) {
                 column.setConverter(anyColumn.getConverter());
             }
             columnToAdd.add(column);
         }
-
     }
 
     private void addColumns(Set<Col> columnsToAdd, boolean append) {

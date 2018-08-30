@@ -29,6 +29,7 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 9, 2013
  */
 public class XceliteSheetImpl implements XceliteSheet {
@@ -37,11 +38,6 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     public XceliteSheetImpl(Sheet sheet) {
         this.sheet = sheet;
-    }
-
-    @Override
-    public Sheet getNativeSheet() {
-        return sheet;
     }
 
     @Override
@@ -62,5 +58,10 @@ public class XceliteSheetImpl implements XceliteSheet {
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
         return new SimpleSheetReader(this);
+    }
+
+    @Override
+    public Sheet getNativeSheet() {
+        return sheet;
     }
 }

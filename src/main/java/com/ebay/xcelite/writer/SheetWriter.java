@@ -15,15 +15,28 @@
 */
 package com.ebay.xcelite.writer;
 
+
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
-
+/**
+ * Generic interface for writer classes that can serialize annotated Java objects to Excel workbooks.
+ *
+ * @author kharel (kharel@ebay.com)
+ * @since 1.0
+ * created Sep 12, 2013
+ */
 public interface SheetWriter<T> {
 
     void write(Collection<T> data);
 
+    /**
+     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
+     */
+    @Deprecated
     void generateHeaderRow(boolean generateHeaderRow);
+
+    void setGenerateHeaderRow(boolean generateHeaderRow);
 
     XceliteSheet getSheet();
 }

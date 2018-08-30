@@ -20,12 +20,19 @@ import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
+import java.util.Collection;
 import java.util.Date;
 
 /**
- * Class description...
+ * An abstract implementation of {@link SheetWriter} writer classes that can serialize
+ * annotated Java objects to Excel workbooks.
+ * Extended by {@link BeanSheetWriter} which writes Java beans object collections
+ * and {@link SimpleSheetWriter} which writes collections of un-annotated cell objects.
+ *
+ * Concrete implementations must override the {@link SheetWriter#write(Collection)} method.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 10, 2013
  */
 public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
@@ -65,8 +72,17 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         }
     }
 
+    /**
+     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
+     */
+    @Deprecated
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
+        setGenerateHeaderRow(generateHeaderRow);
+    }
+
+    @Override
+    public void setGenerateHeaderRow(boolean generateHeaderRow) {
         this.writeHeader = generateHeaderRow;
     }
 }
