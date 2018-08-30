@@ -33,13 +33,19 @@ import com.ebay.xcelite.options.*;
 
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
- * of an Excel sheet as a two-dimensional data structure.
+ * of an Excel sheet as a two-dimensional data structure of simple Java objects.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 8, 2013
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
+  /**
+   * Construct a SimpleSheetReader with custom options
+   * @param sheet the {@link XceliteSheet} to read from
+   * @param options the {@link XceliteOptions} to configure the reader
+   */
   public SimpleSheetReader(XceliteSheet sheet, XceliteOptions options) {
     super(sheet, options);
   }

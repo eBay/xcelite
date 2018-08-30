@@ -47,7 +47,6 @@ import static org.reflections.ReflectionUtils.withName;
  */
 
 public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
-
     private final LinkedHashSet<Col> columns;
     private final Col anyColumn;
     private Row headerRow;
@@ -63,7 +62,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @Override
     public void write(Collection<T> data) {
-        if (writeHeader) {
+        if (generateHeaderRow) {
             writeHeader();
         }
         writeData(data);
@@ -157,7 +156,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))
                 continue;
-            if (writeHeader) {
+            if (generateHeaderRow) {
                 if (headerRow == null)
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);

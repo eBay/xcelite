@@ -52,21 +52,25 @@ import static org.reflections.ReflectionUtils.withName;
  * created Sep 9, 2013
  */
 public class BeanSheetReader<T> extends AbstractSheetReader<T> {
-
-    private final LinkedHashSet<Col> declaredColumns;
     private final Col anyColumn;
     private final ColumnsMapper mapper;
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
 
+    /**
+     * Construct a BeanSheetReader with custom options
+     * @param sheet the {@link XceliteSheet} to read from
+     * @param options the {@link XceliteOptions} to configure the reader
+     * @param type class of the beans
+     */
     public BeanSheetReader(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
         super(sheet, options);
         this.type = type;
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
-        declaredColumns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
+        LinkedHashSet<Col> declaredColumns = extractor.getColumns();
         mapper = new ColumnsMapper(declaredColumns);
     }
 

@@ -20,7 +20,8 @@ import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
 /**
- * Generic interface for writer classes that can serialize annotated Java objects to Excel workbooks.
+ * Generic interface for writer classes that can serialize collections of Java objects
+ * to Excel workbooks.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0

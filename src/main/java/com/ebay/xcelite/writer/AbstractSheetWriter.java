@@ -15,6 +15,7 @@
 */
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
@@ -39,11 +40,28 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
 
     @Getter
     protected XceliteSheet sheet;
-    boolean writeHeader;
+    boolean generateHeaderRow;
 
+    @Getter
+    protected XceliteOptions options;
+
+    /**
+     * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
+     * and set {@link XceliteOptions#setGenerateHeaderRow(boolean)}
+     * to true
+     * @param sheet The sheet to read from
+     * @param writeHeader whether or not one header row should be written
+     */
+    @Deprecated
     AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
         this.sheet = sheet;
-        this.writeHeader = writeHeader;
+        this.generateHeaderRow = writeHeader;
+    }
+
+    AbstractSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+        this.sheet = sheet;
+        this.options = options;
+        this.generateHeaderRow = options.isGenerateHeaderRow();
     }
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
@@ -81,8 +99,9 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         setGenerateHeaderRow(generateHeaderRow);
     }
 
+    @Deprecated
     @Override
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
-        this.writeHeader = generateHeaderRow;
+        this.generateHeaderRow = generateHeaderRow;
     }
 }

@@ -56,7 +56,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
             final AtomicInteger j = new AtomicInteger(0);
             row.forEach(column -> {
                 Cell cell = excelRow.createCell(j.intValue());
-                if (writeHeader && i.intValue() == 0) {
+                if (generateHeaderRow && i.intValue() == 0) {
                     cell.setCellStyle(boldStyle);
                 }
                 writeToCell(cell, column, null);

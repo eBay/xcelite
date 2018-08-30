@@ -23,6 +23,7 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,6 +33,7 @@ import org.apache.poi.ss.usermodel.Sheet;
  *
  * @author kharel (kharel@ebay.com)
  * created Nov 11, 2013
+ * @since 1.0
  *
  */
 public abstract class AbstractSheetReader<T> implements SheetReader<T> {
@@ -42,7 +44,6 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
     @Getter
     protected final XceliteOptions options;
-
 
     public AbstractSheetReader(XceliteSheet sheet) {
         this (sheet, new XceliteOptions());
