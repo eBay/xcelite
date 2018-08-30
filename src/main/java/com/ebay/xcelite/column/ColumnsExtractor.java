@@ -130,7 +130,7 @@ public class ColumnsExtractor {
         });
 
         if (colsOrdering.size() != columns.size()) {
-            throw new XceliteException("Not all columns are specified in Row columns ordering");
+            throw new XceliteException("Not all columns are specified in annotation @Row, attribute 'colsOrder'");
         }
         columns = colsOrdering;
     }

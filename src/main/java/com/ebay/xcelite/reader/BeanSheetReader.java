@@ -132,7 +132,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         for (int i = 0; i < headerColumns.keySet().size(); i++) {
             String columnName = headerColumns.get(i);
-            validateCellAgainstMissingCellPolicy(row, i);
+            checkHasThrowPolicyMustThrow(row, i);
             Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
 
             Col col = mapper.getColumn(columnName);
@@ -172,16 +172,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         Collection<String> headers = headerColumns.values();
         if (!headers.containsAll(declaredHeaders)) {
             throw new ColumnNotFoundException(declaredHeaders.iterator().next());
-        }
-    }
-
-    private void validateCellAgainstMissingCellPolicy(Row row, int colIdx) {
-        MissingCellPolicy policy = options.getMissingCellPolicy();
-        if (policy.equals(MissingCellPolicy.THROW)) {
-            Cell cell = row.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-            if (null == cell) {
-                throw new EmptyCellException(headerColumns.get(colIdx));
-            }
         }
     }
 
@@ -274,15 +264,33 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
         for (int i = 0; i < row.getLastCellNum(); i++) {
-            Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
-            String cellValue = null;
-            if (null != cell) {
-                cellValue = cell.getStringCellValue();
-                if ((null == cellValue) || (cellValue.isEmpty()))
-                    cellValue = null;
+            if (!checkHasThrowPolicyMustThrow(row, i)) {
+                Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
+                String cellValue = null;
+                if (null != cell) {
+                    cellValue = cell.getStringCellValue();
+                    if ((null == cellValue) || (cellValue.isEmpty()))
+                        cellValue = null;
+                }
+                headerColumns.put(i, cellValue);
             }
-            headerColumns.put(i, cellValue);
         };
+    }
+
+    private boolean checkHasThrowPolicyMustThrow(Row row, int colIdx) {
+        MissingCellPolicy policy = options.getMissingCellPolicy();
+        if (policy.equals(MissingCellPolicy.THROW)) {
+            Cell cell = row.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            if (null == cell) {
+                String colName = headerColumns.get(colIdx);
+                if (null != colName)
+                    throw new EmptyCellException(colName);
+                else
+                    throw new EmptyCellException();
+            }
+            return true;
+        }
+        return false;
     }
 
     private class ColumnsMapper {

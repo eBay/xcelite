@@ -115,7 +115,6 @@ public class StringColumnCapitalizationTest {
 
     }
 
-    
     @Test
     public void model_UPPER_readLowerMustFail() {
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
@@ -125,5 +124,4 @@ public class StringColumnCapitalizationTest {
             beanReader.read();
         });
     }
-
 }

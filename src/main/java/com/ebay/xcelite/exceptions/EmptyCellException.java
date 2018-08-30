@@ -5,9 +5,11 @@ package com.ebay.xcelite.exceptions;
  */
 public class EmptyCellException extends XceliteException {
 
-    public EmptyCellException(String cellName) {
-        super("Column "+cellName + " was empty and MissingCellPolicy.THROW active");
+    public EmptyCellException() {
+        super("Cell was empty and MissingCellPolicy.THROW active");
     }
 
-
+    public EmptyCellException(String cellName) {
+        super("Cell of column "+cellName + " was empty and MissingCellPolicy.THROW active");
+    }
 }
