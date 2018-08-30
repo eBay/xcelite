@@ -1,6 +1,5 @@
 package com.ebay.xcelite;
 
-import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
@@ -10,17 +9,14 @@ import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,13 +29,8 @@ public class BeanReaderTests extends AbstractTestBaseForWriterTests {
             {"Witch",	"Doctor",	"01/01/1990",	"male"}
     };
 
-    @BeforeAll
-    @SneakyThrows
-    static void setup() {
-    }
-
     @Test
-    @DisplayName("Must correctly read a header row where some columns are not mapped to annotated properties")
+    @DisplayName("MissingCellPolicy default - Must correctly read a header row where some columns are not mapped to annotated properties")
     void mustReadHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
         options.setSkipRowsBeforeColumnDefinitionRow(3);
@@ -49,7 +40,29 @@ public class BeanReaderTests extends AbstractTestBaseForWriterTests {
     }
 
     @Test
-    @DisplayName("Must correctly throw reading a header row where some columns are not mapped to annotated properties")
+    @DisplayName("MissingCellPolicy.RETURN_BLANK_AS_NULL - Must correctly read a header row where some columns are not mapped to annotated properties")
+    void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_BLANK_AS_NULL_OK() {
+        XceliteOptions options = new XceliteOptions();
+        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
+
+        List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
+        validateData(upper);
+    }
+
+    @Test
+    @DisplayName("MissingCellPolicy.RETURN_NULL_AND_BLANK - Must correctly read a header row where some columns are not mapped to annotated properties")
+    void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_NULL_AND_BLANK_OK() {
+        XceliteOptions options = new XceliteOptions();
+        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setMissingCellPolicy(MissingCellPolicy.RETURN_NULL_AND_BLANK);
+
+        List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
+        validateData(upper);
+    }
+
+    @Test
+    @DisplayName("MissingCellPolicy.THROW - Must correctly throw reading a header row where some columns are not mapped to annotated properties")
     public void mustThrowReadingHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
         options.setSkipRowsBeforeColumnDefinitionRow(3);
