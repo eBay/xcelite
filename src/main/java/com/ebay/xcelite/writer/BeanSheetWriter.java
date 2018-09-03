@@ -102,7 +102,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                     col.getDataFormat()));
         }
 
-        if (col.getType() == Date.class) {
+        if (col.getType().equals(Date.class)) {
             if (col.getDataFormat() == null) {
                 cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle());
             }
@@ -128,7 +128,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             Col column = new Col(entry.getKey(), anyColumnField.getName());
             column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
             column.setAnyColumn(true);
-            if (anyColumn.getConverter() != NoConverterClass.class) {
+            if (!anyColumn.getConverter().equals(NoConverterClass.class)) {
                 column.setConverter(anyColumn.getConverter());
             }
             columnToAdd.add(column);

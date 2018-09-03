@@ -78,7 +78,7 @@ public class ColumnsExtractor {
                     if (!annotation.dataFormat().isEmpty()) {
                         col.setDataFormat(annotation.dataFormat());
                     }
-                    if (annotation.converter() != NoConverterClass.class) {
+                    if (!annotation.converter().equals(NoConverterClass.class)) {
                         col.setConverter(annotation.converter());
                     }
                     columns.add(col);
@@ -107,7 +107,7 @@ public class ColumnsExtractor {
             anyColumn.setAnyColumn(true);
             AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
             anyColumn.setType(annotation.as());
-            if (annotation.converter() != NoConverterClass.class) {
+            if (!annotation.converter().equals(NoConverterClass.class)) {
                 anyColumn.setConverter(annotation.converter());
             }
         } else if (anyColumnFields.size() > 1) {
