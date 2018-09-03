@@ -1,5 +1,6 @@
 package com.ebay.xcelite;
 
+import com.ebay.xcelite.helper.AbstractTestBaseForWriterTests;
 import com.ebay.xcelite.model.AbstractWriterTestsBean;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;

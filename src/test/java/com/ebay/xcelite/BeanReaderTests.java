@@ -1,6 +1,7 @@
 package com.ebay.xcelite;
 
 import com.ebay.xcelite.exceptions.EmptyCellException;
+import com.ebay.xcelite.helper.AbstractTestBaseForWriterTests;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
@@ -9,7 +10,6 @@ import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
