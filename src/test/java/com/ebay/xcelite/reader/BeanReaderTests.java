@@ -1,15 +1,13 @@
-package com.ebay.xcelite;
+package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BeanReaderTests extends AbstractTestBaseForWriterTests {
+public class BeanReaderTests  {
     private SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {

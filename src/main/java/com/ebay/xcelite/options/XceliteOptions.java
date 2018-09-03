@@ -19,6 +19,19 @@ public class XceliteOptions {
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.SKIP;
 
+    public XceliteOptions() {}
+
+    /**
+     * Copy constructor
+     */
+    public XceliteOptions(XceliteOptions other) {
+        this.generateHeaderRow = other.generateHeaderRow;
+        this.skipRowsBeforeColDefinitionRow = other.skipRowsBeforeColDefinitionRow;
+        this.skipRowsAfterColDefinitionRow = other.skipRowsAfterColDefinitionRow;
+        this.missingCellPolicy = other.missingCellPolicy;
+        this.missingRowPolicy = other.missingRowPolicy;
+    }
+
     /**
      * Returns the number of rows Xcelite should skip before trying
      * to parse the next one as the row defining the annotated bean

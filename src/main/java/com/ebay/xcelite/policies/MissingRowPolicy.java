@@ -18,7 +18,7 @@ public enum MissingRowPolicy {
      **/
     THROW;
 
-    private MissingRowPolicy() {
+    MissingRowPolicy() {
     }
 
 }

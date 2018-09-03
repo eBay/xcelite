@@ -28,7 +28,6 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
@@ -278,7 +277,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 }
                 headerColumns.put(i, cellValue);
             }
-        };
+        }
     }
 
     private boolean checkHasThrowPolicyMustThrow(Row row, int colIdx) {

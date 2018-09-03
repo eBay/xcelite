@@ -16,11 +16,9 @@
 package com.ebay.xcelite.reader;
 
 import com.ebay.xcelite.exceptions.EmptyRowException;
-import com.ebay.xcelite.exceptions.XceliteException;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -28,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import com.ebay.xcelite.options.*;
 
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents

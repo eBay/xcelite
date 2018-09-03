@@ -22,7 +22,6 @@ import com.ebay.xcelite.reader.SimpleSheetReader;
 import com.ebay.xcelite.writer.BeanSheetWriter;
 import com.ebay.xcelite.writer.SheetWriter;
 import com.ebay.xcelite.writer.SimpleSheetWriter;
-import lombok.Getter;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
@@ -35,10 +34,7 @@ import java.util.Collection;
  * created Nov 9, 2013
  */
 public class XceliteSheetImpl implements XceliteSheet {
-
     private final Sheet sheet;
-
-    @Getter
     protected XceliteOptions options;
 
     public XceliteSheetImpl(Sheet sheet) {
@@ -74,5 +70,12 @@ public class XceliteSheetImpl implements XceliteSheet {
     @Override
     public Sheet getNativeSheet() {
         return sheet;
+    }
+
+    public XceliteOptions getOptions() {
+        if (null == options) {
+            options = new XceliteOptions();
+        }
+        return options;
     }
 }

@@ -40,7 +40,6 @@ public class TestUtil {
                 retVal = "#ERROR";
                 break;
             default:
-                ;
         }
         return retVal;
     }

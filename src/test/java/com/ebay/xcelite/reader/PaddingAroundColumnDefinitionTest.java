@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ebay.xcelite;
+package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test various combinations of completely empty or not empty rows before and after
@@ -91,7 +91,7 @@ public class PaddingAroundColumnDefinitionTest {
         validateData(upper);
     }
 
-    private List<CamelCase> getData(XceliteOptions options, String filePath) throws ParseException {
+    private List<CamelCase> getData(XceliteOptions options, String filePath) {
         Xcelite xcelite = new Xcelite(new File(filePath));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<CamelCase> beanReader = new BeanSheetReader<>(sheet, options, CamelCase.class);

@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ebay.xcelite;
+package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.ThaiCase;
 import com.ebay.xcelite.model.UpperCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
-import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Test various upper/lower/camel-casings of the header-row
@@ -43,6 +44,7 @@ import java.util.ArrayList;
  * @author Thanthathon.b
  */
 public class StringColumnCapitalizationTest {
+    SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	"2",	"Female"},
@@ -57,7 +59,6 @@ public class StringColumnCapitalizationTest {
     @Test
     @DisplayName("Must correctly recognize uppercase column headers")
     public void model_UPPER_readUpperMustOK() throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<UpperCase> beanReader = sheet.getBeanReader(UpperCase.class);
@@ -66,18 +67,17 @@ public class StringColumnCapitalizationTest {
         UpperCase first = upper.get(0);
         assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
         assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
+        assertEquals(usDateFormat.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
 
         UpperCase second = upper.get(1);
         assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
         assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
+        assertEquals(usDateFormat.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
     }
     
     @Test
     @DisplayName("Must correctly recognize camelcase column headers")
     public void model_camel_readCamelCaseMustOK() throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
         Xcelite xcelite = new Xcelite(new File("src/test/resources/Camel Case.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<CamelCase> beanReader = sheet.getBeanReader(CamelCase.class);
@@ -86,12 +86,12 @@ public class StringColumnCapitalizationTest {
         CamelCase first = upper.get(0);
         assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
         assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
+        assertEquals(usDateFormat.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
 
         CamelCase second = upper.get(1);
         assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
         assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
+        assertEquals(usDateFormat.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
     }
     
     @Test

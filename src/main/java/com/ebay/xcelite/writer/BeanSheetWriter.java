@@ -21,15 +21,19 @@ import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
 import com.ebay.xcelite.exceptions.XceliteException;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
-import org.apache.poi.ss.usermodel.*;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-import lombok.SneakyThrows;
 import static org.reflections.ReflectionUtils.withName;
 
 /**
@@ -42,6 +46,14 @@ import static org.reflections.ReflectionUtils.withName;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getBeanWriter(Class)}
  *
+ * By default, a SheetWriter copies over the {@link XceliteOptions options} from the sheet
+ * it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet} become the
+ * default options, but the SheetWriter can modify option properties locally. However, the user
+ * may use the {@link AbstractSheetWriter#AbstractSheetWriter(XceliteSheet, XceliteOptions)
+ *    BeanSheetWriter(XceliteSheet, XceliteOptions)}
+ * constructor to use - for one writer only - a completely different set of options from
+ * the sheet options.
+ *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
  */
@@ -53,7 +65,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private int rowIndex = 0;
 
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
-        super(sheet, true);
+        super(sheet);
+        options.setGenerateHeaderRow(true);
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
         columns = extractor.getColumns();
@@ -62,7 +75,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @Override
     public void write(Collection<T> data) {
-        if (generateHeaderRow) {
+        if (options.isGenerateHeaderRow()) {
             writeHeader();
         }
         writeData(data);
@@ -156,7 +169,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))
                 continue;
-            if (generateHeaderRow) {
+            if (options.isGenerateHeaderRow()) {
                 if (headerRow == null)
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);

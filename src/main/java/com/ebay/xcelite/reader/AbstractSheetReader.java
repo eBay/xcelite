@@ -15,18 +15,16 @@
 */
 package com.ebay.xcelite.reader;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
-
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class description...

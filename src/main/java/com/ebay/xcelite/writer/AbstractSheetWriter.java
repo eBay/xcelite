@@ -32,6 +32,12 @@ import java.util.Date;
  *
  * Concrete implementations must override the {@link SheetWriter#write(Collection)} method.
  *
+ * By default, a SheetWriter copies over the {@link XceliteOptions options} from the sheet
+ * it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet} become the
+ * default options, but the SheetWriter can modify option properties locally. However, the user
+ * may use the {@link #AbstractSheetWriter(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one writer only - a completely different set of options from the sheet options.
+ *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
  * created Nov 10, 2013
@@ -40,11 +46,14 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
 
     @Getter
     protected XceliteSheet sheet;
-    boolean generateHeaderRow;
 
     @Getter
     protected XceliteOptions options;
 
+    AbstractSheetWriter(XceliteSheet sheet) {
+        this.sheet = sheet;
+        options = new XceliteOptions(sheet.getOptions());
+    }
     /**
      * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
      * and set {@link XceliteOptions#setGenerateHeaderRow(boolean)}
@@ -54,14 +63,13 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
      */
     @Deprecated
     AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
-        this.sheet = sheet;
-        this.generateHeaderRow = writeHeader;
+        this(sheet);
+        options.setGenerateHeaderRow(writeHeader);
     }
 
     AbstractSheetWriter(XceliteSheet sheet, XceliteOptions options) {
-        this.sheet = sheet;
+        this(sheet);
         this.options = options;
-        this.generateHeaderRow = options.isGenerateHeaderRow();
     }
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
@@ -96,12 +104,12 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     @Deprecated
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
-        setGenerateHeaderRow(generateHeaderRow);
+        options.setGenerateHeaderRow(generateHeaderRow);
     }
 
     @Deprecated
     @Override
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
-        this.generateHeaderRow = generateHeaderRow;
+        options.setGenerateHeaderRow(generateHeaderRow);
     }
 }

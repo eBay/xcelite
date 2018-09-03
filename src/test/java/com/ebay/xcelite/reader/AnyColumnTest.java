@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.ebay.xcelite;
+package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.model.AnyColumnBean;
 import com.ebay.xcelite.model.AnyColumnBeanDoneWrong;

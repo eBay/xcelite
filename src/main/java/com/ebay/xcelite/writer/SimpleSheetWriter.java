@@ -36,6 +36,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getSimpleWriter()}
  *
+ * By default, a SheetWriter copies over the {@link com.ebay.xcelite.options.XceliteOptions options}
+ * from the sheet it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet}
+ * become the default options, but the SheetWriter can modify option properties locally. However,
+ * the user may use the {@link com.ebay.xcelite.writer.AbstractSheetWriter#AbstractSheetWriter(XceliteSheet,
+ * com.ebay.xcelite.options.XceliteOptions) SimpleSheetWriter(XceliteSheet, XceliteOptions)}
+ * constructor to use - for one writer only - a completely different set of options from
+ * the sheet options.
+ *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
  * created Nov 10, 2013
@@ -43,7 +51,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
     public SimpleSheetWriter(XceliteSheet sheet) {
-        super(sheet, false);
+        super(sheet);
+        sheet.getOptions().setGenerateHeaderRow(false);
     }
 
     @Override
@@ -56,7 +65,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
             final AtomicInteger j = new AtomicInteger(0);
             row.forEach(column -> {
                 Cell cell = excelRow.createCell(j.intValue());
-                if (generateHeaderRow && i.intValue() == 0) {
+                if (options.isGenerateHeaderRow() && i.intValue() == 0) {
                     cell.setCellStyle(boldStyle);
                 }
                 writeToCell(cell, column, null);
