@@ -55,7 +55,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
     }
 
-    @Override
+   /* @Override
     public void write(Collection<Collection<Object>> data) {
         final AtomicInteger i = new AtomicInteger(0);
 
@@ -64,8 +64,14 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
             writeRow(row, excelRow, i.intValue());
             i.incrementAndGet();
         });
-    }
+    }*/
 
+
+    // NOP for SimpleSheetWriter
+    @Override
+    void writeHeader() { }
+
+    @Override
     public void writeRow(final Collection<Object> row, final Row excelRow, final int rowIndex) {
         final AtomicInteger j = new AtomicInteger(0);
         row.forEach(column -> {

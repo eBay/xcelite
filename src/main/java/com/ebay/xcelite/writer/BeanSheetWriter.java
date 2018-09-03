@@ -143,7 +143,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         writeToCell(cell, fieldValueObj, col.getType());
     }
 
-    private void writeHeader() {
+    @Override
+    void writeHeader() {
         headerRow = sheet.getNativeSheet().createRow(rowIndex);
         rowIndex++;
         addColumns(columns, false);
