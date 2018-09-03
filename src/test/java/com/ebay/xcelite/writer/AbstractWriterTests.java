@@ -1,6 +1,7 @@
-package com.ebay.xcelite;
+package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.model.AbstractWriterTestsBean;
+import com.ebay.xcelite.writer.AbstractTestBaseForWriterTests;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

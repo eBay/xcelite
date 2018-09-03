@@ -239,8 +239,8 @@ DiffResult<User> diffResult = XceliteDiff.diff(readerA, readerB, new ReportGener
 Add xcelite as a dependency:
 ```xml
 <dependency>
-    <groupId>com.ebay</groupId>
-    <artifactId>xcelite</artifactId>
-    <version>1.0.4</version>
+	<groupId>io.xcelite.spreadsheet</groupId>
+	<artifactId>xcelite</artifactId>
+	<version>1.1.0</version>
 </dependency>
 ```

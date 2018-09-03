@@ -20,6 +20,14 @@ import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
 
+/**
+ * Generic interface for reader classes that can deserialize Excel workbooks
+ * to collections of Java objects.
+ *
+ * @author kharel (kharel@ebay.com)
+ * @since 1.0
+ */
+
 public interface SheetReader<T> {
 
   /**

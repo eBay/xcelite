@@ -14,7 +14,7 @@ public enum MissingCellPolicy {
     RETURN_BLANK_AS_NULL,
     THROW;
 
-    private MissingCellPolicy() {}
+    MissingCellPolicy() {}
 
     public static Row.MissingCellPolicy toPoiMissingCellPolicy (MissingCellPolicy policy) {
         if (policy.equals(MissingCellPolicy.THROW))

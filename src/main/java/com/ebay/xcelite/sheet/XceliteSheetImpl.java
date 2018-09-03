@@ -15,6 +15,7 @@
 */
 package com.ebay.xcelite.sheet;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.reader.SimpleSheetReader;
@@ -29,19 +30,21 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 9, 2013
  */
 public class XceliteSheetImpl implements XceliteSheet {
-
     private final Sheet sheet;
+    protected XceliteOptions options;
 
     public XceliteSheetImpl(Sheet sheet) {
         this.sheet = sheet;
+        options = new XceliteOptions();
     }
 
-    @Override
-    public Sheet getNativeSheet() {
-        return sheet;
+    public XceliteSheetImpl(Sheet sheet, XceliteOptions options) {
+        this.sheet = sheet;
+        this.options = options;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     @Override
     public <T> SheetReader<T> getBeanReader(Class<T> type) {
-        return new BeanSheetReader<>(this, type);
+        return new BeanSheetReader<>(this, options, type);
     }
 
     @Override
@@ -61,6 +64,18 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
-        return new SimpleSheetReader(this);
+        return new SimpleSheetReader(this, options);
+    }
+
+    @Override
+    public Sheet getNativeSheet() {
+        return sheet;
+    }
+
+    public XceliteOptions getOptions() {
+        if (null == options) {
+            options = new XceliteOptions();
+        }
+        return options;
     }
 }

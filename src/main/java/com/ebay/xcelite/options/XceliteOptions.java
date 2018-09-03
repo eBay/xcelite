@@ -5,19 +5,32 @@ import com.ebay.xcelite.policies.MissingRowPolicy;
 
 /**
  * Configuration class for setting options of a {@link com.ebay.xcelite.Xcelite}
- * object.
+ * object and sheet readers/writers.
  *
+ * @author Johannes
  * @since 1.2
  */
 
 
 public class XceliteOptions {
-
+    private boolean generateHeaderRow;
     private Integer skipRowsBeforeColDefinitionRow = 0;
     private Integer skipRowsAfterColDefinitionRow = 0;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.SKIP;
 
+    public XceliteOptions() {}
+
+    /**
+     * Copy constructor
+     */
+    public XceliteOptions(XceliteOptions other) {
+        this.generateHeaderRow = other.generateHeaderRow;
+        this.skipRowsBeforeColDefinitionRow = other.skipRowsBeforeColDefinitionRow;
+        this.skipRowsAfterColDefinitionRow = other.skipRowsAfterColDefinitionRow;
+        this.missingCellPolicy = other.missingCellPolicy;
+        this.missingRowPolicy = other.missingRowPolicy;
+    }
 
     /**
      * Returns the number of rows Xcelite should skip before trying
@@ -97,5 +110,15 @@ public class XceliteOptions {
     public void setMissingRowPolicy(MissingRowPolicy missingRowPolicy) {
         this.missingRowPolicy = missingRowPolicy;
     }
+
+
+    public boolean isGenerateHeaderRow() {
+        return generateHeaderRow;
+    }
+
+    public void setGenerateHeaderRow(boolean generateHeaderRow) {
+        this.generateHeaderRow = generateHeaderRow;
+    }
+
 
 }

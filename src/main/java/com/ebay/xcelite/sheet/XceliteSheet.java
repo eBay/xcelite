@@ -15,6 +15,7 @@
 */
 package com.ebay.xcelite.sheet;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.writer.SheetWriter;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -25,6 +26,7 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 9, 2013
  */
 public interface XceliteSheet {
@@ -38,4 +40,6 @@ public interface XceliteSheet {
     SheetReader<Collection<Object>> getSimpleReader();
 
     Sheet getNativeSheet();
+
+    XceliteOptions getOptions();
 }

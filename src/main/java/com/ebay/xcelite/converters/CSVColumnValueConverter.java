@@ -26,6 +26,7 @@ import java.util.Collection;
  * override {@link #getCollection(Iterable)} method.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 14, 2013
  */
 public class CSVColumnValueConverter extends DelimiterColumnValueConverter {

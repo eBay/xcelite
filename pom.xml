@@ -61,6 +61,9 @@
 		<developer>
 			<name>Johannes Jander</name>
 		</developer>
+		<developer>
+			<name>Kfir Harel</name>
+		</developer>
 	</developers>
 
 	<properties>
@@ -162,7 +165,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
+    				<version>1.6</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -225,11 +228,12 @@
 			<version>0.9.11</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>4.2</version>
-		</dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.2</version>
+        </dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -292,4 +296,3 @@
 		</profile>
 	</profiles>
 </project>
-

@@ -1,5 +1,6 @@
-package com.ebay.xcelite;
+package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.reader.AbstractSheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;

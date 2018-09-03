@@ -28,7 +28,7 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -51,22 +51,26 @@ import static org.reflections.ReflectionUtils.withName;
  * created Sep 9, 2013
  */
 public class BeanSheetReader<T> extends AbstractSheetReader<T> {
-
-    private final LinkedHashSet<Col> columns;
     private final Col anyColumn;
     private final ColumnsMapper mapper;
     private final Class<T> type;
-    private ArrayList<String> headers;
+    private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
 
+    /**
+     * Construct a BeanSheetReader with custom options
+     * @param sheet the {@link XceliteSheet} to read from
+     * @param options the {@link XceliteOptions} to configure the reader
+     * @param type class of the beans
+     */
     public BeanSheetReader(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
         super(sheet, options);
         this.type = type;
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
-        columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
-        mapper = new ColumnsMapper(columns);
+        LinkedHashSet<Col> declaredColumns = extractor.getColumns();
+        mapper = new ColumnsMapper(declaredColumns);
     }
 
     /**
@@ -129,29 +133,26 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private T fillObject(Row row) {
         T object = type.newInstance();
 
-        for (int i = 0; i < headers.size(); i++) {
-            String columnName = headers.get(i);
-            validateCellAgainstMissingCellPolicy(row, i);
+        for (int i = 0; i < headerColumns.keySet().size(); i++) {
+            String columnName = headerColumns.get(i);
+            checkHasThrowPolicyMustThrow(row, i);
             Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
 
             Col col = mapper.getColumn(columnName);
-            if (col == null) {
+            if (col != null) {
+                Field field = getField(object.getClass(), col.getFieldName());
+                writeToField(field, object, cell, col);
+            } else {
                 if (anyColumn != null) {
                     Field field = getField(object.getClass(), anyColumn.getFieldName());
                     if (!isColumnInIgnoreList(field, columnName)) {
                         writeToAnyColumnField(field, object, cell, columnName);
                     }
                 }
-            } else {
-                Field field = getField(object.getClass(), col.getFieldName());
-                writeToField(field, object, cell, col);
             }
         }
-
         return object;
     }
-
-
 
     @SuppressWarnings("unchecked")
     private Field getField(Class<?> aClass, String name) {
@@ -159,34 +160,21 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     /**
-     * check that @column is found in header
+     * check that every @column is found in header
      */
     private void validateColumns() {
         if (anyColumn != null) {
             return;
         }
-        boolean found = false;
-        for (Col c: columns) {
-            for (String h: headers) {
-                if (c.getName().equals(h)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new ColumnNotFoundException(c.getName());
-            }
-            found = false;
-        }
-    }
-
-    private void validateCellAgainstMissingCellPolicy(Row row, int colIdx) {
-        MissingCellPolicy policy = options.getMissingCellPolicy();
-        if (policy.equals(MissingCellPolicy.THROW)) {
-            Cell cell = row.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-            if (null == cell) {
-                throw new EmptyCellException(headers.get(colIdx));
-            }
+        Collection<String> declaredHeaders = mapper
+                .getColumnsMap()
+                .values()
+                .stream()
+                .map(c -> c.getName())
+                .collect(Collectors.toSet());
+        Collection<String> headers = headerColumns.values();
+        if (!headers.containsAll(declaredHeaders)) {
+            throw new ColumnNotFoundException(declaredHeaders.iterator().next());
         }
     }
 
@@ -215,8 +203,8 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         if (cellValue != null) {
             if (!annotation.converter().equals(NoConverterClass.class)) {
-                ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) annotation.converter()
-                        .newInstance();
+                ColumnValueConverter<Object, ?> converter =
+                        (ColumnValueConverter<Object, ?>) annotation.converter().newInstance();
                 cellValue = converter.deserialize(cellValue);
             }
         }
@@ -232,8 +220,8 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
         if (cellValue != null) {
             if (column.getConverter() != null) {
-                ColumnValueConverter<Object, ?> converter = (ColumnValueConverter<Object, ?>) column.getConverter()
-                        .newInstance();
+                ColumnValueConverter<Object, ?> converter =
+                        (ColumnValueConverter<Object, ?>) column.getConverter().newInstance();
                 cellValue = converter.deserialize(cellValue);
             } else {
                 cellValue = convertToFieldType(cellValue, field.getType());
@@ -273,25 +261,47 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private void buildHeader() {
-        headers = new ArrayList<>();
+        headerColumns = new LinkedHashMap<>();
         Row row = rowIterator.next();
         if (row == null) {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
+        for (int i = 0; i < row.getLastCellNum(); i++) {
+            if (!checkHasThrowPolicyMustThrow(row, i)) {
+                Cell cell = row.getCell(i, MissingCellPolicy.toPoiMissingCellPolicy(options.getMissingCellPolicy()));
+                String cellValue = null;
+                if (null != cell) {
+                    cellValue = cell.getStringCellValue();
+                    if ((null == cellValue) || (cellValue.isEmpty()))
+                        cellValue = null;
+                }
+                headerColumns.put(i, cellValue);
+            }
+        }
+    }
 
-        row.cellIterator().forEachRemaining(cell -> {
-            String cellValue = (null != cell) ? cell.getStringCellValue() : null;
-            if ((null == cellValue) || (cellValue.isEmpty()))
-                cellValue = null;
-            headers.add(cellValue);
-        });
+    private boolean checkHasThrowPolicyMustThrow(Row row, int colIdx) {
+        MissingCellPolicy policy = options.getMissingCellPolicy();
+        if (policy.equals(MissingCellPolicy.THROW)) {
+            Cell cell = row.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            if (null == cell) {
+                String colName = headerColumns.get(colIdx);
+                if (null != colName)
+                    throw new EmptyCellException(colName);
+                else
+                    throw new EmptyCellException();
+            }
+            return true;
+        }
+        return false;
     }
 
     private class ColumnsMapper {
+        @Getter
         private final Map<String, Col> columnsMap;
 
         ColumnsMapper(Set<Col> columns) {
-            columnsMap = new HashMap<>();
+            columnsMap = new LinkedHashMap<>();
             for (Col col : columns) {
                 columnsMap.put(col.getName(), col);
             }

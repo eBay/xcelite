@@ -16,9 +16,11 @@
 package com.ebay.xcelite.converters;
 
 /**
- * Abstraction of generic column value converter.
+ * Generic column value converter interface. ColumnValueConverter implementations
+ * must implement this.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 12, 2013
  */
 public interface ColumnValueConverter<T, V> {

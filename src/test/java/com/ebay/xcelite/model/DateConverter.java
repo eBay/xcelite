@@ -16,6 +16,7 @@
 package com.ebay.xcelite.model;
 
 import com.ebay.xcelite.converters.ColumnValueConverter;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
