@@ -254,6 +254,14 @@
 			<version>5.1.1</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.iSnow</groupId>
+			<artifactId>Xcelite-compatability-1.0.4</artifactId>
+			<version>1.0.4.8</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<reporting>
@@ -265,6 +273,17 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<!-- Only used for pulling in the Xcelite compat lib, for build logs:
+
+	https://jitpack.io/com/github/iSnow/Xcelite-compatability-1.0.4/1.0.4.6/build.log
+	-->
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<profiles>
 		<profile>
