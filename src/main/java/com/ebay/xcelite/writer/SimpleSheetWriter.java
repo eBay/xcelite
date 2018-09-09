@@ -15,6 +15,7 @@
 */
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import org.apache.poi.ss.usermodel.Cell;
@@ -50,9 +51,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
+    //TODO version 2.x remove "public"
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet);
         sheet.getOptions().setGenerateHeaderRow(false);
+    }
+
+    /**
+     * Construct a {@link SimpleSheetWriter} on the given {@link XceliteSheet sheet} using
+     * the given {@link XceliteOptions options}. Values from the options parameter
+     * are copied over, later changes to the options object will not affect the
+     * options of this writer.
+     * @param sheet the sheet to construct the SimpleSheetWriter on.
+     * @param options options for this SimpleSheetWriter.
+     */
+    SimpleSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+        super(sheet, options);
     }
 
     @Override

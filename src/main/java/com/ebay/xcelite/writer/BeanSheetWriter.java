@@ -64,9 +64,33 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private Row headerRow;
     private int rowIndex = 0;
 
+    /**
+     * Construct a {@link BeanSheetWriter} on the given {@link XceliteSheet sheet}
+     * for writing objects of class `T`.
+     * @param sheet the sheet to construct the SheetWriter on.
+     * @param type Class of the objects to write
+     */
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
         super(sheet);
         options.setGenerateHeaderRow(true);
+        ColumnsExtractor extractor = new ColumnsExtractor(type);
+        extractor.extract();
+        columns = extractor.getColumns();
+        anyColumn = extractor.getAnyColumn();
+    }
+
+    /**
+     * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet}
+     * for writing objects of class `T` using the given {@link XceliteOptions options}.
+     * Values from the options parameter are copied over, later changes to the
+     * options object will not affect the options of this writer.
+     * @param sheet the sheet to construct the SheetWriter on.
+     * @param options options for this SheetWriter.
+     * @param type Class of the objects to write
+     */
+    public BeanSheetWriter(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
+        super(sheet, options);
+        super.options.setGenerateHeaderRow(true);
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
         columns = extractor.getColumns();

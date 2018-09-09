@@ -22,6 +22,7 @@ import com.ebay.xcelite.reader.SimpleSheetReader;
 import com.ebay.xcelite.writer.BeanSheetWriter;
 import com.ebay.xcelite.writer.SheetWriter;
 import com.ebay.xcelite.writer.SimpleSheetWriter;
+import lombok.Getter;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
@@ -33,17 +34,18 @@ import java.util.Collection;
  * @since 1.0
  * created Nov 9, 2013
  */
+@Getter
 public class XceliteSheetImpl implements XceliteSheet {
-    private final Sheet sheet;
+    private final Sheet nativeSheet;
     protected XceliteOptions options;
 
-    public XceliteSheetImpl(Sheet sheet) {
-        this.sheet = sheet;
+    public XceliteSheetImpl(Sheet nativeSheet) {
+        this.nativeSheet = nativeSheet;
         options = new XceliteOptions();
     }
 
-    public XceliteSheetImpl(Sheet sheet, XceliteOptions options) {
-        this.sheet = sheet;
+    public XceliteSheetImpl(Sheet nativeSheet, XceliteOptions options) {
+        this.nativeSheet = nativeSheet;
         this.options = options;
     }
 
@@ -67,15 +69,4 @@ public class XceliteSheetImpl implements XceliteSheet {
         return new SimpleSheetReader(this, options);
     }
 
-    @Override
-    public Sheet getNativeSheet() {
-        return sheet;
-    }
-
-    public XceliteOptions getOptions() {
-        if (null == options) {
-            options = new XceliteOptions();
-        }
-        return options;
-    }
 }
