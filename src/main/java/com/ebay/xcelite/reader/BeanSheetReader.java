@@ -173,6 +173,17 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 .map(c -> c.getName())
                 .collect(Collectors.toSet());
         Collection<String> headers = headerColumns.values();
+        if (!options.isHeaderParsingIsCaseSensitive()) {
+            headers = headers.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+            declaredHeaders =   declaredHeaders.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+        }
+
         if (!headers.containsAll(declaredHeaders)) {
             throw new ColumnNotFoundException(declaredHeaders.iterator().next());
         }
@@ -299,16 +310,23 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private class ColumnsMapper {
         @Getter
         private final Map<String, Col> columnsMap;
+        private final Map<String, Col> lowerCaseColumnsMap;
 
         ColumnsMapper(Set<Col> columns) {
             columnsMap = new LinkedHashMap<>();
+            lowerCaseColumnsMap = new LinkedHashMap<>();
             for (Col col : columns) {
                 columnsMap.put(col.getName(), col);
+                lowerCaseColumnsMap.put(col.getName().toLowerCase(), col);
             }
         }
 
         Col getColumn(String name) {
-            return columnsMap.get(name);
+            if (options.isHeaderParsingIsCaseSensitive() || (null == name)) {
+                return columnsMap.get(name);
+            } else {
+                return lowerCaseColumnsMap.get(name.toLowerCase());
+            }
         }
     }
 

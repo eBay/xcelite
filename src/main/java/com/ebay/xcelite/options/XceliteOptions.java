@@ -14,6 +14,7 @@ import com.ebay.xcelite.policies.MissingRowPolicy;
 
 public class XceliteOptions {
     private boolean generateHeaderRow;
+    private boolean headerParsingIsCaseSensitive = false;
     private Integer skipRowsBeforeColDefinitionRow = 0;
     private Integer skipRowsAfterColDefinitionRow = 0;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
@@ -26,6 +27,7 @@ public class XceliteOptions {
      */
     public XceliteOptions(XceliteOptions other) {
         this.generateHeaderRow = other.generateHeaderRow;
+        this.headerParsingIsCaseSensitive = other.headerParsingIsCaseSensitive;
         this.skipRowsBeforeColDefinitionRow = other.skipRowsBeforeColDefinitionRow;
         this.skipRowsAfterColDefinitionRow = other.skipRowsAfterColDefinitionRow;
         this.missingCellPolicy = other.missingCellPolicy;
@@ -38,6 +40,7 @@ public class XceliteOptions {
      * properties
      *
      * @return The number of rows
+     * @since 1.2
      */
     public Integer getSkipRowsBeforeColumnDefinitionRow() {
         return skipRowsBeforeColDefinitionRow;
@@ -50,6 +53,7 @@ public class XceliteOptions {
      * properties
      *
      * @param skipRowsBeforeColumnDefinitionRow The number of rows to skip
+     * @since 1.2
      */
     public void setSkipRowsBeforeColumnDefinitionRow(Integer skipRowsBeforeColumnDefinitionRow) {
         this.skipRowsBeforeColDefinitionRow = skipRowsBeforeColumnDefinitionRow;
@@ -62,6 +66,7 @@ public class XceliteOptions {
      * Useful eg. for omitting rows containing column filters.
      *
      * @return The number of rows
+     * @since 1.2
      */
     public Integer getSkipRowsAfterColumnDefinitionRow() {
         return skipRowsAfterColDefinitionRow;
@@ -74,6 +79,7 @@ public class XceliteOptions {
      * Useful eg. for omitting rows containing column filters.
      *
      * @param skipRowsAfterColumnDefinitionRow The number of rows
+     * @since 1.2
      */
     public void setSkipRowsAfterColumnDefinitionRow(Integer skipRowsAfterColumnDefinitionRow) {
         this.skipRowsAfterColDefinitionRow = skipRowsAfterColumnDefinitionRow;
@@ -82,6 +88,7 @@ public class XceliteOptions {
     /**
      * Used to specify the different possible policies for the case of null and blank cells
      * @return currently active policy for null and blank cells
+     * @since 1.2
      */
     public MissingCellPolicy getMissingCellPolicy() {
         return missingCellPolicy;
@@ -98,6 +105,7 @@ public class XceliteOptions {
     /**
      * Used to specify the different possible policies for the case of null and blank rows
      * @return currently active policy for null and blank rows
+     * @since 1.2
      */
     public MissingRowPolicy getMissingRowPolicy() {
         return missingRowPolicy;
@@ -106,6 +114,7 @@ public class XceliteOptions {
     /**
      * Used to specify the different possible policies for the case of null and blank rows
      * @param missingRowPolicy set policy for null and blank rows
+     * @since 1.2
      */
     public void setMissingRowPolicy(MissingRowPolicy missingRowPolicy) {
         this.missingRowPolicy = missingRowPolicy;
@@ -119,6 +128,15 @@ public class XceliteOptions {
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
         this.generateHeaderRow = generateHeaderRow;
     }
+
+    public boolean isHeaderParsingIsCaseSensitive() {
+        return headerParsingIsCaseSensitive;
+    }
+
+    public void setHeaderParsingIsCaseSensitive(boolean headerParsingIsCaseSensitive) {
+        this.headerParsingIsCaseSensitive = headerParsingIsCaseSensitive;
+    }
+
 
 
 }
