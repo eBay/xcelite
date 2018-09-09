@@ -15,17 +15,17 @@
  */
 package com.ebay.xcelite.compatibility.version_104.reader;
 
-import com.ebay.xcelite.Xcelite;
-import com.ebay.xcelite.model.FormulaUserBean;
-import com.ebay.xcelite.reader.SheetReader;
-import com.ebay.xcelite.sheet.XceliteSheet;
-import org.junit.jupiter.api.DisplayName;
+import com.ebay.xcelite.compatibility.version_104.model.Compat_FormulaUserBean;
+import compat.com.ebay.xcelite_104.Compat_Xcelite;
+import compat.com.ebay.xcelite_104.reader.Compat_SheetReader;
+import compat.com.ebay.xcelite_104.sheet.Compat_XceliteSheet;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * Test if formula cells work
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Johannes
  */
-public class FormulaCellTest {
+public class Compat_FormulaCellTest {
 
     private static String testData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	"2",	"Female"},
@@ -47,35 +47,16 @@ public class FormulaCellTest {
         https://web.archive.org/web/20180820031225/https://support.office.com/en-us/article/vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
      */
     @Test
-    @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
     public void model_VLOOKUPCanLookupReferencedCell() {
-        Xcelite xcelite = new Xcelite(new File("src/test/resources/formulaData.xlsx"));
-        XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<FormulaUserBean> beanReader = sheet.getBeanReader(FormulaUserBean.class);
-        ArrayList<FormulaUserBean> upper = new ArrayList<>(beanReader.read());
+        Compat_Xcelite xcelite = new Compat_Xcelite(new File("src/test/resources/formulaData.xlsx"));
+        Compat_XceliteSheet sheet = xcelite.getSheet(0);
+        Compat_SheetReader<Compat_FormulaUserBean> beanReader = sheet.getBeanReader(Compat_FormulaUserBean.class);
+        ArrayList<Compat_FormulaUserBean> upper = new ArrayList<Compat_FormulaUserBean>(beanReader.read());
 
-        FormulaUserBean first = upper.get(0);
+        Compat_FormulaUserBean first = upper.get(0);
         assertEquals(testData[0][4], first.getSex(), "Gender mismatch");
 
-        FormulaUserBean second = upper.get(1);
+        Compat_FormulaUserBean second = upper.get(1);
         assertEquals(testData[1][4], second.getSex(), "Gender mismatch");
     }
-
-    // TODO write test With formula cell containing error
-    /*
-    @Test
-    @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
-    public void model_VLOOKUPCanLookupReferencedCellbroken() {
-        Xcelite xcelite = new Xcelite(new File("src/test/resources/formulaDataBroken.xlsx"));
-        XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<FormulaUserBean> beanReader = sheet.getBeanReader(FormulaUserBean.class);
-        ArrayList<FormulaUserBean> upper = new ArrayList<>(beanReader.read());
-
-        FormulaUserBean first = upper.get(0);
-        assertEquals(testData[0][4], first.getSex(), "Gender mismatch");
-
-        FormulaUserBean second = upper.get(1);
-        assertEquals(testData[1][4], second.getSex(), "Gender mismatch");
-    }*/
-
 }
