@@ -22,6 +22,7 @@ import com.ebay.xcelite.compatibility.version_104.model.Compat_UsStringCellDateC
 import compat.com.ebay.xcelite_104.Compat_Xcelite;
 import compat.com.ebay.xcelite_104.reader.Compat_SheetReader;
 import compat.com.ebay.xcelite_104.sheet.Compat_XceliteSheet;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -60,6 +61,7 @@ public class Compat_StringColumnCapitalizationTest {
     COMPATIBILITY: version 1.0.x passes, version 1.2 and later must conform
     */
     @Test
+    @DisplayName("Must correctly recognize uppercase column headers")
     public void model_UPPER_readUpperMustOK() throws ParseException {
         Compat_Xcelite xcelite = new Compat_Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         Compat_XceliteSheet sheet = xcelite.getSheet(0);

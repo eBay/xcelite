@@ -19,6 +19,7 @@ import com.ebay.xcelite.compatibility.version_104.model.Compat_FormulaUserBean;
 import compat.com.ebay.xcelite_104.Compat_Xcelite;
 import compat.com.ebay.xcelite_104.reader.Compat_SheetReader;
 import compat.com.ebay.xcelite_104.sheet.Compat_XceliteSheet;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -47,6 +48,7 @@ public class Compat_FormulaCellTest {
         https://web.archive.org/web/20180820031225/https://support.office.com/en-us/article/vlookup-function-0bbc8083-26fe-4963-8ab8-93a18ad188a1
      */
     @Test
+    @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
     public void model_VLOOKUPCanLookupReferencedCell() {
         Compat_Xcelite xcelite = new Compat_Xcelite(new File("src/test/resources/formulaData.xlsx"));
         Compat_XceliteSheet sheet = xcelite.getSheet(0);
