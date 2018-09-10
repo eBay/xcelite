@@ -31,6 +31,13 @@ import java.util.List;
  * Implementation of the {@link SheetReader} interface that returns the contents
  * of an Excel sheet as a two-dimensional data structure of simple Java objects.
  *
+ * By default, a BeanSheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #SimpleSheetReader(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one reader only - a completely different set of options.
+ *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
  * created Nov 8, 2013

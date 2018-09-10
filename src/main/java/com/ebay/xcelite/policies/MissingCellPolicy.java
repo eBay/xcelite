@@ -3,11 +3,12 @@ package com.ebay.xcelite.policies;
 import org.apache.poi.ss.usermodel.Row;
 
 /**
- * Used to specify the different possible policies for the case of null and blank cells
+ * Used to specify the different possible policies to handle null and blank cells
  *
  * Modeled after the POI missing-cell policy
  *
  * @see org.apache.poi.ss.usermodel.Row.MissingCellPolicy
+ * @see MissingRowPolicy
  */
 public enum MissingCellPolicy {
     RETURN_NULL_AND_BLANK,

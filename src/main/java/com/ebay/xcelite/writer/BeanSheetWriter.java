@@ -46,13 +46,12 @@ import static org.reflections.ReflectionUtils.withName;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getBeanWriter(Class)}
  *
- * By default, a SheetWriter copies over the {@link XceliteOptions options} from the sheet
- * it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet} become the
- * default options, but the SheetWriter can modify option properties locally. However, the user
- * may use the {@link AbstractSheetWriter#AbstractSheetWriter(XceliteSheet, XceliteOptions)
- *    BeanSheetWriter(XceliteSheet, XceliteOptions)}
- * constructor to use - for one writer only - a completely different set of options from
- * the sheet options.
+ * By default, a BeanSheetWriter copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetWriter, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #BeanSheetWriter(XceliteSheet, XceliteOptions, Class)} constructor to
+ * use - for one writer only - a completely different set of options.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -67,6 +66,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     /**
      * Construct a {@link BeanSheetWriter} on the given {@link XceliteSheet sheet}
      * for writing objects of class `T`.
+     *
      * @param sheet the sheet to construct the SheetWriter on.
      * @param type Class of the objects to write
      */
@@ -84,6 +84,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
      * for writing objects of class `T` using the given {@link XceliteOptions options}.
      * Values from the options parameter are copied over, later changes to the
      * options object will not affect the options of this writer.
+     *
      * @param sheet the sheet to construct the SheetWriter on.
      * @param options options for this SheetWriter.
      * @param type Class of the objects to write

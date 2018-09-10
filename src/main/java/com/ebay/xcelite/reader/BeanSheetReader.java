@@ -47,6 +47,13 @@ import static org.reflections.ReflectionUtils.withName;
  * of an Excel sheet as a {@link java.util.Collection}. Each entry into that Collection
  * represents one row in the Excel sheet.
  *
+ * By default, a BeanSheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #BeanSheetReader(XceliteSheet, XceliteOptions, Class)} constructor to
+ * use - for one reader only - a completely different set of options.
+ *
  * @author kharel (kharel@ebay.com)
  * created Sep 9, 2013
  */

@@ -37,13 +37,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getSimpleWriter()}
  *
- * By default, a SheetWriter copies over the {@link com.ebay.xcelite.options.XceliteOptions options}
- * from the sheet it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet}
- * become the default options, but the SheetWriter can modify option properties locally. However,
- * the user may use the {@link com.ebay.xcelite.writer.AbstractSheetWriter#AbstractSheetWriter(XceliteSheet,
- * com.ebay.xcelite.options.XceliteOptions) SimpleSheetWriter(XceliteSheet, XceliteOptions)}
- * constructor to use - for one writer only - a completely different set of options from
- * the sheet options.
+ * By default, a SimpleSheetWriter copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetWriter, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #SimpleSheetWriter(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one writer only - a completely different set of options.
+
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0

@@ -1,10 +1,11 @@
 package com.ebay.xcelite.policies;
 
 /**
- * Used to specify the different possible policies for the case of null and blank rows
+ * Used to specify the different possible policies to handle null and blank rows
  *
  * Modeled after the POI missing-cell policy
  *
+ * @see MissingCellPolicy
  */
 public enum MissingRowPolicy {
     /** SheetReaders return null for blank rows **/
