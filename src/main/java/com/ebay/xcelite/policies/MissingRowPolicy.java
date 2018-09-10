@@ -6,6 +6,7 @@ package com.ebay.xcelite.policies;
  * Modeled after the POI missing-cell policy.
  *
  * @see MissingCellPolicy
+ * @since 1.2
  */
 public enum MissingRowPolicy {
     /** SheetReaders return null for blank rows **/

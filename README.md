@@ -62,7 +62,7 @@ public class User {
   private Date birthDate; 
 }
 ```
-@Column annotation on a property indicates that you want it to be serialized to excel.  
+The `@Column` annotation on a property indicates that you want it to be serialized to excel.  
 By default, if no `name` attribute is provided the excel column name will be taken from the property name.
 
 Now we'll write the same data as before but this time using `BeanWriter` writer instead of `SimpleWriter`:

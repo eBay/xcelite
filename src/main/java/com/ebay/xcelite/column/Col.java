@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
  * Represents a column object which holds all data about the Excel column.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Aug 29, 2013
  */
 @Data

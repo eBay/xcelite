@@ -55,6 +55,7 @@ import static org.reflections.ReflectionUtils.withName;
  * use - for one reader only - a completely different set of options.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 9, 2013
  */
 public class BeanSheetReader<T> extends AbstractSheetReader<T> {

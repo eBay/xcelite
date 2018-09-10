@@ -33,6 +33,10 @@ import static java.util.Optional.of;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
+/**
+ * Class description...
+ * @since 1.0
+ */
 public class ColumnsExtractor {
 
     @Getter

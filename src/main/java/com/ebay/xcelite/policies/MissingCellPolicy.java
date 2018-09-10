@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.Row;
  *
  * @see org.apache.poi.ss.usermodel.Row.MissingCellPolicy
  * @see MissingRowPolicy
+ * @since 1.2
  */
 public enum MissingCellPolicy {
     RETURN_NULL_AND_BLANK,
