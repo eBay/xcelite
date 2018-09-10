@@ -13,6 +13,8 @@
   * [XceliteDiff](#xcelitediff)
 * [How To Use?](#how-to-use)
   * [Using Xcelite in Your Maven Project](#using-xcelite-in-your-maven-project)
+  * [Using Xcelite in Your Gradle Project](#using-xcelite-in-your-gradle-project)
+  * [Using Xcelite with other build systems](#using-xcelite-with-other-build-systems)
 
 ### Introduction
 [Xcelite](http://www.xcelite.io/) is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
@@ -60,10 +62,10 @@ public class User {
   private Date birthDate; 
 }
 ```
-@Column annoatation indicates a property that you want it to be serialized to excel.  
-By default, if no "name" attribute is provided the excel column name will be taken from the property name.
+@Column annotation on a property indicates that you want it to be serialized to excel.  
+By default, if no `name` attribute is provided the excel column name will be taken from the property name.
 
-Now we'll write the same data as before but this time using bean writer instead of simple:
+Now we'll write the same data as before but this time using `BeanWriter` writer instead of `SimpleWriter`:
 ```java
 Xcelite xcelite = new Xcelite();    
 XceliteSheet nativeSheet = xcelite.createSheet("users");
@@ -73,9 +75,14 @@ List<User> users = new ArrayList<>();
 writer.write(users); 
 xcelite.write(new File("users_doc.xlsx"));
 ```
-This will create a nativeSheet with 4 columns plus header row: Firstname, Lastname, id and birthDate.  
-Naturally, the excel column types will be Text for FirstName and LastName, Number for id and Date for birthDate.  
-If you prefer that "id" column should be written as Text instead of Number, use  
+This will create an Excel workbook containing one sheet named "users" with 4 columns plus header row: 
+* Firstname 
+* Lastname 
+* id 
+* birthDate  
+
+Naturally, the excel column types will be Text for `FirstName` and `LastName`, Number for `id` and Date for `birthDate`.  
+If you prefer that column `id`  should be written as Text instead of Number, use  
 
 ```java 
 @Column(ignoreType=true)
@@ -123,23 +130,23 @@ Sheet columns which are not mapped to a @Column annotated property will be ignor
 
 Lets say your bean contains a list of values or some object of your own. By default, Xcelite will serialize the toString() of the object or list, and sometimes this might not be what you want.  
 The converter mechanism allows you to serialize/deserialize the object in any way you want.  
-To demostrate lets add a list to our User bean and use the built-in CSVColumnValueConverter converter:
+To demostrate lets add a list to our `User` bean and use the built-in `CSVColumnValueConverter` converter:
 
 ```java
 @Column(name = "Emails", converter = CSVColumnValueConverter.class)
 private List<String> mailAddresses;
 ```
-The CSVColumnValueConverter takes a collection of objects and serializes it to a comma-separated String.  
+The `CSVColumnValueConverter` takes a collection of objects and serializes it to a comma-separated String.  
 Alternately when deserializing, the converter takes a comma-separated and deserializes it to a collection of Objects.  
 So writing a collection of users will result with a column named "Emails" and the column data will look someting like that:  
 john@mail.com,danny@mail.com,jerry@mail.com  
 
 When reading the nativeSheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
-If you prefer a different collection implementation rather than the default ArrayList, you can always extend the CSVColumnValueConverter and override the getCollection() method to return your preferred implementation.
+If you prefer a different collection implementation rather than the default `ArrayList`, you can always extend the `CSVColumnValueConverter` and override the `getCollection()` method to return your preferred implementation.
 
 ##### Custom Converters
-It is possible of course to create your own converter. All you need to do is to implement ColumnValueConverter interface.  
-For example, lets create a converter for our firstName property that will lowercase the firstName when writing and will uppercase it when reading.  
+It is possible to create your own converter. All you need to do is to implement `ColumnValueConverter` interface.  
+For example, lets create a converter for our `firstName` property that will lowercase the `firstName` when writing and will uppercase it when reading.  
 ```java
 public class UpperLowerCaseConverter implements ColumnValueConverter<String, String> {
   @Override
@@ -209,7 +216,7 @@ reader.addRowPostProcessor(new UserPostRowProcessor());
 Note that you can register as many row post processors as you like. They will be executed in ordered manner.
 
 
-#### Xcelite Spring web application
+#### Xcelite example Spring web application
 
 Currently work in progress, see https://github.com/iSnow/xcelite-web
 
@@ -244,3 +251,12 @@ Add xcelite as a dependency:
 	<version>1.1.0</version>
 </dependency>
 ```
+
+#### Using Xcelite in Your Gradle Project
+Add xcelite as a dependency:
+```gradle
+compile group: 'io.xcelite.spreadsheet', name: 'xcelite', version: '1.1.0'
+```
+
+#### Using Xcelite with other build systems
+See https://mvnrepository.com/artifact/io.xcelite.spreadsheet/xcelite/1.1.0

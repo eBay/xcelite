@@ -40,7 +40,7 @@ public class XceliteSheetImpl implements XceliteSheet {
     private final Sheet nativeSheet;
 
     @Setter
-    protected XceliteOptions options;
+    private XceliteOptions options;
 
     public XceliteSheetImpl(Sheet nativeSheet) {
         this.nativeSheet = nativeSheet;

@@ -61,6 +61,7 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         this.sheet = sheet;
         options = new XceliteOptions(sheet.getOptions());
     }
+
     /**
      * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
      * and set {@link XceliteOptions#setGenerateHeaderRow(boolean)}
