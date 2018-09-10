@@ -16,6 +16,7 @@
 package com.ebay.xcelite.writer;
 
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
@@ -40,4 +41,18 @@ public interface SheetWriter<T> {
     void setGenerateHeaderRow(boolean generateHeaderRow);
 
     XceliteSheet getSheet();
+
+    /**
+     * Gets the {@link XceliteOptions} object used to configure the writer's
+     * behavior
+     * @return configuration object
+     */
+    XceliteOptions getOptions();
+
+    /**
+     * Sets the {@link XceliteOptions} object used to configure the writer's
+     * behavior
+     * @param options configuration object
+     */
+    void setOptions(XceliteOptions options);
 }

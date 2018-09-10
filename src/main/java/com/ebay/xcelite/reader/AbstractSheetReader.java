@@ -18,6 +18,7 @@ package com.ebay.xcelite.reader;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -41,14 +42,14 @@ import java.util.List;
  * @since 1.0
  * created Nov 11, 2013
  */
-public abstract class AbstractSheetReader<T> implements SheetReader<T> {
-    @Getter
-    protected final XceliteSheet sheet;
 
+@Getter
+public abstract class AbstractSheetReader<T> implements SheetReader<T> {
+    protected final XceliteSheet sheet;
     final List<RowPostProcessor<T>> rowPostProcessors;
 
-    @Getter
-    protected final XceliteOptions options;
+    @Setter
+    protected XceliteOptions options;
 
     public AbstractSheetReader(XceliteSheet sheet) {
         this (sheet, new XceliteOptions());

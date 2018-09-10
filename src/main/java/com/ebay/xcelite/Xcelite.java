@@ -29,9 +29,9 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 /**
- * Main class of the Xcelite package. A Xcelite object wraps a POI
- * {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
- * operations on its sheets.
+ * Main class of the Xcelite package. A Xcelite object is constructed on an Excel
+ * file and wraps a POI {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
+ * operations on the workbooks' sheets.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -105,6 +105,7 @@ public class Xcelite {
      * Gets all sheets.
      *
      * @return the list of sheets (a list of {@link XceliteSheet} objects.) or XceliteException
+     * if no sheets exist
      */
     public List<XceliteSheet> getSheets() {
         if (workbook.getNumberOfSheets() == 0) {

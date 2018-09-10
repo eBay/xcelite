@@ -42,4 +42,6 @@ public interface XceliteSheet {
     Sheet getNativeSheet();
 
     XceliteOptions getOptions();
+
+    void setOptions(XceliteOptions options);
 }

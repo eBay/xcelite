@@ -56,6 +56,13 @@ public interface SheetReader<T> {
   XceliteOptions getOptions();
 
   /**
+   * Sets the {@link XceliteOptions} object used to configure the reader's
+   * behavior
+   * @param options configuration object
+   */
+  void setOptions(XceliteOptions options);
+
+  /**
    * Gets the sheet.
    *
    * @return the sheet

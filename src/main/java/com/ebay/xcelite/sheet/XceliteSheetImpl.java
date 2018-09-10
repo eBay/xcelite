@@ -23,6 +23,7 @@ import com.ebay.xcelite.writer.BeanSheetWriter;
 import com.ebay.xcelite.writer.SheetWriter;
 import com.ebay.xcelite.writer.SimpleSheetWriter;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
@@ -37,6 +38,8 @@ import java.util.Collection;
 @Getter
 public class XceliteSheetImpl implements XceliteSheet {
     private final Sheet nativeSheet;
+
+    @Setter
     protected XceliteOptions options;
 
     public XceliteSheetImpl(Sheet nativeSheet) {
