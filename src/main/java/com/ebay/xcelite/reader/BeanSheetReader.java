@@ -66,7 +66,10 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private Iterator<Row> rowIterator;
 
     /**
-     * Construct a BeanSheetReader with custom options
+     * Construct a BeanSheetReader with custom options. The Reader will create
+     * a copy of the options object, therefore later changes of this object will not
+     * influence the behavior of this reader
+     *
      * @param sheet the {@link XceliteSheet} to read from
      * @param options the {@link XceliteOptions} to configure the reader
      * @param type class of the beans
@@ -82,12 +85,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     /**
-     * Construct a BeanSheetReader with default options
+     * Construct a BeanSheetReader with options from the {@link XceliteSheet}
      * @param sheet the {@link XceliteSheet} to read from
      * @param type class of the beans
      */
+    //TODO version 2.x remove if possible
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
-        this(sheet, new XceliteOptions(), type);
+        this(sheet, sheet.getOptions(), type);
     }
 
     @SuppressWarnings("unchecked")
@@ -174,12 +178,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         if (anyColumn != null) {
             return;
         }
-        Collection<String> declaredHeaders = mapper
-                .getColumnsMap()
-                .values()
-                .stream()
-                .map(c -> c.getName())
-                .collect(Collectors.toSet());
+        Collection<String> declaredHeaders = mapper.getDeclaredHeaderNames();
         Collection<String> headers = headerColumns.values();
         if (!options.isHeaderParsingIsCaseSensitive()) {
             headers = headers.stream().map(n -> {
@@ -316,7 +315,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private class ColumnsMapper {
-        @Getter
         private final Map<String, Col> columnsMap;
         private final Map<String, Col> lowerCaseColumnsMap;
 
@@ -335,6 +333,15 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
             } else {
                 return lowerCaseColumnsMap.get(name.toLowerCase());
             }
+        }
+
+        Set<String> getDeclaredHeaderNames() {
+            Set<String> declaredHeaders = columnsMap
+                    .values()
+                    .stream()
+                    .map(c -> c.getName())
+                    .collect(Collectors.toSet());
+            return declaredHeaders;
         }
     }
 

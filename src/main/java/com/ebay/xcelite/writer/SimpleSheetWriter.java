@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
-    //TODO version 2.x remove "public"
+    //TODO version 2.x remove if possible
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet);
         sheet.getOptions().setGenerateHeaderRow(false);
@@ -65,7 +65,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
      * @param sheet the sheet to construct the SimpleSheetWriter on.
      * @param options options for this SimpleSheetWriter.
      */
-    SimpleSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+    public SimpleSheetWriter(XceliteSheet sheet, XceliteOptions options) {
         super(sheet, options);
     }
 

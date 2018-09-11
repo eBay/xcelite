@@ -70,6 +70,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
      * @param sheet the sheet to construct the SheetWriter on.
      * @param type Class of the objects to write
      */
+    //TODO version 2.x remove if possible
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
         super(sheet);
         options.setGenerateHeaderRow(true);

@@ -45,7 +45,10 @@ import java.util.List;
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
   /**
-   * Construct a SimpleSheetReader with custom options
+   * Construct a SimpleSheetReader with custom options. The Reader will create
+   * a copy of the options object, therefore later changes of this object will not
+   * influence the behavior of this reader
+   *
    * @param sheet the {@link XceliteSheet} to read from
    * @param options the {@link XceliteOptions} to configure the reader
    */
@@ -54,11 +57,12 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   }
 
   /**
-   * Construct a SimpleSheetReader with default options
+   * Construct a SimpleSheetReader with options from the {@link XceliteSheet}
    * @param sheet the {@link XceliteSheet} to read from
    */
+  //TODO version 2.x remove if possible
   public SimpleSheetReader(XceliteSheet sheet) {
-    this(sheet, new XceliteOptions());
+    this(sheet, sheet.getOptions());
   }
 
   @Override

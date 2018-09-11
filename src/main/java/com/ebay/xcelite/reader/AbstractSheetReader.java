@@ -51,13 +51,14 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Setter
     protected XceliteOptions options;
 
+    //TODO version 2.x remove if possible
     public AbstractSheetReader(XceliteSheet sheet) {
         this (sheet, new XceliteOptions());
     }
 
     public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
         this.sheet = sheet;
-        this.options = options;
+        this.options = new XceliteOptions(options);
         rowPostProcessors = new ArrayList<>();
     }
 

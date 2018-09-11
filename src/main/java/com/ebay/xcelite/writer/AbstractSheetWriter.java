@@ -33,12 +33,11 @@ import java.util.Date;
  *
  * Concrete implementations must override the {@link SheetWriter#write(Collection)} method.
  *
- * By default, a SheetWriter copies over the {@link XceliteOptions options} from the
- * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
- * options set on the sheet become the default options for the SheetWriter, but it can
- * modify option properties locally. However, the user may use the
- * {@link #AbstractSheetWriter(XceliteSheet, XceliteOptions)} constructor to
- * use - for one writer only - a completely different set of options.
+ * By default, a SheetWriter copies over the {@link XceliteOptions options} from the sheet
+ * it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet} become the
+ * default options, but the SheetWriter can modify option properties locally. However, the user
+ * may use the {@link #AbstractSheetWriter(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one writer only - a completely different set of options from the sheet options.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -53,13 +52,26 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
 
     /**
      * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet} using
+     * the given {@link XceliteOptions options}. Values from the options parameter
+     * are copied over, later changes to the options object will not affect the
+     * options of this writer.
+     * @param sheet the sheet to construct the SheetWriter on.
+     * @param options options for this SheetWriter.
+     */
+    AbstractSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+        this.sheet = sheet;
+        this.options = new XceliteOptions(options);
+    }
+
+    /**
+     * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet} using
      * {@link XceliteOptions options} from the sheet. Sheet options are copied
      * over, later changes will not affect the options of this writer.
      * @param sheet the sheet to construct the SheetWriter on.
      */
+    //TODO version 2.x remove if possible
     AbstractSheetWriter(XceliteSheet sheet) {
-        this.sheet = sheet;
-        options = new XceliteOptions(sheet.getOptions());
+        this (sheet, sheet.getOptions());
     }
 
     /**
@@ -73,19 +85,6 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
         this(sheet);
         options.setGenerateHeaderRow(writeHeader);
-    }
-
-    /**
-     * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet} using
-     * the given {@link XceliteOptions options}. Values from the options parameter
-     * are copied over, later changes to the options object will not affect the
-     * options of this writer.
-     * @param sheet the sheet to construct the SheetWriter on.
-     * @param options options for this SheetWriter.
-     */
-    AbstractSheetWriter(XceliteSheet sheet, XceliteOptions options) {
-        this(sheet);
-        this.options = new XceliteOptions(options);
     }
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {

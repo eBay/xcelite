@@ -34,6 +34,7 @@ public interface SheetReader<T> {
    * Reads the sheet and returns a collection of the specified type.
    *
    * @return collection of the specified type
+   * @since 1.0
    */
   Collection<T> read();
 
@@ -52,6 +53,7 @@ public interface SheetReader<T> {
    * Gets the {@link XceliteOptions} object used to configure the reader's
    * behavior
    * @return configuration object
+   * @since 1.2
    */
   XceliteOptions getOptions();
 
@@ -59,13 +61,14 @@ public interface SheetReader<T> {
    * Sets the {@link XceliteOptions} object used to configure the reader's
    * behavior
    * @param options configuration object
+   * @since 1.2
    */
   void setOptions(XceliteOptions options);
 
+
   /**
-   * Gets the sheet.
-   *
-   * @return the sheet
+   * Gets the {@link XceliteSheet} object this reader is operating on
+   * @return sheet this reader reads from
    */
   XceliteSheet getSheet();
 
