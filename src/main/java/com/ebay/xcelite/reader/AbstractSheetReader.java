@@ -48,7 +48,6 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     protected final XceliteSheet sheet;
     final List<RowPostProcessor<T>> rowPostProcessors;
 
-    @Setter
     protected XceliteOptions options;
 
     //TODO version 2.x remove if possible
@@ -191,5 +190,9 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
             stop = (r.getRowNum() >= lastRowNum);
         }
         return rowIterator;
+    }
+
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
     }
 }

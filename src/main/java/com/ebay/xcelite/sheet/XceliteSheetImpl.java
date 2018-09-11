@@ -39,7 +39,6 @@ import java.util.Collection;
 public class XceliteSheetImpl implements XceliteSheet {
     private final Sheet nativeSheet;
 
-    @Setter
     private XceliteOptions options;
 
     public XceliteSheetImpl(Sheet nativeSheet) {
@@ -49,7 +48,10 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     public XceliteSheetImpl(Sheet nativeSheet, XceliteOptions options) {
         this.nativeSheet = nativeSheet;
-        this.options = options;
+        if (null == options)
+            this.options = new XceliteOptions();
+        else
+            this.options = new XceliteOptions(options);
     }
 
     @Override
@@ -72,4 +74,7 @@ public class XceliteSheetImpl implements XceliteSheet {
         return new SimpleSheetReader(this, options);
     }
 
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
+    }
 }

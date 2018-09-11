@@ -2,6 +2,7 @@ package com.ebay.xcelite.options;
 
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
+import lombok.EqualsAndHashCode;
 
 /**
  * Configuration class for setting options of a {@link com.ebay.xcelite.Xcelite}
@@ -11,7 +12,7 @@ import com.ebay.xcelite.policies.MissingRowPolicy;
  * @since 1.2
  */
 
-
+@EqualsAndHashCode
 public class XceliteOptions {
     private boolean generateHeaderRow = true;
     private boolean headerParsingIsCaseSensitive = true;

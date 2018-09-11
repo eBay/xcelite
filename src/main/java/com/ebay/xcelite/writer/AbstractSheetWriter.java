@@ -47,7 +47,6 @@ import java.util.Date;
 public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     protected XceliteSheet sheet;
 
-    @Setter
     protected XceliteOptions options;
 
     /**
@@ -129,5 +128,9 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     @Override
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
         options.setGenerateHeaderRow(generateHeaderRow);
+    }
+
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
     }
 }
