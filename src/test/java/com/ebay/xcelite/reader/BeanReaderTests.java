@@ -31,7 +31,7 @@ public class BeanReaderTests  {
     @DisplayName("MissingCellPolicy default - Must correctly read a header row where some columns are not mapped to annotated properties")
     void mustReadHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
 
         List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
         validateData(upper);
@@ -41,7 +41,7 @@ public class BeanReaderTests  {
     @DisplayName("MissingCellPolicy.RETURN_BLANK_AS_NULL - Must correctly read a header row where some columns are not mapped to annotated properties")
     void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_BLANK_AS_NULL_OK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
         List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
@@ -52,7 +52,7 @@ public class BeanReaderTests  {
     @DisplayName("MissingCellPolicy.RETURN_NULL_AND_BLANK - Must correctly read a header row where some columns are not mapped to annotated properties")
     void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_NULL_AND_BLANK_OK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(MissingCellPolicy.RETURN_NULL_AND_BLANK);
 
         List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
@@ -63,7 +63,7 @@ public class BeanReaderTests  {
     @DisplayName("MissingCellPolicy.THROW - Must correctly throw reading a header row where some columns are not mapped to annotated properties")
     public void mustThrowReadingHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(MissingCellPolicy.THROW);
 
         assertThrows(EmptyCellException.class, () -> {

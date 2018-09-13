@@ -4,7 +4,6 @@ import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
-import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;
@@ -35,10 +34,10 @@ public class OptionsCopyOnSetterTests {
         options.setHeaderParsingIsCaseSensitive(false);
         copyAndTestOptionsEquality(options);
 
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         copyAndTestOptionsEquality(options);
 
-        options.setSkipRowsAfterColumnDefinitionRow(3);
+        options.setFirstDataRowIndex(3);
         copyAndTestOptionsEquality(options);
 
         options.setMissingCellPolicy(MissingCellPolicy.THROW);
@@ -52,12 +51,12 @@ public class OptionsCopyOnSetterTests {
     @DisplayName("Test Xcelite Setter copies options object")
     void CopyOptionsOnXceliteSetterTest() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         Xcelite xcelite = new Xcelite();
         xcelite.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, xcelite.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, xcelite.getOptions(), "Copying options in Setter failed");
     }
@@ -66,13 +65,13 @@ public class OptionsCopyOnSetterTests {
     @DisplayName("Test XceliteSheet Setter copies options object")
     void CopyOptionsOnXceliteSheetSetterTest() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsAfterColumnDefinitionRow(3);
+        options.setFirstDataRowIndex(3);
         Xcelite xcelite = new Xcelite();
         XceliteSheet sheet = xcelite.createSheet();
         sheet.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, sheet.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, sheet.getOptions(), "Copying options in Setter failed");
     }
@@ -88,7 +87,7 @@ public class OptionsCopyOnSetterTests {
         rdr.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, rdr.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, rdr.getOptions(), "Copying options in Setter failed");
     }
@@ -104,7 +103,7 @@ public class OptionsCopyOnSetterTests {
         rdr.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, rdr.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, rdr.getOptions(), "Copying options in Setter failed");
     }
@@ -120,7 +119,7 @@ public class OptionsCopyOnSetterTests {
         writer.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, writer.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, writer.getOptions(), "Copying options in Setter failed");
     }
@@ -136,7 +135,7 @@ public class OptionsCopyOnSetterTests {
         writer.setOptions(options);
 
         XceliteOptions oldOptions = new XceliteOptions(options);
-        options.setSkipRowsBeforeColumnDefinitionRow(4);
+        options.setHeaderRowIndex(4);
         Assertions.assertEquals(oldOptions, writer.getOptions(), "Copying options in Setter failed");
         Assertions.assertNotEquals(options, writer.getOptions(), "Copying options in Setter failed");
     }

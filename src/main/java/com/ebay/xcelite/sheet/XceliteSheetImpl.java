@@ -54,24 +54,31 @@ public class XceliteSheetImpl implements XceliteSheet {
             this.options = new XceliteOptions(options);
     }
 
+    private XceliteOptions adaptDataRowIndex (int newFirstDataRowIndex) {
+        XceliteOptions lOptions = new XceliteOptions(options);
+        if (lOptions.getFirstDataRowIndex() == -1)
+            lOptions.setFirstDataRowIndex(newFirstDataRowIndex);
+        return lOptions;
+    }
+
     @Override
     public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
-        return new BeanSheetWriter<>(this, options, type);
+        return new BeanSheetWriter<>(this, adaptDataRowIndex (options.getHeaderRowIndex() + 1), type);
     }
 
     @Override
     public <T> SheetReader<T> getBeanReader(Class<T> type) {
-        return new BeanSheetReader<>(this, options, type);
+        return new BeanSheetReader<>(this, adaptDataRowIndex (options.getHeaderRowIndex() + 1), type);
     }
 
     @Override
     public SimpleSheetWriter getSimpleWriter() {
-        return new SimpleSheetWriter(this, options);
+        return new SimpleSheetWriter(this, adaptDataRowIndex (options.getHeaderRowIndex()));
     }
 
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
-        return new SimpleSheetReader(this, options);
+        return new SimpleSheetReader(this, adaptDataRowIndex (options.getHeaderRowIndex()));
     }
 
     public void setOptions(XceliteOptions options) {

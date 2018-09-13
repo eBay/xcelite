@@ -41,7 +41,7 @@ public interface SheetReader<T> {
   /**
    * Whether to skip the first row or not when reading the sheet.
    * @deprecated since 1.2. Use {@link #getOptions()} instead and set
-   * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+   * {@link XceliteOptions#setHeaderRowIndex(Integer) setSkipLinesBeforeHeader}
    * to 1
    *
    * @param skipHeaderRow true to skip the header row, false otherwise

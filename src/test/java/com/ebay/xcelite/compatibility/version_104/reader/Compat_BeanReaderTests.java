@@ -16,7 +16,7 @@ public class Compat_BeanReaderTests {
     @Test
     void mustReadHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
 
         List<Compat_CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
         validateData(upper);
@@ -26,7 +26,7 @@ public class Compat_BeanReaderTests {
     @Test
     void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_BLANK_AS_NULL_OK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
         List<Compat_CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
@@ -36,7 +36,7 @@ public class Compat_BeanReaderTests {
     @Test
     void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_NULL_AND_BLANK_OK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(Row.MissingCellPolicy.RETURN_NULL_AND_BLANK);
 
         List<Compat_CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
@@ -45,7 +45,7 @@ public class Compat_BeanReaderTests {
     @Test
     public void mustThrowReadingHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
         options.setMissingCellPolicy(Row.MissingCellPolicy.THROW);
 
         assertThrows(EmptyCellException.class, () -> {

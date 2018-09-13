@@ -16,8 +16,8 @@ import lombok.EqualsAndHashCode;
 public class XceliteOptions {
     private boolean generateHeaderRow = true;
     private boolean headerParsingIsCaseSensitive = true;
-    private Integer skipRowsBeforeColDefinitionRow = 0;
-    private Integer skipRowsAfterColDefinitionRow = 0;
+    private Integer headerRowIndex = 0;
+    private Integer firstDataRowIndex = -1;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.SKIP;
 
@@ -29,61 +29,55 @@ public class XceliteOptions {
     public XceliteOptions(XceliteOptions other) {
         this.generateHeaderRow = other.generateHeaderRow;
         this.headerParsingIsCaseSensitive = other.headerParsingIsCaseSensitive;
-        this.skipRowsBeforeColDefinitionRow = other.skipRowsBeforeColDefinitionRow;
-        this.skipRowsAfterColDefinitionRow = other.skipRowsAfterColDefinitionRow;
+        this.headerRowIndex = other.headerRowIndex;
+        this.firstDataRowIndex = other.firstDataRowIndex;
         this.missingCellPolicy = other.missingCellPolicy;
         this.missingRowPolicy = other.missingRowPolicy;
     }
 
     /**
-     * Returns the number of rows Xcelite should skip before trying
-     * to parse the next one as the row defining the annotated bean
-     * properties
+     * Returns the row index of the row defining the annotated bean
+     * properties. This index is zero-based.
      *
-     * @return The number of rows
+     * @return column index of the header row.
      * @since 1.2
      */
-    public Integer getSkipRowsBeforeColumnDefinitionRow() {
-        return skipRowsBeforeColDefinitionRow;
+    public Integer getHeaderRowIndex() {
+        return headerRowIndex;
     }
 
 
     /**
-     * Sets the number of rows Xcelite should skip before trying
-     * to parse the next one as the row defining the annotated bean
-     * properties
+     * Sets the row index of the row defining the annotated bean
+     * properties. This index is zero-based.
      *
-     * @param skipRowsBeforeColumnDefinitionRow The number of rows to skip
+     * @param headerRowIndex column index of the header row
      * @since 1.2
      */
-    public void setSkipRowsBeforeColumnDefinitionRow(Integer skipRowsBeforeColumnDefinitionRow) {
-        this.skipRowsBeforeColDefinitionRow = skipRowsBeforeColumnDefinitionRow;
+    public void setHeaderRowIndex(Integer headerRowIndex) {
+        this.headerRowIndex = headerRowIndex;
     }
 
     /**
-     * Returns the number of rows Xcelite should skip after
-     * the row defining the annotated bean properties is parsed and
-     * before the first data row is read.
+     * Returns row index of first data row. This index is zero-based.
      * Useful eg. for omitting rows containing column filters.
      *
-     * @return The number of rows
+     * @return The column index of the first data row.
      * @since 1.2
      */
-    public Integer getSkipRowsAfterColumnDefinitionRow() {
-        return skipRowsAfterColDefinitionRow;
+    public Integer getFirstDataRowIndex() {
+        return firstDataRowIndex;
     }
 
     /**
-     * Set the number of rows Xcelite should skip after
-     * the row defining the annotated bean properties is parsed and
-     * before the first data row is read.
+     * Set row index of first data row. This index is zero-based.
      * Useful eg. for omitting rows containing column filters.
      *
-     * @param skipRowsAfterColumnDefinitionRow The number of rows
+     * @param firstDataRowIndex column index of the first data row
      * @since 1.2
      */
-    public void setSkipRowsAfterColumnDefinitionRow(Integer skipRowsAfterColumnDefinitionRow) {
-        this.skipRowsAfterColDefinitionRow = skipRowsAfterColumnDefinitionRow;
+    public void setFirstDataRowIndex(Integer firstDataRowIndex) {
+        this.firstDataRowIndex = firstDataRowIndex;
     }
 
     /**

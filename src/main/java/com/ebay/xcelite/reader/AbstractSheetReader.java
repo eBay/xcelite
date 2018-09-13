@@ -18,7 +18,6 @@ package com.ebay.xcelite.reader;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -63,7 +62,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
     /**
      * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
-     * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * and set {@link XceliteOptions#setFirstDataRowIndex(Integer) setFirstDataRowIndex}
      * to 1
      * @param sheet The sheet to read from
      * @param skipHeaderRow whether or not one header row should be skipped
@@ -71,8 +70,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Deprecated
     public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
         this (sheet);
-        if (skipHeaderRow)
-            options.setSkipRowsBeforeColumnDefinitionRow(1);
+        skipHeaderRow (skipHeaderRow);
     }
 
     public static Object readValueFromCell(Cell cell) {
@@ -111,7 +109,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
     /**
      * @deprecated since 1.2. Use {@link #getOptions()} instead and set
-     * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * {@link XceliteOptions#setFirstDataRowIndex(Integer) setFirstDataRowIndex}
      * to 1
      * @param skipHeaderRow true to skip the header row, false otherwise
      */
@@ -119,7 +117,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Deprecated
     public void skipHeaderRow(boolean skipHeaderRow) {
         if (skipHeaderRow)
-            options.setSkipRowsBeforeColumnDefinitionRow(1);
+            options.setFirstDataRowIndex(1);
     }
 
     @Override
@@ -155,19 +153,24 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
         return keepObject;
     }
 
-    static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
-        if (options.getSkipRowsAfterColumnDefinitionRow() < 0)
-            return nativeSheet.rowIterator();
-        return skipRows (nativeSheet,
-                options.getSkipRowsBeforeColumnDefinitionRow()
-                        + options.getSkipRowsAfterColumnDefinitionRow()
-                        + 1);
+    /*
+    If the first data row setting from XceliteOptions is the default (-1) AND
+    we have an explicit setting for the header-row index, then assume the first
+    data row is the row following the header row
+     */
+    static Iterator<Row> moveToFirstDataRow(Sheet nativeSheet, XceliteOptions options) {
+        int firstDataRowIndex = options.getFirstDataRowIndex();
+        if (firstDataRowIndex < 0) {
+            if (options.getHeaderRowIndex() != 0)
+                firstDataRowIndex = options.getHeaderRowIndex() +1;
+        }
+        return skipRows (nativeSheet, firstDataRowIndex);
     }
 
-    static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
-        if (options.getSkipRowsBeforeColumnDefinitionRow() <= 0)
+    static Iterator<Row> moveToHeaderRow(Sheet nativeSheet, XceliteOptions options) {
+        if (options.getHeaderRowIndex() <= 0)
             return nativeSheet.rowIterator();
-        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow());
+        return skipRows (nativeSheet, options.getHeaderRowIndex());
     }
 
     /*

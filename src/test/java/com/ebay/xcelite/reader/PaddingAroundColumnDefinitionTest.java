@@ -19,8 +19,6 @@ import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +49,7 @@ public class PaddingAroundColumnDefinitionTest {
     @DisplayName("Must correctly recognize  column headers with empty rows before")
     public void readHeaderWithEmptyRowsBeforeMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
 
         List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition.xlsx");
         validateData(upper);
@@ -62,7 +60,7 @@ public class PaddingAroundColumnDefinitionTest {
     @DisplayName("Must correctly recognize column headers with not empty rows before")
     public void readHeaderWithRowsBeforeMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setHeaderRowIndex(3);
 
         List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition2.xlsx");
         validateData(upper);
@@ -72,8 +70,8 @@ public class PaddingAroundColumnDefinitionTest {
     @DisplayName("Must correctly recognize column headers with empty rows before and after")
     public void readHeaderWithEmptyRowsBeforeAfterMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
-        options.setSkipRowsAfterColumnDefinitionRow(1);
+        options.setHeaderRowIndex(3);
+        options.setFirstDataRowIndex(5);
 
         List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
         validateData(upper);
@@ -84,8 +82,8 @@ public class PaddingAroundColumnDefinitionTest {
     @DisplayName("Must correctly recognize column headers with not empty rows before and after")
     public void readHeaderWithRowsBeforeAfterMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
-        options.setSkipRowsAfterColumnDefinitionRow(1);
+        options.setHeaderRowIndex(3);
+        options.setFirstDataRowIndex(5);
 
         List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
         validateData(upper);

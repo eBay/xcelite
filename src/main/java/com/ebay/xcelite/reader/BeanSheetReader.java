@@ -28,7 +28,6 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -101,13 +100,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         List<T> data = new ArrayList<>();
 
         Sheet s = sheet.getNativeSheet();
-        rowIterator = moveToFirstRow(s, options);
+        rowIterator = moveToHeaderRow(s, options);
         if (!rowIterator.hasNext())
             return data;
 
         buildHeader();
         validateColumns();
-        rowIterator = skipRowsAfterColumnDefinition(s, options);
+        rowIterator = moveToFirstDataRow(s, options);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
