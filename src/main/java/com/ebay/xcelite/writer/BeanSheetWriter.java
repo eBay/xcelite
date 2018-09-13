@@ -46,13 +46,12 @@ import static org.reflections.ReflectionUtils.withName;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getBeanWriter(Class)}
  *
- * By default, a SheetWriter copies over the {@link XceliteOptions options} from the sheet
- * it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet} become the
- * default options, but the SheetWriter can modify option properties locally. However, the user
- * may use the {@link AbstractSheetWriter#AbstractSheetWriter(XceliteSheet, XceliteOptions)
- *    BeanSheetWriter(XceliteSheet, XceliteOptions)}
- * constructor to use - for one writer only - a completely different set of options from
- * the sheet options.
+ * By default, a BeanSheetWriter copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetWriter, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #BeanSheetWriter(XceliteSheet, XceliteOptions, Class)} constructor to
+ * use - for one writer only - a completely different set of options.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -64,9 +63,36 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private Row headerRow;
     private int rowIndex = 0;
 
+    /**
+     * Construct a {@link BeanSheetWriter} on the given {@link XceliteSheet sheet}
+     * for writing objects of class `T`.
+     *
+     * @param sheet the sheet to construct the SheetWriter on.
+     * @param type Class of the objects to write
+     */
+    //TODO version 2.x remove if possible
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
         super(sheet);
         options.setGenerateHeaderRow(true);
+        ColumnsExtractor extractor = new ColumnsExtractor(type);
+        extractor.extract();
+        columns = extractor.getColumns();
+        anyColumn = extractor.getAnyColumn();
+    }
+
+    /**
+     * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet}
+     * for writing objects of class `T` using the given {@link XceliteOptions options}.
+     * Values from the options parameter are copied over, later changes to the
+     * options object will not affect the options of this writer.
+     *
+     * @param sheet the sheet to construct the SheetWriter on.
+     * @param options options for this SheetWriter.
+     * @param type Class of the objects to write
+     */
+    public BeanSheetWriter(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
+        super(sheet, options);
+        super.options.setGenerateHeaderRow(true);
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
         columns = extractor.getColumns();
@@ -81,9 +107,34 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         writeData(data);
     }
 
+    /**
+     * Takes one object instance of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    @SneakyThrows
     @Override
-    public void writeRow(T row, Row excelRow, int rowIndex) {
-
+    public void writeRow(T data, Row excelRow, int rowIndex) {
+        int i = 0;
+        for (Col col: columns) {
+            Set<Field> fields = ReflectionUtils.getAllFields(data.getClass(), withName(col.getFieldName()));
+            Field field = fields.iterator().next();
+            field.setAccessible(true);
+            Object fieldValueObj;
+            if (col.isAnyColumn()) {
+                Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(data);
+                fieldValueObj = anyColumnMap.get(col.getName());
+            } else {
+                fieldValueObj = field.get(data);
+            }
+            Cell cell = excelRow.createCell(i);
+            writeToCell(cell, col, fieldValueObj);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -92,12 +143,12 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         Set<Col> columnsToAdd = new TreeSet();
         for (T t: data) {
             if (anyColumn != null) {
-                columnsToAdd.addAll(createAndReturnAnyColumns(t));
+                appendAnyColumns(t, columnsToAdd);
             }
         }
         addColumns(columnsToAdd, true);
         for (T t: data) {
-            Row row = sheet.getNativeSheet().createRow(rowIndex);
+            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
             int i = 0;
             for (Col col: columns) {
                 Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
@@ -110,7 +161,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 } else {
                     fieldValueObj = field.get(t);
                 }
-                Cell cell = row.createCell(i);
+                Cell cell = excelRow.createCell(i);
                 writeToCell(cell, col, fieldValueObj);
                 i++;
             }
@@ -143,7 +194,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         writeToCell(cell, fieldValueObj, col.getType());
     }
 
-    @Override
     void writeHeader() {
         headerRow = sheet.getNativeSheet().createRow(rowIndex);
         rowIndex++;
@@ -152,8 +202,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private Set<Col> createAndReturnAnyColumns(T t) {
-        Set<Col> columnToAdd = new LinkedHashSet<>();
+    private void appendAnyColumns(T t, Set<Col> columnToAdd) {
         Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
         Field anyColumnField = fields.iterator().next();
         anyColumnField.setAccessible(true);
@@ -167,7 +216,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             }
             columnToAdd.add(column);
         }
-        return columnToAdd;
     }
 
     private void addColumns(Set<Col> columnsToAdd, boolean append) {

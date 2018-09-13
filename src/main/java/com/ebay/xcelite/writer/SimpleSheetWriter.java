@@ -15,8 +15,10 @@
 */
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -36,52 +38,74 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getSimpleWriter()}
  *
- * By default, a SheetWriter copies over the {@link com.ebay.xcelite.options.XceliteOptions options}
- * from the sheet it is constructed on. By this, the {@link com.ebay.xcelite.sheet.XceliteSheet}
- * become the default options, but the SheetWriter can modify option properties locally. However,
- * the user may use the {@link com.ebay.xcelite.writer.AbstractSheetWriter#AbstractSheetWriter(XceliteSheet,
- * com.ebay.xcelite.options.XceliteOptions) SimpleSheetWriter(XceliteSheet, XceliteOptions)}
- * constructor to use - for one writer only - a completely different set of options from
- * the sheet options.
+ * By default, a SimpleSheetWriter copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetWriter, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #SimpleSheetWriter(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one writer only - a completely different set of options.
+
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
-    private CellStyle boldStyle;
+
+    //TODO version 2.x remove if possible
     public SimpleSheetWriter(XceliteSheet sheet) {
-        super(sheet, false);
-        boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+        super(sheet);
+        sheet.getOptions().setGenerateHeaderRow(false);
     }
 
-   /* @Override
+    /**
+     * Construct a {@link SimpleSheetWriter} on the given {@link XceliteSheet sheet} using
+     * the given {@link XceliteOptions options}. Values from the options parameter
+     * are copied over, later changes to the options object will not affect the
+     * options of this writer.
+     * @param sheet the sheet to construct the SimpleSheetWriter on.
+     * @param options options for this SimpleSheetWriter.
+     */
+    public SimpleSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+        super(sheet, options);
+    }
+
+    @Override
     public void write(Collection<Collection<Object>> data) {
+        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
         final AtomicInteger i = new AtomicInteger(0);
 
         data.forEach(row -> {
             Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
-            writeRow(row, excelRow, i.intValue());
+            final AtomicInteger j = new AtomicInteger(0);
+            row.forEach(column -> {
+                Cell cell = excelRow.createCell(j.intValue());
+                if (options.isGenerateHeaderRow() && i.intValue() == 0) {
+                    cell.setCellStyle(boldStyle);
+                }
+                writeToCell(cell, column, null);
+                j.incrementAndGet();
+            });
             i.incrementAndGet();
         });
-    }*/
-
-
-    // NOP for SimpleSheetWriter
-    @Override
-    void writeHeader() { }
-
-    @Override
-    public void writeRow(final Collection<Object> row, final Row excelRow, final int rowIndex) {
-        final AtomicInteger j = new AtomicInteger(0);
-        row.forEach(column -> {
-            Cell cell = excelRow.createCell(j.intValue());
-            if (options.isGenerateHeaderRow() && j.intValue() == 0) {
-                cell.setCellStyle(boldStyle);
-            }
-            writeToCell(cell, column, null);
-            j.incrementAndGet();
-
-        });
     }
+
+    /**
+     * Takes an object collection and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data Object collection representing one row
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    @Override
+    public void writeRow(Collection<Object> data, Row excelRow, int rowIndex) {
+
+    }
+
+    /*
+    No-Op for SimpleSheetWriter
+     */
+    void writeHeader() {}
 }

@@ -120,8 +120,6 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         });
     }
 
-    abstract void writeRow(final T row, final Row excelRow, final int rowIndex);
-
     abstract void writeHeader();
 
     @Override
@@ -133,5 +131,9 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     @Override
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
         options.setGenerateHeaderRow(generateHeaderRow);
+    }
+
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
     }
 }
