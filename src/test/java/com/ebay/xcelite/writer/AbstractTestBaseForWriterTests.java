@@ -15,13 +15,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
-class AbstractTestBaseForWriterTests{
+public class AbstractTestBaseForWriterTests{
     // set to true to look at the resulting spreadsheet files
     private static final boolean writeToFile = false;
     static XSSFWorkbook workbook;
 
     @SneakyThrows
-    static void setup(Object bean) {
+    public static void setup(Object bean) {
         Xcelite xcelite = new Xcelite();
         ArrayList beans = new ArrayList();
         XceliteSheet sheet = xcelite.createSheet("Tests");

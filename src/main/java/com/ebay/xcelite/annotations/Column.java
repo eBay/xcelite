@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
  * Annotation to annotate a field to represent a column in excel file.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Aug 29, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -3,7 +3,7 @@
 
 	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.2.2-SNAPSHOT</version>
+	<version>1.2.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>xcelite</name>
@@ -68,7 +68,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
         <apache-poi.version>3.17</apache-poi.version>
 	</properties>
 
@@ -90,8 +92,8 @@
 				<version>3.8.0</version>
 				<configuration>
 					<encoding>utf-8</encoding>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
 				</configuration>
 			</plugin>
 
@@ -254,6 +256,14 @@
 			<version>5.1.1</version>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.iSnow</groupId>
+			<artifactId>Xcelite-compatability-1.0.4</artifactId>
+			<version>1.0.4.9</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<reporting>
@@ -265,6 +275,17 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<!-- Only used for pulling in the Xcelite compat lib, for build logs:
+
+	https://jitpack.io/com/github/iSnow/Xcelite-compatability-1.0.4/1.0.4.9/build.log
+	-->
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<profiles>
 		<profile>

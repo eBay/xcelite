@@ -16,9 +16,12 @@
 package com.ebay.xcelite;
 
 import com.ebay.xcelite.exceptions.XceliteException;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import com.google.common.collect.Lists;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -29,9 +32,9 @@ import java.util.List;
 import static java.util.Optional.ofNullable;
 
 /**
- * Main class of the Xcelite package. A Xcelite object wraps a POI
- * {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
- * operations on its sheets.
+ * Main class of the Xcelite package. A Xcelite object is constructed on an Excel
+ * file and wraps a POI {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
+ * operations on the workbooks' sheets.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -43,8 +46,12 @@ public class Xcelite {
     //TODO Version 2.0: remove this member variable together with write();
     private File file;
 
+    @Getter
+    protected XceliteOptions options;
+
     public Xcelite() {
         workbook = new XSSFWorkbook();
+        options = new XceliteOptions();
     }
 
     @SneakyThrows
@@ -64,7 +71,7 @@ public class Xcelite {
      * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
      */
     public XceliteSheet createSheet() {
-        return new XceliteSheetImpl(workbook.createSheet());
+        return new XceliteSheetImpl(workbook.createSheet(), options);
     }
 
     /**
@@ -74,7 +81,7 @@ public class Xcelite {
      * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
      */
     public XceliteSheet createSheet(String name) {
-        return new XceliteSheetImpl(workbook.createSheet(name));
+        return new XceliteSheetImpl(workbook.createSheet(name), options);
     }
 
     /**
@@ -102,9 +109,10 @@ public class Xcelite {
     }
 
     /**
-     * Gets all sheets.
+     * Returns all sheets.
      *
      * @return the list of sheets (a list of {@link XceliteSheet} objects.) or XceliteException
+     * if no sheets exist
      */
     public List<XceliteSheet> getSheets() {
         if (workbook.getNumberOfSheets() == 0) {
@@ -164,5 +172,9 @@ public class Xcelite {
             write(byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         }
+    }
+
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
     }
 }

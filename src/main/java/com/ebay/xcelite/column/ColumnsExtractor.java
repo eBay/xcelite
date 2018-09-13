@@ -33,6 +33,10 @@ import static java.util.Optional.of;
 import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
+/**
+ * Class description...
+ * @since 1.0
+ */
 public class ColumnsExtractor {
 
     @Getter
@@ -63,26 +67,26 @@ public class ColumnsExtractor {
     @SuppressWarnings("unchecked")
     public void extract() {
         getAllFields(type, withAnnotation(Column.class))
-                .forEach(columnField -> {
-                    Column annotation = columnField.getAnnotation(Column.class);
-                    Col col = of(annotation)
-                            .filter(column -> !column.name().isEmpty())
-                            .map(column -> new Col(column.name(), columnField.getName()))
-                            .orElse(new Col(columnField.getName(), columnField.getName()));
+            .forEach(columnField -> {
+                Column annotation = columnField.getAnnotation(Column.class);
+                Col col = of(annotation)
+                        .filter(column -> !column.name().isEmpty())
+                        .map(column -> new Col(column.name(), columnField.getName()))
+                        .orElse(new Col(columnField.getName(), columnField.getName()));
 
-                    if (annotation.ignoreType()) {
-                        col.setType(String.class);
-                    } else {
-                        col.setType(columnField.getType());
-                    }
-                    if (!annotation.dataFormat().isEmpty()) {
-                        col.setDataFormat(annotation.dataFormat());
-                    }
-                    if (!annotation.converter().equals(NoConverterClass.class)) {
-                        col.setConverter(annotation.converter());
-                    }
-                    columns.add(col);
-                });
+                if (annotation.ignoreType()) {
+                    col.setType(String.class);
+                } else {
+                    col.setType(columnField.getType());
+                }
+                if (!annotation.dataFormat().isEmpty()) {
+                    col.setDataFormat(annotation.dataFormat());
+                }
+                if (!annotation.converter().equals(NoConverterClass.class)) {
+                    col.setConverter(annotation.converter());
+                }
+                columns.add(col);
+            });
 
         if (colsOrdering != null) {
             orderColumns();

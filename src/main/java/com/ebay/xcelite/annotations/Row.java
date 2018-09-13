@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
  * Annotation used for configuring the bean class.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Aug 20, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -28,7 +28,6 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -47,7 +46,15 @@ import static org.reflections.ReflectionUtils.withName;
  * of an Excel sheet as a {@link java.util.Collection}. Each entry into that Collection
  * represents one row in the Excel sheet.
  *
+ * By default, a BeanSheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #BeanSheetReader(XceliteSheet, XceliteOptions, Class)} constructor to
+ * use - for one reader only - a completely different set of options.
+ *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 9, 2013
  */
 public class BeanSheetReader<T> extends AbstractSheetReader<T> {
@@ -58,7 +65,10 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private Iterator<Row> rowIterator;
 
     /**
-     * Construct a BeanSheetReader with custom options
+     * Construct a BeanSheetReader with custom options. The Reader will create
+     * a copy of the options object, therefore later changes of this object will not
+     * influence the behavior of this reader
+     *
      * @param sheet the {@link XceliteSheet} to read from
      * @param options the {@link XceliteOptions} to configure the reader
      * @param type class of the beans
@@ -74,12 +84,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     /**
-     * Construct a BeanSheetReader with default options
+     * Construct a BeanSheetReader with options from the {@link XceliteSheet}
      * @param sheet the {@link XceliteSheet} to read from
      * @param type class of the beans
      */
+    //TODO version 2.x remove if possible
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
-        this(sheet, new XceliteOptions(), type);
+        this(sheet, sheet.getOptions(), type);
     }
 
     @SuppressWarnings("unchecked")
@@ -89,13 +100,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         List<T> data = new ArrayList<>();
 
         Sheet s = sheet.getNativeSheet();
-        rowIterator = moveToFirstRow(s, options);
+        rowIterator = moveToHeaderRow(s, options);
         if (!rowIterator.hasNext())
             return data;
 
         buildHeader();
         validateColumns();
-        rowIterator = skipRowsAfterColumnDefinition(s, options);
+        rowIterator = moveToFirstDataRow(s, options);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
@@ -166,13 +177,19 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         if (anyColumn != null) {
             return;
         }
-        Collection<String> declaredHeaders = mapper
-                .getColumnsMap()
-                .values()
-                .stream()
-                .map(c -> c.getName())
-                .collect(Collectors.toSet());
+        Collection<String> declaredHeaders = mapper.getDeclaredHeaderNames();
         Collection<String> headers = headerColumns.values();
+        if (!options.isHeaderParsingIsCaseSensitive()) {
+            headers = headers.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+            declaredHeaders =   declaredHeaders.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+        }
+
         if (!headers.containsAll(declaredHeaders)) {
             throw new ColumnNotFoundException(declaredHeaders.iterator().next());
         }
@@ -297,18 +314,33 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private class ColumnsMapper {
-        @Getter
         private final Map<String, Col> columnsMap;
+        private final Map<String, Col> lowerCaseColumnsMap;
 
         ColumnsMapper(Set<Col> columns) {
             columnsMap = new LinkedHashMap<>();
+            lowerCaseColumnsMap = new LinkedHashMap<>();
             for (Col col : columns) {
                 columnsMap.put(col.getName(), col);
+                lowerCaseColumnsMap.put(col.getName().toLowerCase(), col);
             }
         }
 
         Col getColumn(String name) {
-            return columnsMap.get(name);
+            if (options.isHeaderParsingIsCaseSensitive() || (null == name)) {
+                return columnsMap.get(name);
+            } else {
+                return lowerCaseColumnsMap.get(name.toLowerCase());
+            }
+        }
+
+        Set<String> getDeclaredHeaderNames() {
+            Set<String> declaredHeaders = columnsMap
+                    .values()
+                    .stream()
+                    .map(c -> c.getName())
+                    .collect(Collectors.toSet());
+            return declaredHeaders;
         }
     }
 

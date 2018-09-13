@@ -19,6 +19,7 @@ package com.ebay.xcelite.utils.diff.info;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 21, 2013
  */
 public class StringTuple {

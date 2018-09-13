@@ -25,6 +25,7 @@ import java.util.Collection;
  * other than {@link java.util.ArrayList}, extend this class to override {@link #getCollection(Iterable)} method.
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 14, 2013
  */
 public class VTColumnValueConverter extends DelimiterColumnValueConverter {
