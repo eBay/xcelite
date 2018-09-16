@@ -67,12 +67,12 @@ public class Compat_BeanReaderTests {
         Compat_CamelCase first = data.get(0);
         assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
         assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
+        assertEquals(df.parse(usTestData[0][2]), first.getBirthdate(), "Birthdate mismatch");
 
         Compat_CamelCase second = data.get(1);
         assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
         assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
+        assertEquals(df.parse(usTestData[1][2]), second.getBirthdate(), "Birthdate mismatch");
     }
 */
 }

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 public class BeanWriterTests extends AbstractTestBaseForWriterTests {
@@ -28,7 +29,8 @@ public class BeanWriterTests extends AbstractTestBaseForWriterTests {
     @Test
     @DisplayName("Must correctly write 32KB strings (max length of Excel 2007 format)")
     void mustWriteLongStringsOK() {
-        Map<String, Object> columnsMap = extractCellValues (workbook);
+        List<Map<String, Object>> rowList = extractCellValues (workbook);
+        Map<String, Object> columnsMap = rowList.get(0);
         String val = bean.getLongString();
         Object obj = columnsMap.get("LONG_STRING");
         Assertions.assertEquals(val, obj);

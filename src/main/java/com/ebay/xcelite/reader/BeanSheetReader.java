@@ -99,14 +99,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
 
-        Sheet s = sheet.getNativeSheet();
-        rowIterator = moveToHeaderRow(s, options);
+        rowIterator = sheet.moveToHeaderRow(options, false);
         if (!rowIterator.hasNext())
             return data;
 
         buildHeader();
         validateColumns();
-        rowIterator = moveToFirstDataRow(s, options);
+        rowIterator = sheet.moveToFirstDataRow(options, false);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
@@ -115,10 +114,10 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 switch (options.getMissingRowPolicy()) {
                     case THROW:
                         throw new EmptyRowException();
-                    case RETURN_EMPTY_OBJECT:
+                    case EMPTY_OBJECT:
                         object = fillObject(excelRow);
                         break;
-                    case RETURN_NULL:
+                    case NULL:
                         object = null;
                         break;
                     default:
@@ -252,26 +251,19 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         String value = String.valueOf(cellValue);
         if ((fieldType.equals(Double.class)) || (fieldType.equals(double.class))) {
             return Double.valueOf(value);
-        }
-        if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
+        } else if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
             return Double.valueOf(value).intValue();
-        }
-        if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
+        } else if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
             return Double.valueOf(value).shortValue();
-        }
-        if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
+        } else if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
             return Double.valueOf(value).longValue();
-        }
-        if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
+        } else if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
             return Double.valueOf(value).floatValue();
-        }
-        if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
+        } else if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
             return value.charAt(0);
-        }
-        if (fieldType.equals(Date.class)) {
+        } else if (fieldType.equals(Date.class)) {
             return DateUtil.getJavaDate(Double.valueOf(value));
-        }
-        if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
+        } else if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
             return Boolean.valueOf(value);
         }
         return value;

@@ -55,8 +55,8 @@ public class StringColumnCapitalizationTest {
     };
 
     private static String thaiTestData[][] = {
-            {"แม่มด",	"น้ำแข็ง",	"01/02/1990",	"2",	"Female"},
-            {"พ่อมด",	"หมอ",	"01/01/1990",	"1",	"Male"}
+            {"แม่มด",	"น้ำแข็ง","02/01/1447",	"2",	"Female"},
+            {"พ่อมด",	"หมอ",	"01/01/1447",	"1",	"Male"}
     };
 
     @Test

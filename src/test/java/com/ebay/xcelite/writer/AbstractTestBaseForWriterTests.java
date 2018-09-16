@@ -1,6 +1,7 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.Xcelite;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.AbstractSheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;
@@ -17,40 +18,61 @@ import java.util.*;
 
 public class AbstractTestBaseForWriterTests{
     // set to true to look at the resulting spreadsheet files
-    private static final boolean writeToFile = false;
+    static boolean writeToFile = false;
     static XSSFWorkbook workbook;
 
     @SneakyThrows
-    public static void setup(Object bean) {
+    public static void setup(XceliteOptions options, Object... inBeans) {
         Xcelite xcelite = new Xcelite();
         ArrayList beans = new ArrayList();
         XceliteSheet sheet = xcelite.createSheet("Tests");
-        beans.add(bean);
-        SheetWriter bs = sheet.getBeanWriter(bean.getClass());
+        Class clazz = null;
+        for (Object bean : inBeans) {
+            beans.add(bean);
+            if (null != bean)
+                clazz = bean.getClass();
+        }
+        SheetWriter bs = sheet.getBeanWriter(clazz);
+        bs.setOptions(options);
         bs.write(beans);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
         if (writeToFile)
             writeWorkbookToFile(workbook);
     }
 
-    Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
+    @SneakyThrows
+    public static void setup(Object... inBeans) {
+        setup(new XceliteOptions(), inBeans);
+    }
+
+    List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook) {
+        return extractCellValues (workbook, 0,0);
+    }
+
+    List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook, int skipBeforeHeader, int skipAfterHeader) {
+        List<Map<String, Object>> rowVals = new ArrayList<>();
         List<String> columnNames = new ArrayList<>();
-        Map<String, Object> columnsMap = new LinkedHashMap<>();
         Sheet excelSheet = workbook.getSheet("Tests");
         Iterator<Row> iter = excelSheet.rowIterator();
         // move to header row
+        while (--skipBeforeHeader >= 0)
+            iter.next();
         Row header = iter.next();
         header.cellIterator().forEachRemaining(cell -> {
             Object val = AbstractSheetReader.readValueFromCell(cell);
             columnNames.add(val.toString());
         });
+        while (--skipAfterHeader >= 0)
+            iter.next();
         iter.forEachRemaining(row -> {
+            Map<String, Object> columnsMap = new LinkedHashMap<>();
+            rowVals.add(columnsMap);
             Iterator<Cell> cellIter = row.cellIterator();
             for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
                 columnsMap.put(columnNames.get(i), AbstractSheetReader.readValueFromCell(cellIter.next()));
             }
         });
-        return columnsMap;
+        return rowVals;
     }
 
     @SneakyThrows

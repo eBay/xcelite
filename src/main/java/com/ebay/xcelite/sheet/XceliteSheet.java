@@ -18,9 +18,11 @@ package com.ebay.xcelite.sheet;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.writer.SheetWriter;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Class description...
@@ -38,6 +40,12 @@ public interface XceliteSheet {
     SheetWriter<Collection<Object>> getSimpleWriter();
 
     SheetReader<Collection<Object>> getSimpleReader();
+
+    Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows);
+
+    Iterator<Row> moveToHeaderRow(XceliteOptions options, boolean createRows);
+
+    Iterator<Row> skipRows (int rowsToSkip, boolean createRows);
 
     Sheet getNativeSheet();
 

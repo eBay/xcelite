@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Johannes
  */
-public class PaddingAroundColumnDefinitionTest {
+public class PaddingAroundColumnDefinitionReaderTest {
     private SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {

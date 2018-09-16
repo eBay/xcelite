@@ -20,8 +20,12 @@ import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
+import com.ebay.xcelite.exceptions.EmptyCellException;
+import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
+import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.SneakyThrows;
@@ -101,15 +105,18 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @Override
     public void write(Collection<T> data) {
+        sheet.moveToHeaderRow(options, true);
         if (options.isGenerateHeaderRow()) {
             writeHeader();
         }
+        sheet.moveToFirstDataRow(options, false);
         writeData(data);
     }
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
+        Class clazz = getBeansClass(data);
         Set<Col> columnsToAdd = new TreeSet();
         for (T t: data) {
             if (anyColumn != null) {
@@ -117,7 +124,34 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             }
         }
         addColumns(columnsToAdd, true);
+
         for (T t: data) {
+            if (null == t) {
+                switch(options.getMissingRowPolicy()) {
+                    case SKIP: {
+                        continue;
+                    }
+                    case NULL: {
+                        rowIndex++;
+                        continue;
+                    }
+                    case EMPTY_OBJECT: {
+                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
+                            sheet.getNativeSheet().createRow(rowIndex);
+                            rowIndex++;
+                            continue;
+                        } else {
+                            t = (T) clazz.newInstance();
+                        }
+                        break;
+                    }
+                    case THROW: {
+                        throw new PolicyViolationException("Null object found and " +
+                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
+                    }
+                }
+
+            }
             Row row = sheet.getNativeSheet().createRow(rowIndex);
             int i = 0;
             for (Col col: columns) {
@@ -131,6 +165,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 } else {
                     fieldValueObj = field.get(t);
                 }
+                checkHasThrowPolicyMustThrow(fieldValueObj, col);
                 Cell cell = row.createCell(i);
                 writeToCell(cell, col, fieldValueObj);
                 i++;
@@ -138,6 +173,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             rowIndex++;
         }
     }
+
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
@@ -205,6 +241,26 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 i++;
             }
             columns.add(column);
+        }
+    }
+
+    private Class getBeansClass(Collection<T> data) {
+        Class clazz = null;
+        Iterator<T> iter = data.iterator();
+        while ((iter.hasNext() && (null == clazz))) {
+            T obj = iter.next();
+            if (null != obj)
+                clazz = obj.getClass();
+        }
+        return clazz;
+    }
+
+    private void checkHasThrowPolicyMustThrow(Object fieldValueObj, Col col) {
+        if ((null == fieldValueObj)
+                && (options.getMissingCellPolicy().equals(MissingCellPolicy.THROW))) {
+            throw new PolicyViolationException("Null property found and " +
+                    "MissingCellPolicy.THROW active. Object index: "+ rowIndex
+                    + ", property name" + col.getFieldName());
         }
     }
 }
