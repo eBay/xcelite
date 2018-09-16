@@ -5,7 +5,7 @@ import com.ebay.xcelite.annotations.Row;
 
 import java.util.Date;
 
-@Row(colsOrder = {"Firstname", "Lastname", "id", "birthdate"})
+@Row(colsOrder = {"Firstname", "Lastname", "id", "birthDate"})
 public class User {
 
     @Column(name = "Firstname")

@@ -40,7 +40,7 @@ public class User {
   private String firstName;
   private String lastName;
   private long id; 
-  private Date birthdate; 
+  private Date birthDate; 
 }
 ```
 How do i serialize a collection of this bean to excel?
@@ -59,7 +59,7 @@ public class User {
   private long id; 
   
   @Column
-  private Date birthdate; 
+  private Date birthDate; 
 }
 ```
 The `@Column` annotation on a property indicates that you want it to be serialized to excel.  
@@ -79,25 +79,25 @@ This will create an Excel workbook containing one sheet named "users" with 4 col
 * Firstname 
 * Lastname 
 * id 
-* birthdate  
+* birthDate  
 
-Naturally, the excel column types will be Text for `FirstName` and `LastName`, Number for `id` and Date for `birthdate`.  
+Naturally, the excel column types will be Text for `FirstName` and `LastName`, Number for `id` and Date for `birthDate`.  
 If you prefer that column `id`  should be written as Text instead of Number, use  
 
 ```java 
 @Column(ignoreType=true)
 private long id;
 ```
-It is possible to control the data format that will be used when writing. For instance, Xcelite will use a default data format for "birthdate" date. In order to change the format, use
+It is possible to control the data format that will be used when writing. For instance, Xcelite will use a default data format for "birthDate" date. In order to change the format, use
 ```java 
 @Column(dataFormat="ddd mmm dd hh:mm:ss yyy")
-private Date birthdate;
+private Date birthDate;
 ```
 The data format is exacly as the same as used in Excel. It is recommended to check the format in Excel first before using it in your code.
 
 Note that the excel columns order in this case is arbitrary. If you want to control the order of the columns use the @Row annotation on your bean class
 ```java
-@Row(colsOrder = {"Firstname", "Lastname", "id", birthdate})
+@Row(colsOrder = {"Firstname", "Lastname", "id", "birthDate"})
 public class User {
 // ...
 }

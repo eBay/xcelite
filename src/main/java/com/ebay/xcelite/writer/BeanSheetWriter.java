@@ -105,8 +105,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @Override
     public void write(Collection<T> data) {
-        sheet.moveToHeaderRow(options, true);
         if (options.isGenerateHeaderRow()) {
+            sheet.moveToHeaderRow(options, true);
             writeHeader();
         }
         sheet.moveToFirstDataRow(options, false);
@@ -116,7 +116,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
-        Class clazz = getBeansClass(data);
         Set<Col> columnsToAdd = new TreeSet();
         for (T t: data) {
             if (anyColumn != null) {
@@ -141,6 +140,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                             rowIndex++;
                             continue;
                         } else {
+                            Class clazz = getBeansClass(data);
                             t = (T) clazz.newInstance();
                         }
                         break;

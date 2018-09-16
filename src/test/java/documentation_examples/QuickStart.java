@@ -45,7 +45,7 @@ public class QuickStart {
 
     @AfterAll
     static void after() {
-        File f1 = new File("users_doc.xlsx");
+        File f1 = new File("data.xlsx");
         File f2 = new File("users_doc.xlsx");
 
         if (f1.exists())
