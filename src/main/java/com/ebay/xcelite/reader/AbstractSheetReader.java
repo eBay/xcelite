@@ -91,6 +91,9 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
                     case NUMERIC:
                         cellValue = cell.getNumericCellValue();
                         break;
+                    case BOOLEAN:
+                        cellValue = cell.getBooleanCellValue();
+                        break;
                     default:
                         cellValue = cell.getStringCellValue();
                 }
