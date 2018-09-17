@@ -123,6 +123,8 @@ public class XceliteSheetImpl implements XceliteSheet {
             Row r = nativeSheet.getRow(i);
             if (null != r)
                 lastRowNum = r.getRowNum();
+            else if (createRows)
+                nativeSheet.createRow(i);
         }
         Iterator<Row> rowIterator= nativeSheet.rowIterator();
         boolean stop = false;

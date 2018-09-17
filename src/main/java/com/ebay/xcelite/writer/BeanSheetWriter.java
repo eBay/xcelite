@@ -109,7 +109,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             sheet.moveToHeaderRow(options, true);
             writeHeader();
         }
-        sheet.moveToFirstDataRow(options, false);
+        sheet.moveToFirstDataRow(options, true);
         writeData(data);
     }
 
