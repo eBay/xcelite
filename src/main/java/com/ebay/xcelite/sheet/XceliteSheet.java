@@ -43,7 +43,7 @@ public interface XceliteSheet {
 
     Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows);
 
-    Iterator<Row> moveToHeaderRow(XceliteOptions options, boolean createRows);
+    Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows);
 
     Iterator<Row> skipRows (int rowsToSkip, boolean createRows);
 

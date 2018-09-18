@@ -106,7 +106,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     @Override
     public void write(Collection<T> data) {
         if (options.isGenerateHeaderRow()) {
-            sheet.moveToHeaderRow(options, true);
+            sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
+            rowIndex = sheet.getNativeSheet().getLastRowNum();
             writeHeader();
         }
         sheet.moveToFirstDataRow(options, true);
@@ -152,7 +153,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 }
 
             }
-            Row row = sheet.getNativeSheet().createRow(rowIndex);
+            Row row = sheet.getNativeSheet().createRow(rowIndex++);
             int i = 0;
             for (Col col: columns) {
                 Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
@@ -170,7 +171,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 writeToCell(cell, col, fieldValueObj);
                 i++;
             }
-            rowIndex++;
         }
     }
 

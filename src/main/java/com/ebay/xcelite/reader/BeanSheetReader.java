@@ -99,7 +99,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
 
-        rowIterator = sheet.moveToHeaderRow(options, false);
+        rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
         if (!rowIterator.hasNext())
             return data;
 

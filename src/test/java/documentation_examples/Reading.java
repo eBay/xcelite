@@ -28,13 +28,13 @@ public class Reading {
         List<Collection<Object>> data = new ArrayList<>();
 
         Set<Object> usr1 = new LinkedHashSet<>();
-        usr1.add(1l);
+        usr1.add(1L);
         usr1.add("Max");
         usr1.add("Busch");
         data.add(usr1);
 
         Set<Object> usr2 = new LinkedHashSet<>();
-        usr2.add(2l);
+        usr2.add(2L);
         usr2.add("Moritz");
         usr2.add("Busch");
         data.add(usr2);
@@ -47,14 +47,14 @@ public class Reading {
         List<User> users = new ArrayList<>();
 
         User usr3 = new User();
-        usr3.setId(1l);
+        usr3.setId(1L);
         usr3.setFirstName("Max");
         usr3.setLastName("Busch");
         users.add(usr3);
 
         User usr4 = new User();
-        usr4.setId(1l);
-        usr4.setFirstName("Max");
+        usr4.setId(2L);
+        usr4.setFirstName("Moritz");
         usr4.setLastName("Busch");
         users.add(usr4);
 
@@ -87,7 +87,7 @@ public class Reading {
         if (f1.exists())
             f1.delete();
 
-        if (f2.exists())
-            f2.delete();
+        /*if (f2.exists())
+            f2.delete();*/
     }
 }

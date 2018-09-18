@@ -97,17 +97,17 @@ public class XceliteSheetImpl implements XceliteSheet {
     public Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows) {
         int firstDataRowIndex = options.getFirstDataRowIndex();
         if (firstDataRowIndex < 0) {
-            if (options.getHeaderRowIndex() != 0)
-                firstDataRowIndex = options.getHeaderRowIndex() +1;
+            firstDataRowIndex = options.getHeaderRowIndex() +1;
         }
         return skipRows (firstDataRowIndex, createRows);
     }
 
     @Override
-    public Iterator<Row> moveToHeaderRow(XceliteOptions options, boolean createRows) {
-        if (options.getHeaderRowIndex() <= 0)
+    public Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows) {
+        if (headerRowIndex <= 0) {
             return nativeSheet.rowIterator();
-        return skipRows (options.getHeaderRowIndex(), createRows);
+        }
+        return skipRows (headerRowIndex, createRows);
     }
 
     /*
@@ -123,8 +123,10 @@ public class XceliteSheetImpl implements XceliteSheet {
             Row r = nativeSheet.getRow(i);
             if (null != r)
                 lastRowNum = r.getRowNum();
-            else if (createRows)
-                nativeSheet.createRow(i);
+            else if (createRows) {
+                r = nativeSheet.createRow(i);
+                lastRowNum = r.getRowNum();
+            }
         }
         Iterator<Row> rowIterator= nativeSheet.rowIterator();
         boolean stop = false;

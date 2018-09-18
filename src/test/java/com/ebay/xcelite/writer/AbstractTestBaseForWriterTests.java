@@ -18,7 +18,7 @@ import java.util.*;
 
 public class AbstractTestBaseForWriterTests{
     // set to true to look at the resulting spreadsheet files
-    static boolean writeToFile = false;
+    static boolean writeToFile = true;
     static XSSFWorkbook workbook;
 
     @SneakyThrows

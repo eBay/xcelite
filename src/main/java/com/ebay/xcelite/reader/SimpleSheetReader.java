@@ -68,7 +68,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   @Override
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
-    Iterator<Row> rowIterator = sheet.moveToHeaderRow(options, false);
+    Iterator<Row> rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
     if (!rowIterator.hasNext())
       return rows;
 
