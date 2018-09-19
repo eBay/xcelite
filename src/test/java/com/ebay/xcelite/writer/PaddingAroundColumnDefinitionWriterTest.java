@@ -161,8 +161,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         options.setHeaderRowIndex(3);
         options.setFirstDataRowIndex(5);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
-        validateData(upper);
+        List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        validateCamelCaseData(upper);
     }
 
 
@@ -173,8 +173,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         options.setHeaderRowIndex(3);
         options.setFirstDataRowIndex(5);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
-        validateData(upper);
+        List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
+        validateCamelCaseData(upper);
     }*/
 
 
@@ -186,25 +186,5 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         else
             Assertions.assertEquals(input.getBirthdate(), DateUtil.getJavaDate((double)readValues.get("Birthdate")));
         Assertions.assertEquals(input.getSex(), readValues.get("Sex"));
-    }
-
-    private List<CamelCase> getData(XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new File(filePath));
-        XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<CamelCase> beanReader = new BeanSheetReader<>(sheet, options, CamelCase.class);
-        ArrayList<CamelCase> data = new ArrayList<>(beanReader.read());
-        return data;
-    }
-
-    private void validateData(List<CamelCase> data) throws ParseException {
-        CamelCase first = data.get(0);
-        assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
-        assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
-
-        CamelCase second = data.get(1);
-        assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
-        assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
     }
 }

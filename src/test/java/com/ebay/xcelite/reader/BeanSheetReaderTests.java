@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BeanReaderTests extends TestBaseForReaderTests {
+public class BeanSheetReaderTests extends TestBaseForReaderTests {
 
     private static String usTestData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	"female"},

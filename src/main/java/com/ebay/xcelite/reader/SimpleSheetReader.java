@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
+
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
  * of an Excel sheet as a two-dimensional data structure of simple Java objects.
@@ -70,7 +72,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
     final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
-    Iterator<Row> rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
+    Iterator<Row> rowIterator = sheet.moveToFirstDataRow(options, false);
     if (!rowIterator.hasNext())
       return rows;
 
@@ -89,13 +91,17 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
           default:
             row = null;
         }
+        if (!options.getMissingRowPolicy().equals(SKIP)) {
+          if (shouldKeepObject(row, rowPostProcessors)) {
+            rows.add(row);
+          }
+        }
       } else {
         row = fillObject(excelRow);
-      }
-
-      if (shouldKeepObject(row, rowPostProcessors)) {
-        rows.add(row);
-        lastNonEmptyRowId.set(rows.size());
+        if (shouldKeepObject(row, rowPostProcessors)) {
+          rows.add(row);
+          lastNonEmptyRowId.set(rows.size());
+        }
       }
     });
 
