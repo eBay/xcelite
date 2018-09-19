@@ -21,11 +21,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract implementation of {@link SheetWriter} writer classes that can serialize
@@ -113,23 +111,6 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
             cell.setCellValue(fieldValueObj.toString());
         }
     }
-
-    @Override
-    public void write(final Collection<T> data) {
-        if (options.isGenerateHeaderRow()) {
-            writeHeader();
-        }
-        final AtomicInteger i = new AtomicInteger(0);
-        data.forEach(row -> {
-            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
-            final AtomicInteger j = new AtomicInteger(0);
-            writeRow(row, excelRow, i.intValue());
-            i.incrementAndGet();
-        });
-    }
-
-    abstract void writeHeader();
-
 
     /**
      * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}

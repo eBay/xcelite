@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
@@ -68,6 +69,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   @Override
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
+    final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
     Iterator<Row> rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
     if (!rowIterator.hasNext())
       return rows;
@@ -93,9 +95,11 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
 
       if (shouldKeepObject(row, rowPostProcessors)) {
         rows.add(row);
+        lastNonEmptyRowId.set(rows.size());
       }
     });
-    return rows;
+
+    return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId.intValue());
   }
 
   @SneakyThrows

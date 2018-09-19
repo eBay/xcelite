@@ -1,11 +1,7 @@
 package com.ebay.xcelite.writer;
 
-import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.BeanWriterTestsBean;
-import com.ebay.xcelite.model.Person;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.writer.AbstractTestBaseForWriterTests;
 import documentation_examples.model.User;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.SpreadsheetVersion;
@@ -15,13 +11,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BeanSheetWriterTests extends AbstractTestBaseForWriterTests {
+public class BeanSheetWriterTests extends TestBaseForWriterTests {
     private static BeanWriterTestsBean bean = new BeanWriterTestsBean();
 
     @BeforeAll

@@ -144,22 +144,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId.intValue());
     }
 
-    private Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
-        if (lastNonEmptyRowId == data.size())
-            return data;
-        switch (options.getTrailingEmptyRowPolicy()) {
-            case SKIP:
-                return data.subList(0, lastNonEmptyRowId);
-            case THROW:
-                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
-            case NULL:
-                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
-                    data.set(i, null);
-                }
-                return data;
-        }
-        return data;
-    }
 
     @SneakyThrows
     private T fillObject(Row row) {

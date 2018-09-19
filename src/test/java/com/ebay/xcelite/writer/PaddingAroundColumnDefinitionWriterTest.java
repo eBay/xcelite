@@ -16,7 +16,6 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.Xcelite;
-import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.Person;
@@ -28,7 +27,6 @@ import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Johannes
  */
-public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseForWriterTests{
+public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTests {
     private SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {

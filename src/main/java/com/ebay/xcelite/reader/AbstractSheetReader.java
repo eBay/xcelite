@@ -15,6 +15,7 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
@@ -23,6 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -154,6 +156,23 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
         }
 
         return keepObject;
+    }
+
+    Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
+        if (lastNonEmptyRowId == data.size())
+            return data;
+        switch (options.getTrailingEmptyRowPolicy()) {
+            case SKIP:
+                return data.subList(0, lastNonEmptyRowId);
+            case THROW:
+                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
+            case NULL:
+                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
+                    data.set(i, null);
+                }
+                return data;
+        }
+        return data;
     }
 
     public void setOptions(XceliteOptions options) {
