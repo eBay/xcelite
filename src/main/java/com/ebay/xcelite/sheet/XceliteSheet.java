@@ -41,6 +41,14 @@ public interface XceliteSheet {
 
     SheetReader<Collection<Object>> getSimpleReader();
 
+    <T> SheetWriter<T> getBeanWriter(Class<T> type, XceliteOptions options);
+
+    <T> SheetReader<T> getBeanReader(Class<T> type, XceliteOptions options);
+
+    SheetWriter<Collection<Object>> getSimpleWriter(XceliteOptions options);
+
+    SheetReader<Collection<Object>> getSimpleReader(XceliteOptions options);
+
     Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows);
 
     Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows);

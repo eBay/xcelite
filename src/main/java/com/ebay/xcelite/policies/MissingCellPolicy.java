@@ -25,7 +25,7 @@ public enum MissingCellPolicy {
     /**
      * Readers: All empty cells will be returned as null objects.
      *
-     * Writers: Empty string member variables will be written as nully cells, null
+     * Writers: Empty string member variables will be written as null cells, null
      * member variables will also be written as null.
      */
     RETURN_BLANK_AS_NULL,

@@ -4,6 +4,8 @@ import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +33,6 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         validateSimpleCamelCaseData(cc, usTestData);
     }
 
-
     @Test
     @DisplayName("Must correctly recognize column headers with not empty rows before and after")
     public void readDataWithRowsBeforeAfterMustOK() throws ParseException {
@@ -42,4 +43,19 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         validateSimpleCamelCaseData(cc, usTestData);
     }
 
+    @Test
+    @DisplayName("Must correctly recognize data with empty rows before and after")
+    public void readDataWithEmptyRowsAfterOK() throws ParseException {
+        XceliteOptions options = new XceliteOptions();
+        options.setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy.EMPTY_OBJECT);
+
+        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        Assertions.assertEquals(1001, cc.size());
+        Assertions.assertNull(cc.get(1));
+        Assertions.assertNull(cc.get(4));
+        Assertions.assertNotNull(cc.get(2));
+        Assertions.assertNotNull(cc.get(3));
+        Assertions.assertNotNull(cc.get(10));
+        //validateSimpleCamelCaseData(cc, usTestData);
+    }
 }

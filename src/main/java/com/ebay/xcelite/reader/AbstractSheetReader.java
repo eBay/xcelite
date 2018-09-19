@@ -167,13 +167,20 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
             case THROW:
                 throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
             case NULL:
-                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
+                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
                     data.set(i, null);
+                }
+                return data;
+            case EMPTY_OBJECT:
+                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                    data.set(i, getNewObject());
                 }
                 return data;
         }
         return data;
     }
+
+    abstract T getNewObject();
 
     public void setOptions(XceliteOptions options) {
         this.options = new XceliteOptions(options);

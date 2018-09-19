@@ -80,7 +80,7 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
-        return new SimpleSheetReader(this, adaptDataRowIndex (options.getHeaderRowIndex()));
+        return new SimpleSheetReader(this, adaptDataRowIndex (0));
     }
 
     public void setOptions(XceliteOptions options) {

@@ -144,10 +144,9 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId.intValue());
     }
 
-
     @SneakyThrows
     private T fillObject(Row row) {
-        T object = type.newInstance();
+        T object = getNewObject();
 
         for (int i = 0; i < headerColumns.keySet().size(); i++) {
             String columnName = headerColumns.get(i);
@@ -173,6 +172,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @SuppressWarnings("unchecked")
     private Field getField(Class<?> aClass, String name) {
         return ReflectionUtils.getAllFields(aClass, withName(name)).iterator().next();
+    }
+
+    @SneakyThrows
+    T getNewObject(){
+        return type.newInstance();
     }
 
     /**
