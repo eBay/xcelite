@@ -68,7 +68,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
   @Override
   public Collection<Collection<Object>> read() {
     List<Collection<Object>> rows = new ArrayList<>();
-    Iterator<Row> rowIterator = moveToHeaderRow(sheet.getNativeSheet(), options);
+    Iterator<Row> rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
     if (!rowIterator.hasNext())
       return rows;
 
@@ -78,10 +78,10 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
         switch (options.getMissingRowPolicy()) {
           case THROW:
             throw new EmptyRowException();
-          case RETURN_EMPTY_OBJECT:
+          case EMPTY_OBJECT:
             row = new ArrayList<>();
             break;
-          case RETURN_NULL:
+          case NULL:
             row = null;
             break;
           default:

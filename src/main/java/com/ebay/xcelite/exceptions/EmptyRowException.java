@@ -8,10 +8,14 @@ package com.ebay.xcelite.exceptions;
  * @author Johannes
  * @since 1.2
  */
-public class EmptyRowException extends XceliteException {
+public class EmptyRowException extends PolicyViolationException {
 
     public EmptyRowException() {
         super("Empty Row encountered and MissingRowPolicy.THROW active");
+    }
+
+    public EmptyRowException(String message) {
+        super(message);
     }
 
     public EmptyRowException(int rowNum) {

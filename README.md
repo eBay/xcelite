@@ -45,7 +45,7 @@ public class User {
 ```
 How do i serialize a collection of this bean to excel?
 
-First, lets add annotations
+First, lets add annotations so Xcelite knows which properties to serialize:
 ```java
 public class User { 
 
@@ -62,8 +62,8 @@ public class User {
   private Date birthDate; 
 }
 ```
-The `@Column` annotation on a property indicates that you want it to be serialized to excel.  
-By default, if no `name` attribute is provided the excel column name will be taken from the property name.
+The `@Column` annotation on a property indicates that you want it to be serialized to MS Excel format.  
+By default, if no `name` attribute is provided the MS Excel column name will be taken from the property name.
 
 Now we'll write the same data as before but this time using `BeanWriter` writer instead of `SimpleWriter`:
 ```java
@@ -81,21 +81,22 @@ This will create an Excel workbook containing one sheet named "users" with 4 col
 * id 
 * birthDate  
 
-Naturally, the excel column types will be Text for `FirstName` and `LastName`, Number for `id` and Date for `birthDate`.  
+Naturally, the MS Excel column types will be Text for `FirstName` and `LastName`, Number for `id` and Date for `birthDate`.  
 If you prefer that column `id`  should be written as Text instead of Number, use  
 
 ```java 
 @Column(ignoreType=true)
 private long id;
 ```
-It is possible to control the data format that will be used when writing. For instance, Xcelite will use a default data format for "birthDate" date. In order to change the format, use
+It is possible to control the data format that will be used when writing. For instance, 
+Xcelite will use a default data format for the `birthDate` property, which is of type `Date`. In order to change the format, use
 ```java 
 @Column(dataFormat="ddd mmm dd hh:mm:ss yyy")
 private Date birthDate;
 ```
-The data format is exacly as the same as used in Excel. It is recommended to check the format in Excel first before using it in your code.
+The data format is exacly as the same as used in MS Excel. It is recommended to check the format in Excel first before using it in your code.
 
-Note that the excel columns order in this case is arbitrary. If you want to control the order of the columns use the @Row annotation on your bean class
+Note that the Excel columns order in this case is arbitrary (due to limitations of Java reflection). If you want to control the order of the columns use the `@Row` annotation on your bean class
 ```java
 @Row(colsOrder = {"Firstname", "Lastname", "id", "birthDate"})
 public class User {
@@ -103,14 +104,14 @@ public class User {
 }
 ```
 #### Reading
-How do I simply read an existing Excel nativeSheet to a two-dimensional collection?
+How do I simply read a sheet in an existing MS Excel file to a two-dimensional collection?
 ```java
 Xcelite xcelite = new Xcelite(new File("data.xlsx"));
 XceliteSheet nativeSheet = xcelite.getSheet("data_sheet");
 SheetReader<Collection<Object>> simpleReader = nativeSheet.getSimpleReader();
 Collection<Collection<Object>> data = simpleReader.read();
 ```
-If the first row in the nativeSheet is an header, you can skip it by doing:
+If the first row in the nativeSheet is a header, you can skip it by writing:
 ```java
 simpleReader.skipHeaderRow(true);
 ```
@@ -122,13 +123,13 @@ XceliteSheet nativeSheet = xcelite.getSheet("users");
 SheetReader<User> reader = nativeSheet.getBeanReader(User.class);
 Collection<User> users = reader.read();
 ```
-Note that Xcelite will try to map only the @Column annotated properties. If no column found in the nativeSheet for an annotated property it will be ignored.  
-Sheet columns which are not mapped to a @Column annotated property will be ignored as well.
+Note that Xcelite will try to map only the `@Column` annotated properties. If for an annotated property no column is found in the nativeSheet it will be ignored.  
+Sheet columns which are not mapped to a `@Column` annotated property will be ignored as well.
 
 ### Advanced Stuff
 #### Using Converters
 
-Lets say your bean contains a list of values or some object of your own. By default, Xcelite will serialize the toString() of the object or list, and sometimes this might not be what you want.  
+Lets say your bean contains a list of values or some object of your own. By default, Xcelite will serialize using the `toString()`-method of the object or list, and sometimes this might not be what you want.  
 The converter mechanism allows you to serialize/deserialize the object in any way you want.  
 To demostrate lets add a list to our `User` bean and use the built-in `CSVColumnValueConverter` converter:
 
@@ -139,7 +140,8 @@ private List<String> mailAddresses;
 The `CSVColumnValueConverter` takes a collection of objects and serializes it to a comma-separated String.  
 Alternately when deserializing, the converter takes a comma-separated and deserializes it to a collection of Objects.  
 So writing a collection of users will result with a column named "Emails" and the column data will look someting like that:  
-john@mail.com,danny@mail.com,jerry@mail.com  
+
+    john@mail.com,danny@mail.com,jerry@mail.com  
 
 When reading the nativeSheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
 If you prefer a different collection implementation rather than the default `ArrayList`, you can always extend the `CSVColumnValueConverter` and override the `getCollection()` method to return your preferred implementation.

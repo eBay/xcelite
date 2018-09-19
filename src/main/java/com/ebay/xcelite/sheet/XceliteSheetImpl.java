@@ -24,9 +24,11 @@ import com.ebay.xcelite.writer.SheetWriter;
 import com.ebay.xcelite.writer.SimpleSheetWriter;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Class description...
@@ -83,5 +85,55 @@ public class XceliteSheetImpl implements XceliteSheet {
 
     public void setOptions(XceliteOptions options) {
         this.options = new XceliteOptions(options);
+    }
+
+
+    /*
+    If the first data row setting from XceliteOptions is the default (-1) AND
+    we have an explicit setting for the header-row index, then assume the first
+    data row is the row following the header row
+     */
+    @Override
+    public Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows) {
+        int firstDataRowIndex = options.getFirstDataRowIndex();
+        if (firstDataRowIndex < 0) {
+            firstDataRowIndex = options.getHeaderRowIndex() +1;
+        }
+        return skipRows (firstDataRowIndex, createRows);
+    }
+
+    @Override
+    public Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows) {
+        if (headerRowIndex <= 0) {
+            return nativeSheet.rowIterator();
+        }
+        return skipRows (headerRowIndex, createRows);
+    }
+
+    /*
+     Empty rows sadly are returned as null. Therefore, we need to find the  last  logical row
+     that corresponds to the last skipped row.
+     After that, iterate the row iterator as many times to skip lines and set it to the row
+     before the wanted row. Seems clumsy, maybe think about a better way.
+     */
+    @Override
+    public Iterator<Row> skipRows (int rowsToSkip, boolean createRows) {
+        int lastRowNum = 0;
+        for (int i = 0; i < rowsToSkip; i++) {
+            Row r = nativeSheet.getRow(i);
+            if (null != r)
+                lastRowNum = r.getRowNum();
+            else if (createRows) {
+                r = nativeSheet.createRow(i);
+                lastRowNum = r.getRowNum();
+            }
+        }
+        Iterator<Row> rowIterator= nativeSheet.rowIterator();
+        boolean stop = false;
+        while ((rowIterator.hasNext()) && (!stop)) {
+            Row r = rowIterator.next();
+            stop = (r.getRowNum() >= lastRowNum);
+        }
+        return rowIterator;
     }
 }

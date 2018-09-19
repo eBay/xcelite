@@ -8,7 +8,7 @@ package com.ebay.xcelite.exceptions;
  * @author Johannes
  * @since 1.2
  */
-public class EmptyCellException extends XceliteException {
+public class EmptyCellException extends PolicyViolationException {
 
     public EmptyCellException() {
         super("Cell was empty and MissingCellPolicy.THROW active");

@@ -27,6 +27,7 @@ import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
@@ -37,8 +38,10 @@ import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 import static org.reflections.ReflectionUtils.withName;
 
 /**
@@ -98,15 +101,15 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @SneakyThrows
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
+        final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
 
-        Sheet s = sheet.getNativeSheet();
-        rowIterator = moveToHeaderRow(s, options);
+        rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
         if (!rowIterator.hasNext())
             return data;
 
         buildHeader();
         validateColumns();
-        rowIterator = moveToFirstDataRow(s, options);
+        rowIterator = sheet.moveToFirstDataRow(options, false);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
@@ -115,16 +118,16 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 switch (options.getMissingRowPolicy()) {
                     case THROW:
                         throw new EmptyRowException();
-                    case RETURN_EMPTY_OBJECT:
+                    case EMPTY_OBJECT:
                         object = fillObject(excelRow);
                         break;
-                    case RETURN_NULL:
+                    case NULL:
                         object = null;
                         break;
                     default:
                         object = null;
                 }
-                if (!options.getMissingRowPolicy().equals(MissingRowPolicy.SKIP)) {
+                if (!options.getMissingRowPolicy().equals(SKIP)) {
                     if (shouldKeepObject(object, rowPostProcessors)) {
                         data.add(object);
                     }
@@ -134,9 +137,27 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 if (shouldKeepObject(object, rowPostProcessors)) {
                     data.add(object);
                 }
+                lastNonEmptyRowId.set(data.size());
             }
         });
 
+        return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId.intValue());
+    }
+
+    private Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
+        if (lastNonEmptyRowId == data.size())
+            return data;
+        switch (options.getTrailingEmptyRowPolicy()) {
+            case SKIP:
+                return data.subList(0, lastNonEmptyRowId);
+            case THROW:
+                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
+            case NULL:
+                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
+                    data.set(i, null);
+                }
+                return data;
+        }
         return data;
     }
 
@@ -252,26 +273,19 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         String value = String.valueOf(cellValue);
         if ((fieldType.equals(Double.class)) || (fieldType.equals(double.class))) {
             return Double.valueOf(value);
-        }
-        if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
+        } else if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
             return Double.valueOf(value).intValue();
-        }
-        if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
+        } else if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
             return Double.valueOf(value).shortValue();
-        }
-        if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
+        } else if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
             return Double.valueOf(value).longValue();
-        }
-        if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
+        } else if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
             return Double.valueOf(value).floatValue();
-        }
-        if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
+        } else if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
             return value.charAt(0);
-        }
-        if (fieldType.equals(Date.class)) {
+        } else if (fieldType.equals(Date.class)) {
             return DateUtil.getJavaDate(Double.valueOf(value));
-        }
-        if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
+        } else if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
             return Boolean.valueOf(value);
         }
         return value;

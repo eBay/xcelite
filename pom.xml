@@ -257,13 +257,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.github.iSnow</groupId>
-			<artifactId>Xcelite-compatability-1.0.4</artifactId>
-			<version>1.0.4.9</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 	<reporting>

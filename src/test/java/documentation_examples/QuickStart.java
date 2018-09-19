@@ -4,6 +4,7 @@ import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;
 import documentation_examples.model.User;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -40,5 +41,17 @@ public class QuickStart {
     // ...fill up users
     writer.write(users);
     xcelite.write(new File("users_doc.xlsx"));
+    }
+
+    @AfterAll
+    static void after() {
+        File f1 = new File("data.xlsx");
+        File f2 = new File("users_doc.xlsx");
+
+        if (f1.exists())
+            f1.delete();
+
+        if (f2.exists())
+            f2.delete();
     }
 }

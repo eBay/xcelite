@@ -116,6 +116,23 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         }
     }
 
+    @Override
+    public void write(final Collection<T> data) {
+        if (options.isGenerateHeaderRow()) {
+            writeHeader();
+        }
+        final AtomicInteger i = new AtomicInteger(0);
+        data.forEach(row -> {
+            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+            final AtomicInteger j = new AtomicInteger(0);
+            writeRow(row, excelRow, i.intValue());
+            i.incrementAndGet();
+        });
+    }
+
+    abstract void writeHeader();
+
+
     /**
      * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
      */
