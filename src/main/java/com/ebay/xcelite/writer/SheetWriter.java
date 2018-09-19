@@ -18,6 +18,7 @@ package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 /**
@@ -37,6 +38,17 @@ public interface SheetWriter<T> {
      * @since 1.0
      */
     void write(Collection<T> data);
+
+    /**
+     * Takes one instance of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    void writeRow(T data, Row excelRow, int rowIndex);
 
     /**
      * Determines whether this writer will generate a header row with the
