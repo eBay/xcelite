@@ -17,9 +17,11 @@ package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -135,6 +137,22 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
      * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
      */
     @Deprecated
+    @Override
+    public void write(final Collection<T> data) {
+        if (options.isGenerateHeaderRow()) {
+            writeHeader();
+        }
+        final AtomicInteger i = new AtomicInteger(0);
+        data.forEach(row -> {
+            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+            final AtomicInteger j = new AtomicInteger(0);
+            writeRow(row, excelRow, i.intValue());
+            i.incrementAndGet();
+        });
+    }
+
+    abstract void writeHeader();
+
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
         options.setGenerateHeaderRow(generateHeaderRow);

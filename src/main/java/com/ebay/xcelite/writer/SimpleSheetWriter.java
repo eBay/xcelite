@@ -77,15 +77,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
         data.forEach(row -> {
             Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
-            final AtomicInteger j = new AtomicInteger(0);
-            row.forEach(column -> {
-                Cell cell = excelRow.createCell(j.intValue());
-                if (options.isGenerateHeaderRow() && i.intValue() == 0) {
-                    cell.setCellStyle(boldStyle);
-                }
-                writeToCell(cell, column, null);
-                j.incrementAndGet();
-            });
+            writeRow(row, excelRow, i.intValue());
             i.incrementAndGet();
         });
     }

@@ -15,9 +15,9 @@
 */
 package com.ebay.xcelite.styles;
 
-import com.google.common.collect.Maps;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public final class CellStylesBank {
     private static Map<Workbook, CellStyles> cellStylesMap;
 
     static {
-        cellStylesMap = Maps.newHashMap();
+        cellStylesMap = new HashMap<>();
     }
 
     public static CellStyles get(Workbook workbook) {

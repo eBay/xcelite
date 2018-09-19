@@ -154,7 +154,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             }
         }
         addColumns(columnsToAdd, true);
-
         for (T t: data) {
             if (null == t) {
                 switch(options.getMissingRowPolicy()) {
