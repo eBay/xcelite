@@ -2,6 +2,7 @@ package com.ebay.xcelite.options;
 
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import lombok.EqualsAndHashCode;
 
 /**
@@ -19,7 +20,8 @@ public class XceliteOptions {
     private Integer headerRowIndex = 0;
     private Integer firstDataRowIndex = -1;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
-    private MissingRowPolicy missingRowPolicy = MissingRowPolicy.SKIP;
+    private MissingRowPolicy missingRowPolicy = MissingRowPolicy.NULL;
+    private TrailingEmptyRowPolicy trailingEmptyRowPolicy = TrailingEmptyRowPolicy.SKIP;
 
     public XceliteOptions() {}
 
@@ -33,6 +35,7 @@ public class XceliteOptions {
         this.firstDataRowIndex = other.firstDataRowIndex;
         this.missingCellPolicy = other.missingCellPolicy;
         this.missingRowPolicy = other.missingRowPolicy;
+        trailingEmptyRowPolicy = other.trailingEmptyRowPolicy;
     }
 
     /**
@@ -166,6 +169,28 @@ public class XceliteOptions {
         this.headerParsingIsCaseSensitive = headerParsingIsCaseSensitive;
     }
 
+    /**
+     * Used to specify the policy to handle null and trailing blank rows following
+     * data blocks for readers and trailing null objects for writers.
+     *
+     * @return trailingEmptyRowPolicy the policy for trailing null and blank rows
+     *
+     * @since 1.2
+     */
+    public TrailingEmptyRowPolicy getTrailingEmptyRowPolicy() {
+        return trailingEmptyRowPolicy;
+    }
 
+    /**
+     * Used to specify the policy to handle null and trailing blank rows following
+     * data blocks for readers and trailing null objects for writers.
+     *
+     * @param trailingEmptyRowPolicy set olicy for trailing null and blank rows
+     *
+     * @since 1.2
+     */
+    public void setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy trailingEmptyRowPolicy) {
+        this.trailingEmptyRowPolicy = trailingEmptyRowPolicy;
+    }
 
 }

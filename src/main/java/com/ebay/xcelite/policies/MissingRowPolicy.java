@@ -1,11 +1,18 @@
 package com.ebay.xcelite.policies;
 
 /**
- * Used to specify the different possible policies to handle null and blank rows.
+ * Used to specify the different possible policies to handle null and
+ * blank rows in data blocks for readers and null objects for writers.
  *
- * Loosely modeled after the POI missing-cell policy.
+ * Default is NULL.
+ *
+ * This is different from {@link TrailingEmptyRowPolicy} which deals with
+ * empty/missing rows in the data.
+ *
+ * Loosely modeled after {@link MissingCellPolicy}.
  *
  * @see MissingCellPolicy
+ * @see TrailingEmptyRowPolicy
  * @since 1.2
  */
 public enum MissingRowPolicy {

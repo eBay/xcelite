@@ -14,6 +14,10 @@ public class EmptyRowException extends PolicyViolationException {
         super("Empty Row encountered and MissingRowPolicy.THROW active");
     }
 
+    public EmptyRowException(String message) {
+        super(message);
+    }
+
     public EmptyRowException(int rowNum) {
         super("Row "+rowNum + " was empty and MissingRowPolicy.THROW active");
     }

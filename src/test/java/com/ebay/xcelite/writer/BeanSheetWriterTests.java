@@ -18,13 +18,17 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 public class BeanSheetWriterTests extends AbstractTestBaseForWriterTests {
     private static BeanWriterTestsBean bean = new BeanWriterTestsBean();
 
     @BeforeAll
     @SneakyThrows
-    static void setup() {
-    }
+    static void setup() { }
+
+
     @Test
     @DisplayName("Must correctly write with default XceliteOptions")
     public void basicWriterTest() {
@@ -51,11 +55,38 @@ public class BeanSheetWriterTests extends AbstractTestBaseForWriterTests {
         assertPropertiesMatch(users[1], data.get(1));
     }
 
+    @Test
+    @DisplayName("Must correctly write with default XceliteOptions")
+    public void basicWriterTestWithNullObject() {
+        User users[] = new User[3];
+
+        users[0] = null;
+        User usr3 = new User();
+        usr3.setId(1L);
+        usr3.setFirstName("Max");
+        usr3.setLastName("Busch");
+        users[1] = usr3;
+
+        User usr4 = new User();
+        usr4.setId(2L);
+        usr4.setFirstName("Moritz");
+        usr4.setLastName("Busch");
+        users[2] = usr4;
+
+        setup(new XceliteOptions(), users);
+
+        List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
+        Assertions.assertEquals(users.length, data.size(), "number of read rows is wrong");
+        assertEquals(0, data.get(0).size());
+        assertPropertiesMatch(users[1], data.get(1));
+        assertPropertiesMatch(users[2], data.get(2));
+    }
+
     private void assertPropertiesMatch(User input, Map<String, Object> readValues) {
         Assertions.assertEquals(input.getFirstName(), readValues.get("Firstname"));
         Assertions.assertEquals(input.getLastName(), readValues.get("Lastname"));
         if (null == input.getBirthDate())
-            Assertions.assertNull(readValues.get("BirthDate"));
+            assertNull(readValues.get("BirthDate"));
         else
             Assertions.assertEquals(input.getBirthDate(), DateUtil.getJavaDate((double)readValues.get("BirthDate")));
         Assertions.assertEquals(((double)input.getId()), readValues.get("id"));

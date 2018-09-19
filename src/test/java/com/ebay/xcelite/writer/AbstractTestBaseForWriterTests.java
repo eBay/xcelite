@@ -54,24 +54,33 @@ public class AbstractTestBaseForWriterTests{
         List<String> columnNames = new ArrayList<>();
         Sheet excelSheet = workbook.getSheet("Tests");
         Iterator<Row> iter = excelSheet.rowIterator();
+        int rowId = 0;
         // move to header row
-        while (--skipBeforeHeader >= 0)
+        while (--skipBeforeHeader >= 0) {
+            rowId++;
             iter.next();
+        }
         Row header = iter.next();
+        rowId++;
         header.cellIterator().forEachRemaining(cell -> {
             Object val = AbstractSheetReader.readValueFromCell(cell);
             columnNames.add(val.toString());
         });
-        while (--skipAfterHeader >= 0)
+        while (--skipAfterHeader >= 0) {
+            rowId++;
             iter.next();
-        iter.forEachRemaining(row -> {
+        }
+        for (int i = rowId; i <= excelSheet.getLastRowNum(); i++) {
+            Row row = excelSheet.getRow(i);
             Map<String, Object> columnsMap = new LinkedHashMap<>();
             rowVals.add(columnsMap);
-            Iterator<Cell> cellIter = row.cellIterator();
-            for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
-                columnsMap.put(columnNames.get(i), AbstractSheetReader.readValueFromCell(cellIter.next()));
+            if (null != row) {
+                Iterator<Cell> cellIter = row.cellIterator();
+                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                    columnsMap.put(columnNames.get(j), AbstractSheetReader.readValueFromCell(cellIter.next()));
+                }
             }
-        });
+        };
         return rowVals;
     }
 
