@@ -27,6 +27,7 @@ import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
@@ -37,8 +38,10 @@ import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 import static org.reflections.ReflectionUtils.withName;
 
 /**
@@ -98,6 +101,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @SneakyThrows
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
+        final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
 
         rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
         if (!rowIterator.hasNext())
@@ -123,7 +127,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                     default:
                         object = null;
                 }
-                if (!options.getMissingRowPolicy().equals(MissingRowPolicy.SKIP)) {
+                if (!options.getMissingRowPolicy().equals(SKIP)) {
                     if (shouldKeepObject(object, rowPostProcessors)) {
                         data.add(object);
                     }
@@ -133,9 +137,27 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 if (shouldKeepObject(object, rowPostProcessors)) {
                     data.add(object);
                 }
+                lastNonEmptyRowId.set(data.size());
             }
         });
 
+        return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId.intValue());
+    }
+
+    private Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
+        if (lastNonEmptyRowId == data.size())
+            return data;
+        switch (options.getTrailingEmptyRowPolicy()) {
+            case SKIP:
+                return data.subList(0, lastNonEmptyRowId);
+            case THROW:
+                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
+            case NULL:
+                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
+                    data.set(i, null);
+                }
+                return data;
+        }
         return data;
     }
 
