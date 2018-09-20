@@ -22,7 +22,6 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
             {"Witch",	"Doctor",	"01/01/1990",	"male"}
     };
 
-
     @Test
     @DisplayName("Must correctly recognize data with empty rows before and after")
     public void readDataWithEmptyRowsBeforeAfterMustOK() throws ParseException {
@@ -34,7 +33,27 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
     }
 
     @Test
-    @DisplayName("Must correctly recognize column headers with not empty rows before and after")
+    @DisplayName("Must correctly recognize data with empty rows before and after - II")
+    public void readDataWithEmptyRowsBeforeOK() throws ParseException {
+        XceliteOptions options = new XceliteOptions();
+        options.setFirstDataRowIndex(1);
+
+        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeData.xlsx");
+        validateSimpleCamelCaseData(cc, usTestData);
+    }
+
+    @Test
+    @DisplayName("Must correctly recognize data with empty rows before and after - III")
+    public void readDataWithEmptyRowsBeforeOK2() throws ParseException {
+        XceliteOptions options = new XceliteOptions();
+        options.setFirstDataRowIndex(5);
+
+        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeData2.xlsx");
+        validateSimpleCamelCaseData(cc, usTestData);
+    }
+
+    @Test
+    @DisplayName("Must correctly recognize data with not empty rows before and after")
     public void readDataWithRowsBeforeAfterMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
         options.setFirstDataRowIndex(5);
@@ -47,15 +66,14 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
     @DisplayName("Must correctly recognize data with empty rows before and after")
     public void readDataWithEmptyRowsAfterOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
+        options.setFirstDataRowIndex(5);
         options.setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy.EMPTY_OBJECT);
 
         List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
-        Assertions.assertEquals(1001, cc.size());
-        Assertions.assertNull(cc.get(1));
-        Assertions.assertNull(cc.get(4));
-        Assertions.assertNotNull(cc.get(2));
-        Assertions.assertNotNull(cc.get(3));
+        Assertions.assertEquals(999, cc.size());
+        Assertions.assertNotNull(cc.get(0));
+        Assertions.assertNotNull(cc.get(1));
         Assertions.assertNotNull(cc.get(10));
-        //validateSimpleCamelCaseData(cc, usTestData);
+        validateSimpleCamelCaseData(cc, usTestData);
     }
 }

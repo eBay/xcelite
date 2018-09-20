@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -35,11 +36,14 @@ public class TestBaseForReaderAndWriterTests {
         setup(new XceliteOptions(), inBeans);
     }
 
-    public List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook) {
+    public List<Map<String, Object>> extractCellValues (XSSFWorkbook workbook) {
         return extractCellValues (workbook, 0,0);
     }
 
-    public List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook, int skipBeforeHeader, int skipAfterHeader) {
+    public List<Map<String, Object>> extractCellValues (
+            XSSFWorkbook workbook,
+            int skipBeforeHeader,
+            int skipAfterHeader) {
         List<Map<String, Object>> rowVals = new ArrayList<>();
         List<String> columnNames = new ArrayList<>();
         Sheet excelSheet = workbook.getSheet("Tests");
@@ -74,13 +78,18 @@ public class TestBaseForReaderAndWriterTests {
         return rowVals;
     }
 
-
-    public List<CamelCase> getCamelCaseData(XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new File(filePath));
+    @SneakyThrows
+    public List getData(Class clazz, XceliteOptions options, String filePath) {
+        Xcelite xcelite = new Xcelite(new FileInputStream(new File(filePath)), options);
         XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<CamelCase> beanReader = sheet.getBeanReader(CamelCase.class);
-        beanReader.setOptions(options);
-        ArrayList<CamelCase> data = new ArrayList<>(beanReader.read());
+        SheetReader beanReader = sheet.getBeanReader(clazz);
+        ArrayList data = new ArrayList<>(beanReader.read());
+        return data;
+    }
+
+    @SneakyThrows
+    public List<CamelCase> getCamelCaseData(XceliteOptions options, String filePath) {
+        List<CamelCase> data = getData(CamelCase.class, options, filePath);
         return data;
     }
 
@@ -97,11 +106,11 @@ public class TestBaseForReaderAndWriterTests {
         assertEquals(usDateFormat.parse(testData[1][2]), second.getBirthDate(), "Birthdate mismatch");
     }
 
+    @SneakyThrows
     public List<Collection<Object>> getSimpleCamelCaseData(XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new File(filePath));
+        Xcelite xcelite = new Xcelite(new FileInputStream(new File(filePath)), options);
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<Collection<Object>> simpleReader = sheet.getSimpleReader();
-        simpleReader.setOptions(options);
         ArrayList<Collection<Object>> data = new ArrayList<>(simpleReader.read());
         return data;
     }

@@ -18,7 +18,7 @@ public class XceliteOptions {
     private boolean generateHeaderRow = true;
     private boolean headerParsingIsCaseSensitive = true;
     private Integer headerRowIndex = 0;
-    private Integer firstDataRowIndex = -1;
+    private Integer firstDataRowIndex = 0;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.NULL;
     private TrailingEmptyRowPolicy trailingEmptyRowPolicy = TrailingEmptyRowPolicy.SKIP;

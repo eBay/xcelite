@@ -18,7 +18,6 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 

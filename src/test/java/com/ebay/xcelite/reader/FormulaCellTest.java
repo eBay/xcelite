@@ -17,6 +17,7 @@ package com.ebay.xcelite.reader;
 
 import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.FormulaUserBean;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Johannes
  */
-public class FormulaCellTest {
+public class FormulaCellTest extends TestBaseForReaderTests {
 
     private static String testData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	"2",	"Female"},
@@ -49,10 +51,8 @@ public class FormulaCellTest {
     @Test
     @DisplayName("Must correctly lookup data on another sheet via VLKOOKUP")
     public void model_VLOOKUPCanLookupReferencedCell() {
-        Xcelite xcelite = new Xcelite(new File("src/test/resources/formulaData.xlsx"));
-        XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<FormulaUserBean> beanReader = sheet.getBeanReader(FormulaUserBean.class);
-        ArrayList<FormulaUserBean> upper = new ArrayList<>(beanReader.read());
+        List<FormulaUserBean> upper = getData(FormulaUserBean.class,
+                new XceliteOptions (), "src/test/resources/formulaData.xlsx");
 
         FormulaUserBean first = upper.get(0);
         assertEquals(testData[0][4], first.getSex(), "Gender mismatch");

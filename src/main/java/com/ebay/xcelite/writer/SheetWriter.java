@@ -29,6 +29,7 @@ import java.util.Collection;
  * created Sep 12, 2013
  */
 public interface SheetWriter<T> {
+
     /**
      * Takes a collection of the specified type and writes it to the
      * {@link XceliteSheet} object this writer is operating on.
