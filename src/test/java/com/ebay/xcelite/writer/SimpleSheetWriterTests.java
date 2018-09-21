@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SimpleSheetWriterTests extends TestBaseForWriterTests {
-    private static BeanWriterTestsBean bean = new BeanWriterTestsBean();
 
     @Test
     @DisplayName("Must correctly write with default XceliteOptions")

@@ -8,17 +8,22 @@ import com.ebay.xcelite.reader.AbstractSheetReader;
 import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.writer.SheetWriter;
+import documentation_examples.model.User;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
@@ -29,9 +34,21 @@ public class TestBaseForReaderAndWriterTests {
 
 
     @SneakyThrows
-    public static void setup(Object... inBeans) {
-        setup(new XceliteOptions(), inBeans);
+    public static void setupSimple(XceliteOptions options, Collection<Object>... rowObjects) {
+        ArrayList objs = new ArrayList();
+        for (Collection<Object> row : rowObjects) {
+            objs.add(row);
+        }
+        Xcelite xcelite = new Xcelite();
+        XceliteSheet sheet = xcelite.createSheet("Tests");
+        SheetWriter bs = sheet.getSimpleWriter();
+        bs.setOptions(options);
+        bs.write(objs);
+        workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
+        if (writeToFile)
+            writeWorkbookToFile(workbook);
     }
+
 
     public List<Map<String, Object>> extractCellValues (XSSFWorkbook workbook) {
         return extractCellValues (workbook, 0,0);
@@ -75,9 +92,10 @@ public class TestBaseForReaderAndWriterTests {
         return rowVals;
     }
 
+
     @SneakyThrows
-    public List getData(Class clazz, XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new FileInputStream(new File(filePath)), options);
+    public List getData(Class clazz, XceliteOptions options, InputStream in) {
+        Xcelite xcelite = new Xcelite(in, options);
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader beanReader = sheet.getBeanReader(clazz);
         ArrayList data = new ArrayList<>(beanReader.read());
@@ -85,9 +103,23 @@ public class TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
+    public List getData(Class clazz, XceliteOptions options, String filePath) {
+        return getData(clazz, options, new FileInputStream(new File(filePath)));
+    }
+
+    @SneakyThrows
     public List<CamelCase> getCamelCaseData(XceliteOptions options, String filePath) {
         List<CamelCase> data = getData(CamelCase.class, options, filePath);
         return data;
+    }
+
+    @SneakyThrows
+    public List getData(Class clazz, XceliteOptions options) {
+        Xcelite xcelite =  readXceliteFromWorkbook(options);
+        XceliteSheet sheet = xcelite.getSheet(0);
+        SheetReader beanReader = sheet.getBeanReader(clazz);
+        ArrayList readData = new ArrayList<>(beanReader.read());
+        return readData;
     }
 
     @SneakyThrows
@@ -105,19 +137,12 @@ public class TestBaseForReaderAndWriterTests {
 
     @SneakyThrows
     public List<Collection<Object>> getSimpleData(XceliteOptions options) {
-        byte data[] = null;
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            workbook.write(byteArrayOutputStream);
-            data = byteArrayOutputStream.toByteArray();
-        }
-        Xcelite xcelite = new Xcelite(new ByteArrayInputStream(data), options);
+        Xcelite xcelite =  readXceliteFromWorkbook(options);
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<Collection<Object>> simpleReader = sheet.getSimpleReader();
         ArrayList<Collection<Object>> readData = new ArrayList<>(simpleReader.read());
         return readData;
     }
-
-
 
     @SneakyThrows
     public List<Collection<Object>> getSimpleData(XceliteOptions options, InputStream in) {
@@ -159,6 +184,26 @@ public class TestBaseForReaderAndWriterTests {
         assertEquals(testData[1].get(2), second.get(2), "Surname mismatch");
     }
 
+    public void validateUserBeanData(User input, Map<String, Object> readValues) {
+        Assertions.assertEquals(input.getFirstName(), readValues.get("Firstname"));
+        Assertions.assertEquals(input.getLastName(), readValues.get("Lastname"));
+        if (null == input.getBirthDate())
+            assertNull(readValues.get("BirthDate"));
+        else
+            Assertions.assertEquals(input.getBirthDate(), DateUtil.getJavaDate((double)readValues.get("BirthDate")));
+        Assertions.assertEquals(((double)input.getId()), readValues.get("id"));
+    }
+
+    public void validateUserBeanData(User input, User read) {
+        Assertions.assertEquals(input.getFirstName(), read.getFirstName());
+        Assertions.assertEquals(input.getLastName(), read.getLastName());
+        if (null == input.getBirthDate())
+            assertNull(read.getBirthDate());
+        else
+            Assertions.assertEquals(input.getBirthDate(), read.getBirthDate());
+        Assertions.assertEquals(input.getId(), read.getId());
+    }
+
     @SneakyThrows
     public static void writeWorkbookToFile(XSSFWorkbook workbook) {
         long tm = System.currentTimeMillis();
@@ -166,5 +211,15 @@ public class TestBaseForReaderAndWriterTests {
         FileOutputStream st = new FileOutputStream(f);
         workbook.write(st);
         st.close();
+    }
+
+    @SneakyThrows
+    protected Xcelite readXceliteFromWorkbook(XceliteOptions options) {
+        byte data[] = null;
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            workbook.write(byteArrayOutputStream);
+            data = byteArrayOutputStream.toByteArray();
+        }
+        return new Xcelite(new ByteArrayInputStream(data), options);
     }
 }

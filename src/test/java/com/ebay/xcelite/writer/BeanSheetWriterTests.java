@@ -38,9 +38,8 @@ public class BeanSheetWriterTests extends TestBaseForWriterTests {
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
-        //assertPropertiesMatch(new Person(), data.get(0));
-        assertPropertiesMatch(users[0], data.get(0));
-        assertPropertiesMatch(users[1], data.get(1));
+        validateUserBeanData(users[0], data.get(0));
+        validateUserBeanData(users[1], data.get(1));
     }
 
     @Test
@@ -66,18 +65,8 @@ public class BeanSheetWriterTests extends TestBaseForWriterTests {
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(users.length, data.size(), "number of read rows is wrong");
         assertEquals(0, data.get(0).size());
-        assertPropertiesMatch(users[1], data.get(1));
-        assertPropertiesMatch(users[2], data.get(2));
-    }
-
-    private void assertPropertiesMatch(User input, Map<String, Object> readValues) {
-        Assertions.assertEquals(input.getFirstName(), readValues.get("Firstname"));
-        Assertions.assertEquals(input.getLastName(), readValues.get("Lastname"));
-        if (null == input.getBirthDate())
-            assertNull(readValues.get("BirthDate"));
-        else
-            Assertions.assertEquals(input.getBirthDate(), DateUtil.getJavaDate((double)readValues.get("BirthDate")));
-        Assertions.assertEquals(((double)input.getId()), readValues.get("id"));
+        validateUserBeanData(users[1], data.get(1));
+        validateUserBeanData(users[2], data.get(2));
     }
 
 
