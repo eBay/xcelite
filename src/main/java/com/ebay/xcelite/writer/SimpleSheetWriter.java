@@ -70,7 +70,6 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
     @Override
     public void write(Collection<Collection<Object>> data) {
-        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
         final AtomicInteger i = new AtomicInteger(0);
 
         data.forEach(row -> {
@@ -99,7 +98,8 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         final AtomicInteger j = new AtomicInteger(0);
         data.forEach(column -> {
             Cell cell = excelRow.createCell(j.intValue());
-            if (options.isGenerateHeaderRow() && rowIndex == 0) {
+            if (hasHeaderRow() && rowIndex == 0) {
+                CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
                 cell.setCellStyle(boldStyle);
             }
             writeToCell(cell, column, null);

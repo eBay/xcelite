@@ -23,9 +23,11 @@ import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract implementation of {@link SheetWriter} writer classes that can serialize
@@ -111,13 +113,10 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
         }
     }
 
-    /**
-     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
-     */
     @Deprecated
     @Override
     public void write(final Collection<T> data) {
-        if (options.isGenerateHeaderRow()) {
+        if (hasHeaderRow()) {
             writeHeader();
         }
         final AtomicInteger i = new AtomicInteger(0);
@@ -131,6 +130,9 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
 
     abstract void writeHeader();
 
+    /**
+     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
+     */
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
         options.setHasHeaderRow(generateHeaderRow);

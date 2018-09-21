@@ -19,6 +19,7 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 /**

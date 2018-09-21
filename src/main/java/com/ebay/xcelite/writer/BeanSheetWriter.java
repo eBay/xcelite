@@ -110,6 +110,36 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         writeData(data);
     }
 
+    /**
+     * Takes one object instance of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    @SuppressWarnings("unchecked")
+    @SneakyThrows
+    @Override
+    public void writeRow(T data, Row excelRow, int rowIndex) {
+        int i = 0;
+        for (Col col: columns) {
+            Set<Field> fields = ReflectionUtils.getAllFields(data.getClass(), withName(col.getFieldName()));
+            Field field = fields.iterator().next();
+            field.setAccessible(true);
+            Object fieldValueObj;
+            if (col.isAnyColumn()) {
+                Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(data);
+                fieldValueObj = anyColumnMap.get(col.getName());
+            } else {
+                fieldValueObj = field.get(data);
+            }
+            Cell cell = excelRow.createCell(i);
+            writeToCell(cell, col, fieldValueObj);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
