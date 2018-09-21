@@ -97,8 +97,7 @@ public class XceliteSheetImpl implements XceliteSheet {
      setting for the header-row index, then assume the first data row is the row
      following the header row.
      */
-    @Override
-    public Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows) {
+    public static int getFirstDataRowIndex(DataMarshaller marshall) {
         XceliteOptions options = marshall.getOptions();
         boolean expectHeaderRow = marshall.expectsHeaderRow();
         if (null != options.isHasHeaderRow()) {
@@ -108,6 +107,18 @@ public class XceliteSheetImpl implements XceliteSheet {
         if ((expectHeaderRow) && (firstDataRowIndex <= options.getHeaderRowIndex())) {
             firstDataRowIndex = options.getHeaderRowIndex() +1;
         }
+        return firstDataRowIndex;
+    }
+
+    /*
+     For readers/writers expecting a header-row:
+     If the first data row setting from XceliteOptions is smaller than the
+     setting for the header-row index, then assume the first data row is the row
+     following the header row.
+     */
+    @Override
+    public Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows) {
+        int firstDataRowIndex = getFirstDataRowIndex(marshall);
         return skipRows (firstDataRowIndex, createRows);
     }
 

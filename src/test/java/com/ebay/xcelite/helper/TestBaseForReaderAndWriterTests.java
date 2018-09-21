@@ -29,7 +29,7 @@ public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = false;
+    public static boolean writeToFile = true;
     public static XSSFWorkbook workbook;
 
 
@@ -92,6 +92,27 @@ public class TestBaseForReaderAndWriterTests {
         return rowVals;
     }
 
+public User[] createUserClassTestDataWithNullPadding(int nullBefore, int nullAfter) {
+    User users[] = new User[nullBefore+nullAfter+2];
+
+    for (int i = 0; i < nullBefore; i++)
+        users[i] = null;
+
+    User usr3 = new User();
+    usr3.setId(1L);
+    usr3.setFirstName("Max");
+    usr3.setLastName("Busch");
+    users[nullBefore] = usr3;
+
+    User usr4 = new User();
+    usr4.setId(2L);
+    usr4.setFirstName("Moritz");
+    usr4.setLastName("Busch");
+    users[nullBefore + 1] = usr4;
+    for (int i = 0; i < nullAfter; i++)
+        users[nullBefore + 2 + i] = null;
+    return users;
+}
 
     @SneakyThrows
     public List getData(Class clazz, XceliteOptions options, InputStream in) {
@@ -172,7 +193,7 @@ public class TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
-    public void validateSimpleUserData(List<Collection<Object>> data, List<Object>  testData[]) {
+    public void validateSimpleUserData(List<Collection<Object>> data, List<Object> testData[]) {
         List<Object> first = (List<Object>)data.get(0);
         assertEquals(((Number)testData[0].get(0)).doubleValue(), first.get(0), "Id mismatch");
         assertEquals(testData[0].get(1), first.get(1), "Name mismatch");

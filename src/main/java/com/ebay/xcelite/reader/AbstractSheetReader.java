@@ -172,7 +172,7 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
                 }
                 return data;
             case EMPTY_OBJECT:
-                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                for (int i = lastNonEmptyRowId; i < data.size(); i++) {
                     data.set(i, getNewObject());
                 }
                 return data;

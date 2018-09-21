@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ebay.xcelite.writer.TestBaseForWriterTests.setupBeans;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests {
 
@@ -23,20 +24,7 @@ public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests 
     @DisplayName("Must correctly write with default XceliteOptions")
     public void basicWriterTest() {
         XceliteOptions options = new XceliteOptions();
-        User users[] = new User[2];
-
-        User usr3 = new User();
-        usr3.setId(1L);
-        usr3.setFirstName("Max");
-        usr3.setLastName("Busch");
-        users[0] = usr3;
-
-        User usr4 = new User();
-        usr4.setId(2L);
-        usr4.setFirstName("Moritz");
-        usr4.setLastName("Busch");
-        users[1] = usr4;
-
+        User users[] = createUserClassTestDataWithNullPadding(0, 0);
         setupBeans(options, users);
 
         List<User> readData = getData(User.class, options );
@@ -45,4 +33,16 @@ public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests 
         validateUserBeanData(users[1], readData.get(1));
     }
 
+    @Test
+    @DisplayName("Must correctly write with default XceliteOptions")
+    public void basicWriterTestWithNullObject() {
+        XceliteOptions options = new XceliteOptions();
+        User users[] = createUserClassTestDataWithNullPadding(1, 0);
+        setupBeans(options, users);
+
+        List<User> readData = getData(User.class, options );
+        Assertions.assertEquals(users.length, readData.size(), "number of read rows is wrong");
+        validateUserBeanData(users[1], readData.get(1));
+        validateUserBeanData(users[2], readData.get(2));
+    }
 }
