@@ -28,7 +28,7 @@ public class OptionsCopyOnSetterTests {
     void OptionsCopyConstructorTest() {
         XceliteOptions options = new XceliteOptions();
 
-        options.setGenerateHeaderRow(false);
+        options.setHasHeaderRow(false);
         copyAndTestOptionsEquality(options);
 
         options.setHeaderParsingIsCaseSensitive(false);
@@ -112,7 +112,7 @@ public class OptionsCopyOnSetterTests {
     @DisplayName("Test BeanSheetWriter Setter copies options object")
     void CopyOptionsOnBeanSheetWriterSetterTest() {
         XceliteOptions options = new XceliteOptions();
-        options.setGenerateHeaderRow(false);
+        options.setHasHeaderRow(false);
         Xcelite xcelite = new Xcelite();
         XceliteSheet sheet = xcelite.createSheet();
         SheetWriter<CamelCase> writer = sheet.getBeanWriter(CamelCase.class);

@@ -15,28 +15,19 @@
  */
 package com.ebay.xcelite.writer;
 
-import com.ebay.xcelite.Xcelite;
-import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.exceptions.PolicyViolationException;
-import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.Person;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SheetReader;
-import com.ebay.xcelite.sheet.XceliteSheet;
 import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Johannes
  */
-public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseForWriterTests{
+public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTests {
     private SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {
@@ -67,7 +58,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         Person beans[] = new Person[2];
         beans[0] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[1] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 2, 0);
         Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
@@ -86,7 +77,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         beans[0] = null;
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -110,7 +101,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         beans[0].setBirthdate(DateUtil.getJavaDate((double)0));
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -130,7 +121,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         beans[0] = null;
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -151,7 +142,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
 
         assertThrows(PolicyViolationException.class, () -> {
-            setup(options, beans);
+            setupBeans(options, beans);
             List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         });
     }
@@ -163,8 +154,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         options.setHeaderRowIndex(3);
         options.setFirstDataRowIndex(5);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
-        validateData(upper);
+        List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        validateCamelCaseData(upper);
     }
 
 
@@ -175,8 +166,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         options.setHeaderRowIndex(3);
         options.setFirstDataRowIndex(5);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
-        validateData(upper);
+        List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
+        validateCamelCaseData(upper);
     }*/
 
 
@@ -188,25 +179,5 @@ public class PaddingAroundColumnDefinitionWriterTest extends AbstractTestBaseFor
         else
             Assertions.assertEquals(input.getBirthdate(), DateUtil.getJavaDate((double)readValues.get("Birthdate")));
         Assertions.assertEquals(input.getSex(), readValues.get("Sex"));
-    }
-
-    private List<CamelCase> getData(XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new File(filePath));
-        XceliteSheet sheet = xcelite.getSheet(0);
-        SheetReader<CamelCase> beanReader = new BeanSheetReader<>(sheet, options, CamelCase.class);
-        ArrayList<CamelCase> data = new ArrayList<>(beanReader.read());
-        return data;
-    }
-
-    private void validateData(List<CamelCase> data) throws ParseException {
-        CamelCase first = data.get(0);
-        assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
-        assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[0][2]), first.getBirthDate(), "Birthdate mismatch");
-
-        CamelCase second = data.get(1);
-        assertEquals(usTestData[1][0], second.getName(), "Name mismatch");
-        assertEquals(usTestData[1][1], second.getSurname(), "Surname mismatch");
-        assertEquals(df.parse(usTestData[1][2]), second.getBirthDate(), "Birthdate mismatch");
     }
 }

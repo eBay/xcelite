@@ -1,7 +1,6 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.model.AbstractWriterTestsBean;
-import com.ebay.xcelite.writer.AbstractTestBaseForWriterTests;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-class AbstractWriterTests extends AbstractTestBaseForWriterTests {
+class AbstractWriterTests extends TestBaseForWriterTests {
     private static AbstractWriterTestsBean bean = new AbstractWriterTestsBean();
 
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean);
+        setupBeans(bean);
     }
 
     @Test

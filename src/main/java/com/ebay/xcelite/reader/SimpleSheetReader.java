@@ -19,6 +19,7 @@ import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.SneakyThrows;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -26,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 
 /**
  * Implementation of the {@link SheetReader} interface that returns the contents
@@ -43,70 +47,82 @@ import java.util.List;
  * created Nov 8, 2013
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
+    public boolean expectsHeaderRow(){return false;}
 
-  /**
-   * Construct a SimpleSheetReader with custom options. The Reader will create
-   * a copy of the options object, therefore later changes of this object will not
-   * influence the behavior of this reader
-   *
-   * @param sheet the {@link XceliteSheet} to read from
-   * @param options the {@link XceliteOptions} to configure the reader
-   */
-  public SimpleSheetReader(XceliteSheet sheet, XceliteOptions options) {
-    super(sheet, options);
-  }
-
-  /**
-   * Construct a SimpleSheetReader with options from the {@link XceliteSheet}
-   * @param sheet the {@link XceliteSheet} to read from
-   */
-  //TODO version 2.x remove if possible
-  public SimpleSheetReader(XceliteSheet sheet) {
-    this(sheet, sheet.getOptions());
-  }
-
-  @Override
-  public Collection<Collection<Object>> read() {
-    List<Collection<Object>> rows = new ArrayList<>();
-    Iterator<Row> rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
-    if (!rowIterator.hasNext())
-      return rows;
-
-    rowIterator.forEachRemaining(excelRow -> {
-      List<Object> row;
-      if (isBlankRow(excelRow)) {
-        switch (options.getMissingRowPolicy()) {
-          case THROW:
-            throw new EmptyRowException();
-          case EMPTY_OBJECT:
-            row = new ArrayList<>();
-            break;
-          case NULL:
-            row = null;
-            break;
-          default:
-            row = null;
-        }
-      } else {
-        row = fillObject(excelRow);
-      }
-
-      if (shouldKeepObject(row, rowPostProcessors)) {
-        rows.add(row);
-      }
-    });
-    return rows;
-  }
-
-  @SneakyThrows
-  private List<Object> fillObject(Row excelRow) {
-    List<Object> row = new ArrayList<>();
-    Iterator<Cell> cellIterator = excelRow.cellIterator();
-
-    while (cellIterator.hasNext()) {
-      Object value = readValueFromCell(cellIterator.next());
-      row.add(value);
+    /**
+     * Construct a SimpleSheetReader with custom options. The Reader will create
+     * a copy of the options object, therefore later changes of this object will not
+     * influence the behavior of this reader
+     *
+     * @param sheet the {@link XceliteSheet} to read from
+     * @param options the {@link XceliteOptions} to configure the reader
+     */
+    public SimpleSheetReader(XceliteSheet sheet, XceliteOptions options) {
+        super(sheet, options);
     }
-    return row;
-  }
+
+    /**
+     * Construct a SimpleSheetReader with options from the {@link XceliteSheet}
+     * @param sheet the {@link XceliteSheet} to read from
+     */
+    public SimpleSheetReader(XceliteSheet sheet) {
+        this(sheet, sheet.getOptions());
+    }
+
+    @Override
+    public Collection<Collection<Object>> read() {
+        List<Collection<Object>> rows = new ArrayList<>();
+        final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
+        Iterator<Row> rowIterator = sheet.moveToFirstDataRow(this, false);
+        if (!rowIterator.hasNext())
+            return rows;
+
+        rowIterator.forEachRemaining(excelRow -> {
+            Collection<Object> row;
+            if (isBlankRow(excelRow)) {
+                switch (options.getMissingRowPolicy()) {
+                    case THROW:
+                        throw new EmptyRowException();
+                    case EMPTY_OBJECT:
+                        row = new ArrayList<>();
+                        break;
+                    case NULL:
+                        row = null;
+                        break;
+                    default:
+                        row = null;
+                }
+                if (!options.getMissingRowPolicy().equals(SKIP)) {
+                    if (shouldKeepObject(row, rowPostProcessors)) {
+                        rows.add(row);
+                    }
+                }
+            } else {
+                row = fillObject(excelRow);
+                if (shouldKeepObject(row, rowPostProcessors)) {
+                    rows.add(row);
+                    lastNonEmptyRowId.set(rows.size());
+                }
+            }
+        });
+
+        return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId.intValue());
+    }
+
+    @SneakyThrows
+    private Collection<Object> fillObject(Row excelRow) {
+        Collection<Object> row = getNewObject();
+        Iterator<Cell> cellIterator = excelRow.cellIterator();
+
+        while (cellIterator.hasNext()) {
+            Object value = readValueFromCell(cellIterator.next());
+            row.add(value);
+        }
+        return row;
+    }
+
+    @SneakyThrows
+    Collection<Object> getNewObject(){
+        return new ArrayList<>();
+    }
 }

@@ -16,18 +16,16 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract implementation of {@link SheetWriter} writer classes that can serialize
@@ -48,10 +46,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * created Nov 10, 2013
  */
 @Getter
-public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
+public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller implements SheetWriter<T> {
     protected XceliteSheet sheet;
-
-    protected XceliteOptions options;
 
     /**
      * Construct a {@link SheetWriter} on the given {@link XceliteSheet sheet} using
@@ -72,14 +68,13 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
      * over, later changes will not affect the options of this writer.
      * @param sheet the sheet to construct the SheetWriter on.
      */
-    //TODO version 2.x remove if possible
     AbstractSheetWriter(XceliteSheet sheet) {
         this (sheet, sheet.getOptions());
     }
 
     /**
      * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
-     * and set {@link XceliteOptions#setGenerateHeaderRow(boolean)}
+     * and set {@link XceliteOptions#setHasHeaderRow(boolean)}
      * to true
      * @param sheet The sheet to write to
      * @param writeHeader whether or not one header row should be written
@@ -87,7 +82,7 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     @Deprecated
     AbstractSheetWriter(XceliteSheet sheet, boolean writeHeader) {
         this(sheet);
-        options.setGenerateHeaderRow(writeHeader);
+        options.setHasHeaderRow(writeHeader);
     }
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
@@ -116,23 +111,6 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
         }
     }
 
-    @Override
-    public void write(final Collection<T> data) {
-        if (options.isGenerateHeaderRow()) {
-            writeHeader();
-        }
-        final AtomicInteger i = new AtomicInteger(0);
-        data.forEach(row -> {
-            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
-            final AtomicInteger j = new AtomicInteger(0);
-            writeRow(row, excelRow, i.intValue());
-            i.incrementAndGet();
-        });
-    }
-
-    abstract void writeHeader();
-
-
     /**
      * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
      */
@@ -155,7 +133,7 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
 
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
-        options.setGenerateHeaderRow(generateHeaderRow);
+        options.setHasHeaderRow(generateHeaderRow);
     }
 
     /**
@@ -164,10 +142,7 @@ public abstract class AbstractSheetWriter<T> implements SheetWriter<T> {
     @Deprecated
     @Override
     public void setGenerateHeaderRow(boolean generateHeaderRow) {
-        options.setGenerateHeaderRow(generateHeaderRow);
+        options.setHasHeaderRow(generateHeaderRow);
     }
 
-    public void setOptions(XceliteOptions options) {
-        this.options = new XceliteOptions(options);
-    }
 }

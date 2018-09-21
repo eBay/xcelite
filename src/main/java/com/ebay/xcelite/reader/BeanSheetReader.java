@@ -66,6 +66,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
+    public boolean expectsHeaderRow(){return true;}
 
     /**
      * Construct a BeanSheetReader with custom options. The Reader will create
@@ -91,7 +92,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
      * @param sheet the {@link XceliteSheet} to read from
      * @param type class of the beans
      */
-    //TODO version 2.x remove if possible
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
         this(sheet, sheet.getOptions(), type);
     }
@@ -109,7 +109,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         buildHeader();
         validateColumns();
-        rowIterator = sheet.moveToFirstDataRow(options, false);
+        rowIterator = sheet.moveToFirstDataRow(this, false);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;
@@ -144,26 +144,9 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId.intValue());
     }
 
-    private Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
-        if (lastNonEmptyRowId == data.size())
-            return data;
-        switch (options.getTrailingEmptyRowPolicy()) {
-            case SKIP:
-                return data.subList(0, lastNonEmptyRowId);
-            case THROW:
-                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
-            case NULL:
-                for (int i = lastNonEmptyRowId+1; i < data.size(); i++) {
-                    data.set(i, null);
-                }
-                return data;
-        }
-        return data;
-    }
-
     @SneakyThrows
     private T fillObject(Row row) {
-        T object = type.newInstance();
+        T object = getNewObject();
 
         for (int i = 0; i < headerColumns.keySet().size(); i++) {
             String columnName = headerColumns.get(i);
@@ -189,6 +172,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @SuppressWarnings("unchecked")
     private Field getField(Class<?> aClass, String name) {
         return ReflectionUtils.getAllFields(aClass, withName(name)).iterator().next();
+    }
+
+    @SneakyThrows
+    T getNewObject(){
+        return type.newInstance();
     }
 
     /**

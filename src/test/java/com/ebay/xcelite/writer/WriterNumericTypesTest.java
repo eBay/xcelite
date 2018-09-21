@@ -1,7 +1,6 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.model.WriterNumericTypesBean;
-import com.ebay.xcelite.writer.AbstractTestBaseForWriterTests;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,13 +21,13 @@ import java.util.concurrent.atomic.*;
  * @since 1.2
  */
 
-class WriterNumericTypesTest extends AbstractTestBaseForWriterTests {
+class WriterNumericTypesTest extends TestBaseForWriterTests {
     static final WriterNumericTypesBean bean = new WriterNumericTypesBean();
 
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean);
+        setupBeans(bean);
     }
 
     @Test

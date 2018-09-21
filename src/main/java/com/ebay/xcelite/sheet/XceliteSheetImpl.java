@@ -16,14 +16,9 @@
 package com.ebay.xcelite.sheet;
 
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SheetReader;
-import com.ebay.xcelite.reader.SimpleSheetReader;
-import com.ebay.xcelite.writer.BeanSheetWriter;
-import com.ebay.xcelite.writer.SheetWriter;
-import com.ebay.xcelite.writer.SimpleSheetWriter;
+import com.ebay.xcelite.reader.*;
+import com.ebay.xcelite.writer.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -31,7 +26,15 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Class description...
+ * Wrapper class around a POI native sheet that represents one sheet
+ * of an Excel workbook. User can request a {@link SheetReader} or
+ * {@link SheetWriter} from it to read or write to/from the underlying
+ * Excel sheet. Readers and Writers inherit the XceliteSheet's
+ * {@link XceliteOptions options}.
+ *
+ * Users should not use constructors to get a XceliteSheet, but use
+ * the methods in {@link com.ebay.xcelite.Xcelite} to retrieve or
+ * create XceliteSheets on their workbooks.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -56,31 +59,24 @@ public class XceliteSheetImpl implements XceliteSheet {
             this.options = new XceliteOptions(options);
     }
 
-    private XceliteOptions adaptDataRowIndex (int newFirstDataRowIndex) {
-        XceliteOptions lOptions = new XceliteOptions(options);
-        if (lOptions.getFirstDataRowIndex() == -1)
-            lOptions.setFirstDataRowIndex(newFirstDataRowIndex);
-        return lOptions;
-    }
-
     @Override
-    public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
-        return new BeanSheetWriter<>(this, adaptDataRowIndex (options.getHeaderRowIndex() + 1), type);
+    public SheetReader<Collection<Object>> getSimpleReader() {
+        return new SimpleSheetReader(this, adaptDataRowIndex (options,0));
     }
 
     @Override
     public <T> SheetReader<T> getBeanReader(Class<T> type) {
-        return new BeanSheetReader<>(this, adaptDataRowIndex (options.getHeaderRowIndex() + 1), type);
+        return new BeanSheetReader<>(this, adaptDataRowIndex (options, options.getHeaderRowIndex() + 1), type);
     }
 
     @Override
     public SimpleSheetWriter getSimpleWriter() {
-        return new SimpleSheetWriter(this, adaptDataRowIndex (options.getHeaderRowIndex()));
+        return new SimpleSheetWriter(this, adaptDataRowIndex (options, 0));
     }
 
     @Override
-    public SheetReader<Collection<Object>> getSimpleReader() {
-        return new SimpleSheetReader(this, adaptDataRowIndex (options.getHeaderRowIndex()));
+    public <T> SheetWriter<T> getBeanWriter(Class<T> type) {
+        return new BeanSheetWriter<>(this, adaptDataRowIndex (options,options.getHeaderRowIndex() + 1), type);
     }
 
     public void setOptions(XceliteOptions options) {
@@ -88,15 +84,28 @@ public class XceliteSheetImpl implements XceliteSheet {
     }
 
 
+    private XceliteOptions adaptDataRowIndex (XceliteOptions options, int newFirstDataRowIndex) {
+        XceliteOptions lOptions = new XceliteOptions(options);
+        if (lOptions.getFirstDataRowIndex() == -1)
+            lOptions.setFirstDataRowIndex(newFirstDataRowIndex);
+        return lOptions;
+    }
+
     /*
-    If the first data row setting from XceliteOptions is the default (-1) AND
-    we have an explicit setting for the header-row index, then assume the first
-    data row is the row following the header row
+     For readers/writers expecting a header-row:
+     If the first data row setting from XceliteOptions is smaller than the
+     setting for the header-row index, then assume the first data row is the row
+     following the header row.
      */
     @Override
-    public Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows) {
+    public Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows) {
+        XceliteOptions options = marshall.getOptions();
+        boolean expectHeaderRow = marshall.expectsHeaderRow();
+        if (null != options.isHasHeaderRow()) {
+            expectHeaderRow = options.isHasHeaderRow();
+        }
         int firstDataRowIndex = options.getFirstDataRowIndex();
-        if (firstDataRowIndex < 0) {
+        if ((expectHeaderRow) && (firstDataRowIndex <= options.getHeaderRowIndex())) {
             firstDataRowIndex = options.getHeaderRowIndex() +1;
         }
         return skipRows (firstDataRowIndex, createRows);
@@ -111,13 +120,16 @@ public class XceliteSheetImpl implements XceliteSheet {
     }
 
     /*
-     Empty rows sadly are returned as null. Therefore, we need to find the  last  logical row
-     that corresponds to the last skipped row.
+     Empty rows sadly are returned as null by POI and not contained in the rowiterator.
+     Therefore, we need to find the last logical row that corresponds to the last skipped row.
      After that, iterate the row iterator as many times to skip lines and set it to the row
      before the wanted row. Seems clumsy, maybe think about a better way.
      */
     @Override
     public Iterator<Row> skipRows (int rowsToSkip, boolean createRows) {
+        if ((rowsToSkip == 1) && (null == nativeSheet.getRow(0))) {
+            return nativeSheet.rowIterator();
+        }
         int lastRowNum = 0;
         for (int i = 0; i < rowsToSkip; i++) {
             Row r = nativeSheet.getRow(i);
@@ -129,7 +141,7 @@ public class XceliteSheetImpl implements XceliteSheet {
             }
         }
         Iterator<Row> rowIterator= nativeSheet.rowIterator();
-        boolean stop = false;
+        boolean stop = (lastRowNum >= rowsToSkip);
         while ((rowIterator.hasNext()) && (!stop)) {
             Row r = rowIterator.next();
             stop = (r.getRowNum() >= lastRowNum);

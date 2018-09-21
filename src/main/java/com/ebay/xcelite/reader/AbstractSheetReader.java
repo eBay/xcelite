@@ -15,14 +15,16 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +45,7 @@ import java.util.List;
  */
 
 @Getter
-public abstract class AbstractSheetReader<T> implements SheetReader<T> {
+public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller implements SheetReader<T> {
     protected final XceliteSheet sheet;
     final List<RowPostProcessor<T>> rowPostProcessors;
 
@@ -155,6 +157,30 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
         return keepObject;
     }
+
+    Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
+        if (lastNonEmptyRowId == data.size())
+            return data;
+        switch (options.getTrailingEmptyRowPolicy()) {
+            case SKIP:
+                return data.subList(0, lastNonEmptyRowId);
+            case THROW:
+                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
+            case NULL:
+                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                    data.set(i, null);
+                }
+                return data;
+            case EMPTY_OBJECT:
+                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                    data.set(i, getNewObject());
+                }
+                return data;
+        }
+        return data;
+    }
+
+    abstract T getNewObject();
 
     public void setOptions(XceliteOptions options) {
         this.options = new XceliteOptions(options);

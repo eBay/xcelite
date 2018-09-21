@@ -15,10 +15,10 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public class XceliteOptions {
-    private boolean generateHeaderRow = true;
+    private Boolean hasHeaderRow = null;
     private boolean headerParsingIsCaseSensitive = true;
     private Integer headerRowIndex = 0;
-    private Integer firstDataRowIndex = -1;
+    private Integer firstDataRowIndex = 0;
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.NULL;
     private TrailingEmptyRowPolicy trailingEmptyRowPolicy = TrailingEmptyRowPolicy.SKIP;
@@ -29,7 +29,7 @@ public class XceliteOptions {
      * Copy constructor
      */
     public XceliteOptions(XceliteOptions other) {
-        this.generateHeaderRow = other.generateHeaderRow;
+        this.hasHeaderRow = other.hasHeaderRow;
         this.headerParsingIsCaseSensitive = other.headerParsingIsCaseSensitive;
         this.headerRowIndex = other.headerRowIndex;
         this.firstDataRowIndex = other.firstDataRowIndex;
@@ -122,27 +122,38 @@ public class XceliteOptions {
     }
 
     /**
-     * Specifies whether to generate a row with header columns that can be mapped
-     * to {@link com.ebay.xcelite.annotations.Column} annotations. {@link com.ebay.xcelite.reader.BeanSheetReader}
-     * needs this set to true, {@link com.ebay.xcelite.reader.SimpleSheetReader} to false.
+     * Readers: whether to expect a header row.
+     *
+     * Writers: Specifies whether to generate a row with header columns that can be mapped
+     * to {@link com.ebay.xcelite.annotations.Column} annotations.
+     *
+     * {@link com.ebay.xcelite.reader.BeanSheetReader} needs this set to true,
+     * {@link com.ebay.xcelite.reader.SimpleSheetReader} to false.
+     *
+     * Default: null, the type of Reader/Writer determines whether
+     * a header row is expected.
      *
      * @since 1.2
      * @return whether to generate a column definition row
      */
-    public boolean isGenerateHeaderRow() {
-        return generateHeaderRow;
+    public Boolean isHasHeaderRow() {
+        return hasHeaderRow;
     }
 
     /**
-     * Specifies whether to generate a row with header columns that can be mapped
-     * to {@link com.ebay.xcelite.annotations.Column} annotations. {@link com.ebay.xcelite.reader.BeanSheetReader}
-     * needs this set to true, {@link com.ebay.xcelite.reader.SimpleSheetReader} to false.
+     * Readers: whether to expect a header row.
+     *
+     * Writers: Specifies whether to generate a row with header columns that can be mapped
+     * to {@link com.ebay.xcelite.annotations.Column} annotations.
+     *
+     * {@link com.ebay.xcelite.reader.BeanSheetReader} needs this set to true,
+     * {@link com.ebay.xcelite.reader.SimpleSheetReader} to false.
      *
      * @since 1.2
-     * @param generateHeaderRow whether to generate a column definition row
+     * @param hasHeaderRow whether to generate a column definition row
      */
-    public void setGenerateHeaderRow(boolean generateHeaderRow) {
-        this.generateHeaderRow = generateHeaderRow;
+    public void setHasHeaderRow(boolean hasHeaderRow) {
+        this.hasHeaderRow = hasHeaderRow;
     }
 
     /**

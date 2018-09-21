@@ -16,6 +16,7 @@
 package com.ebay.xcelite.reader;
 
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ import java.util.Collection;
  * @since 1.0
  */
 
-public interface SheetReader<T> {
+public interface SheetReader<T> extends DataMarshaller {
 
   /**
    * Reads the sheet and returns a collection of the specified type.
@@ -49,28 +50,13 @@ public interface SheetReader<T> {
   @Deprecated
   void skipHeaderRow(boolean skipHeaderRow);
 
-  /**
-   * Gets the {@link XceliteOptions} object used to configure the reader's
-   * behavior
-   * @return configuration object
-   * @since 1.2
-   */
-  XceliteOptions getOptions();
-
-  /**
-   * Sets the {@link XceliteOptions} object used to configure the reader's
-   * behavior
-   * @param options configuration object
-   * @since 1.2
-   */
-  void setOptions(XceliteOptions options);
-
 
   /**
    * Gets the {@link XceliteSheet} object this reader is operating on
    * @return sheet this reader reads from
    */
   XceliteSheet getSheet();
+
 
   /**
    * Adds a row post processor. The row post processors will be executed in

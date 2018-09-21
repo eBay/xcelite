@@ -7,7 +7,7 @@ package com.ebay.xcelite.policies;
  * Default is NULL.
  *
  * This is different from {@link TrailingEmptyRowPolicy} which deals with
- * empty/missing rows in the data.
+ * empty/missing rows after the data block.
  *
  * Loosely modeled after {@link MissingCellPolicy}.
  *

@@ -28,6 +28,4 @@ public class ColumnNotFoundException extends XceliteException {
     public ColumnNotFoundException(String columnName) {
         super(columnName + " not found");
     }
-
-
 }

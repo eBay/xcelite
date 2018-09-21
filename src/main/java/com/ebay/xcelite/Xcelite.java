@@ -17,16 +17,14 @@ package com.ebay.xcelite;
 
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.sheet.XceliteSheetImpl;
-import com.google.common.collect.Lists;
+import com.ebay.xcelite.sheet.*;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -43,6 +41,7 @@ import static java.util.Optional.ofNullable;
 public class Xcelite {
 
     private final Workbook workbook;
+
     //TODO Version 2.0: remove this member variable together with write();
     private File file;
 
@@ -54,9 +53,20 @@ public class Xcelite {
         options = new XceliteOptions();
     }
 
+    public Xcelite(XceliteOptions options) {
+        workbook = new XSSFWorkbook();
+        this.options = options;
+    }
+
     @SneakyThrows
     public Xcelite(InputStream inputStream) {
         workbook = new XSSFWorkbook(inputStream);
+    }
+
+    @SneakyThrows
+    public Xcelite(InputStream inputStream, XceliteOptions options) {
+        workbook = new XSSFWorkbook(inputStream);
+        this.options = options;
     }
 
     @SneakyThrows
@@ -85,43 +95,47 @@ public class Xcelite {
     }
 
     /**
-     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} at the specified index.
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} at
+     * the specified index and the {@link XceliteOptions options} from
+     * this Xcelite instance.
      *
      * @param sheetIndex the sheet index
      * @return XceliteSheet object
      */
     public XceliteSheet getSheet(int sheetIndex) {
         return ofNullable(workbook.getSheetAt(sheetIndex))
-                .map(XceliteSheetImpl::new)
+                .map(s -> new XceliteSheetImpl(s, options))
                 .orElseThrow(() -> new XceliteException(String.format("Could not find sheet at index %s", sheetIndex)));
     }
 
     /**
-     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} with the specified name.
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} with
+     * the specified name and the {@link XceliteOptions options} from
+     * this Xcelite instance.
      *
      * @param sheetName the sheet name
      * @return XceliteSheet object
      */
     public XceliteSheet getSheet(String sheetName) {
         return ofNullable(workbook.getSheet(sheetName))
-                .map(XceliteSheetImpl::new)
+                .map(s -> new XceliteSheetImpl(s, options))
                 .orElseThrow(() -> new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName)));
     }
 
     /**
      * Returns all sheets.
      *
-     * @return the list of sheets (a list of {@link XceliteSheet} objects.) or XceliteException
-     * if no sheets exist
+     * @return the list of sheets (a list of {@link XceliteSheet} objects)
+     * or throws a {@link XceliteException} if no sheets exist
      */
     public List<XceliteSheet> getSheets() {
         if (workbook.getNumberOfSheets() == 0) {
             throw new XceliteException("Could not find any sheet");
         }
 
-        List<XceliteSheet> xceliteSheets = Lists.newArrayList();
-        workbook.sheetIterator()
-                .forEachRemaining(sheet -> xceliteSheets.add(new XceliteSheetImpl(sheet)));
+        List<XceliteSheet> xceliteSheets = new ArrayList<>();
+        workbook.sheetIterator().forEachRemaining(
+                sheet -> xceliteSheets.add(new XceliteSheetImpl(sheet)));
 
         return xceliteSheets;
     }
@@ -140,7 +154,7 @@ public class Xcelite {
     }
 
     /**
-     * Saves data to a new {@link java.io.File}.
+     * Saves data to a {@link java.io.File}.
      *
      * @param file the {@link java.io.File} to save the data into
      */
