@@ -14,10 +14,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -107,8 +104,24 @@ public class TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
-    public List<Collection<Object>> getSimpleCamelCaseData(XceliteOptions options, String filePath) {
-        Xcelite xcelite = new Xcelite(new FileInputStream(new File(filePath)), options);
+    public List<Collection<Object>> getSimpleData(XceliteOptions options) {
+        byte data[] = null;
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            workbook.write(byteArrayOutputStream);
+            data = byteArrayOutputStream.toByteArray();
+        }
+        Xcelite xcelite = new Xcelite(new ByteArrayInputStream(data), options);
+        XceliteSheet sheet = xcelite.getSheet(0);
+        SheetReader<Collection<Object>> simpleReader = sheet.getSimpleReader();
+        ArrayList<Collection<Object>> readData = new ArrayList<>(simpleReader.read());
+        return readData;
+    }
+
+
+
+    @SneakyThrows
+    public List<Collection<Object>> getSimpleData(XceliteOptions options, InputStream in) {
+        Xcelite xcelite = new Xcelite(in, options);
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<Collection<Object>> simpleReader = sheet.getSimpleReader();
         ArrayList<Collection<Object>> data = new ArrayList<>(simpleReader.read());
@@ -116,7 +129,12 @@ public class TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
-    public void validateSimpleCamelCaseData(List<Collection<Object>> data, String testData[][]) {
+    public List<Collection<Object>> getSimpleData(XceliteOptions options, String filePath) {
+        return getSimpleData (options, new FileInputStream(new File(filePath)));
+    }
+
+    @SneakyThrows
+    public void validateSimpleData(List<Collection<Object>> data, String testData[][]) {
         List<Object> first = (List<Object>)data.get(0);
         assertEquals(testData[0][0], first.get(0), "Name mismatch");
         assertEquals(testData[0][1], first.get(1), "Surname mismatch");
@@ -126,6 +144,19 @@ public class TestBaseForReaderAndWriterTests {
         assertEquals(testData[1][0], second.get(0), "Name mismatch");
         assertEquals(testData[1][1], second.get(1), "Surname mismatch");
         assertEquals(testData[1][2], second.get(2), "Birthdate mismatch");
+    }
+
+    @SneakyThrows
+    public void validateSimpleUserData(List<Collection<Object>> data, List<Object>  testData[]) {
+        List<Object> first = (List<Object>)data.get(0);
+        assertEquals(((Number)testData[0].get(0)).doubleValue(), first.get(0), "Id mismatch");
+        assertEquals(testData[0].get(1), first.get(1), "Name mismatch");
+        assertEquals(testData[0].get(2), first.get(2), "Surname mismatch");
+
+        List<Object> second = (List<Object>)data.get(1);
+        assertEquals(((Number)testData[1].get(0)).doubleValue(), second.get(0), "Id mismatch");
+        assertEquals(testData[1].get(1), second.get(1), "Name mismatch");
+        assertEquals(testData[1].get(2), second.get(2), "Surname mismatch");
     }
 
     @SneakyThrows

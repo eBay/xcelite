@@ -16,7 +16,7 @@ class AbstractWriterTests extends TestBaseForWriterTests {
     @BeforeAll
     @SneakyThrows
     static void setup() {
-        setup(bean);
+        setupBeans(bean);
     }
 
     @Test

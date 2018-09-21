@@ -3,6 +3,7 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.model.BeanWriterTestsBean;
 import com.ebay.xcelite.options.XceliteOptions;
 import documentation_examples.model.User;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.junit.jupiter.api.Assertions;
@@ -14,35 +15,35 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class BeanSheetWriterTests extends TestBaseForWriterTests {
+public class SimpleSheetWriterTests extends TestBaseForWriterTests {
     private static BeanWriterTestsBean bean = new BeanWriterTestsBean();
 
     @Test
     @DisplayName("Must correctly write with default XceliteOptions")
+    @SneakyThrows
     public void basicWriterTest() {
-        User users[] = new User[2];
+        XceliteOptions options = new XceliteOptions();
+        List<Object> users[] = new List[2];
 
-        User usr3 = new User();
-        usr3.setId(1L);
-        usr3.setFirstName("Max");
-        usr3.setLastName("Busch");
+        List<Object> usr3 = new ArrayList<>();
+        usr3.add(1L);
+        usr3.add("Max");
+        usr3.add("Busch");
         users[0] = usr3;
 
-        User usr4 = new User();
-        usr4.setId(2L);
-        usr4.setFirstName("Moritz");
-        usr4.setLastName("Busch");
+        List<Object> usr4 = new ArrayList<>();
+        usr4.add(2L);
+        usr4.add("Moritz");
+        usr4.add("Busch");
         users[1] = usr4;
 
-        setupBeans(new XceliteOptions(), users);
+        setupSimple(options, users);
 
-        List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
-        Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
-        //assertPropertiesMatch(new Person(), data.get(0));
-        assertPropertiesMatch(users[0], data.get(0));
-        assertPropertiesMatch(users[1], data.get(1));
+        List<Collection<Object>> readData = getSimpleData(options);
+        Assertions.assertEquals(2, readData.size(), "number of read rows is wrong");
+        validateSimpleUserData(readData, users);
     }
-
+/*
     @Test
     @DisplayName("Must correctly write with default XceliteOptions")
     public void basicWriterTestWithNullObject() {
@@ -70,15 +71,6 @@ public class BeanSheetWriterTests extends TestBaseForWriterTests {
         assertPropertiesMatch(users[2], data.get(2));
     }
 
-    private void assertPropertiesMatch(User input, Map<String, Object> readValues) {
-        Assertions.assertEquals(input.getFirstName(), readValues.get("Firstname"));
-        Assertions.assertEquals(input.getLastName(), readValues.get("Lastname"));
-        if (null == input.getBirthDate())
-            assertNull(readValues.get("BirthDate"));
-        else
-            Assertions.assertEquals(input.getBirthDate(), DateUtil.getJavaDate((double)readValues.get("BirthDate")));
-        Assertions.assertEquals(((double)input.getId()), readValues.get("id"));
-    }
 
 
     @Test
@@ -96,6 +88,6 @@ public class BeanSheetWriterTests extends TestBaseForWriterTests {
         Object obj = columnsMap.get("LONG_STRING");
         Assertions.assertEquals(val, obj);
     }
-
+*/
 
 }

@@ -66,6 +66,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
+    public boolean expectsHeaderRow(){return true;}
 
     /**
      * Construct a BeanSheetReader with custom options. The Reader will create
@@ -91,7 +92,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
      * @param sheet the {@link XceliteSheet} to read from
      * @param type class of the beans
      */
-    //TODO version 2.x remove if possible
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
         this(sheet, sheet.getOptions(), type);
     }
@@ -109,7 +109,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
 
         buildHeader();
         validateColumns();
-        rowIterator = sheet.moveToFirstDataRow(options, false);
+        rowIterator = sheet.moveToFirstDataRow(this, false);
 
         rowIterator.forEachRemaining(excelRow -> {
             T object;

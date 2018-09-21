@@ -17,11 +17,11 @@ package com.ebay.xcelite.reader;
 
 import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,7 +45,7 @@ import java.util.List;
  */
 
 @Getter
-public abstract class AbstractSheetReader<T> implements SheetReader<T> {
+public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller implements SheetReader<T> {
     protected final XceliteSheet sheet;
     final List<RowPostProcessor<T>> rowPostProcessors;
 

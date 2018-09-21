@@ -49,7 +49,7 @@ public interface XceliteSheet {
 
     SheetReader<Collection<Object>> getSimpleReader();
 
-    Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows);
+    Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows);
 
     Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows);
 

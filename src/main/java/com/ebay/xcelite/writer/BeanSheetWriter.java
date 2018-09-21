@@ -20,12 +20,10 @@ import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.column.Col;
 import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
-import com.ebay.xcelite.exceptions.EmptyCellException;
 import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
-import com.ebay.xcelite.policies.MissingRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.SneakyThrows;
@@ -66,6 +64,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private final Col anyColumn;
     private Row headerRow;
     private int rowIndex = 0;
+    public boolean expectsHeaderRow(){return true;}
 
     /**
      * Construct a {@link BeanSheetWriter} on the given {@link XceliteSheet sheet}
@@ -74,10 +73,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
      * @param sheet the sheet to construct the SheetWriter on.
      * @param type Class of the objects to write
      */
-    //TODO version 2.x remove if possible
     public BeanSheetWriter(XceliteSheet sheet, Class<T> type) {
         super(sheet);
-        options.setGenerateHeaderRow(true);
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
         columns = extractor.getColumns();
@@ -96,7 +93,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
      */
     public BeanSheetWriter(XceliteSheet sheet, XceliteOptions options, Class<T> type) {
         super(sheet, options);
-        super.options.setGenerateHeaderRow(true);
         ColumnsExtractor extractor = new ColumnsExtractor(type);
         extractor.extract();
         columns = extractor.getColumns();
@@ -105,12 +101,12 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
 
     @Override
     public void write(Collection<T> data) {
-        if (options.isGenerateHeaderRow()) {
+        if (hasHeaderRow()) {
             sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
             rowIndex = sheet.getNativeSheet().getLastRowNum();
             writeHeader();
         }
-        sheet.moveToFirstDataRow(options, true);
+        sheet.moveToFirstDataRow(this, true);
         writeData(data);
     }
 
@@ -231,7 +227,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))
                 continue;
-            if (options.isGenerateHeaderRow()) {
+            if (hasHeaderRow()) {
                 if (headerRow == null)
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);

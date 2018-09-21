@@ -15,26 +15,19 @@
  */
 package com.ebay.xcelite.writer;
 
-import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.PolicyViolationException;
-import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.Person;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
-import com.ebay.xcelite.reader.BeanSheetReader;
-import com.ebay.xcelite.reader.SheetReader;
-import com.ebay.xcelite.sheet.XceliteSheet;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +58,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         Person beans[] = new Person[2];
         beans[0] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[1] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 2, 0);
         Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
@@ -84,7 +77,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[0] = null;
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -108,7 +101,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[0].setBirthdate(DateUtil.getJavaDate((double)0));
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -128,7 +121,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[0] = null;
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setup(options, beans);
+        setupBeans(options, beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -149,7 +142,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
 
         assertThrows(PolicyViolationException.class, () -> {
-            setup(options, beans);
+            setupBeans(options, beans);
             List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         });
     }

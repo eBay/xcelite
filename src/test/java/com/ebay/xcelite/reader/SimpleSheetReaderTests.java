@@ -1,9 +1,6 @@
 package com.ebay.xcelite.reader;
 
-import com.ebay.xcelite.exceptions.EmptyCellException;
-import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +25,8 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         XceliteOptions options = new XceliteOptions();
         options.setFirstDataRowIndex(5);
 
-        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
-        validateSimpleCamelCaseData(cc, usTestData);
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        validateSimpleData(cc, usTestData);
     }
 
     @Test
@@ -38,8 +35,8 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         XceliteOptions options = new XceliteOptions();
         options.setFirstDataRowIndex(1);
 
-        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeData.xlsx");
-        validateSimpleCamelCaseData(cc, usTestData);
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/RowsBeforeData.xlsx");
+        validateSimpleData(cc, usTestData);
     }
 
     @Test
@@ -48,8 +45,8 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         XceliteOptions options = new XceliteOptions();
         options.setFirstDataRowIndex(5);
 
-        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeData2.xlsx");
-        validateSimpleCamelCaseData(cc, usTestData);
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/RowsBeforeData2.xlsx");
+        validateSimpleData(cc, usTestData);
     }
 
     @Test
@@ -58,8 +55,8 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         XceliteOptions options = new XceliteOptions();
         options.setFirstDataRowIndex(5);
 
-        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
-        validateSimpleCamelCaseData(cc, usTestData);
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
+        validateSimpleData(cc, usTestData);
     }
 
     @Test
@@ -69,11 +66,11 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         options.setFirstDataRowIndex(5);
         options.setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy.EMPTY_OBJECT);
 
-        List<Collection<Object>> cc = getSimpleCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
         Assertions.assertEquals(999, cc.size());
         Assertions.assertNotNull(cc.get(0));
         Assertions.assertNotNull(cc.get(1));
         Assertions.assertNotNull(cc.get(10));
-        validateSimpleCamelCaseData(cc, usTestData);
+        validateSimpleData(cc, usTestData);
     }
 }

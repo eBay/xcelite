@@ -47,6 +47,7 @@ import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
  * created Nov 8, 2013
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
+    public boolean expectsHeaderRow(){return false;}
 
     /**
      * Construct a SimpleSheetReader with custom options. The Reader will create
@@ -64,7 +65,6 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
      * Construct a SimpleSheetReader with options from the {@link XceliteSheet}
      * @param sheet the {@link XceliteSheet} to read from
      */
-    //TODO version 2.x remove if possible
     public SimpleSheetReader(XceliteSheet sheet) {
         this(sheet, sheet.getOptions());
     }
@@ -73,7 +73,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
     public Collection<Collection<Object>> read() {
         List<Collection<Object>> rows = new ArrayList<>();
         final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
-        Iterator<Row> rowIterator = sheet.moveToFirstDataRow(options, false);
+        Iterator<Row> rowIterator = sheet.moveToFirstDataRow(this, false);
         if (!rowIterator.hasNext())
             return rows;
 

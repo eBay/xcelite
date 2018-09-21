@@ -59,13 +59,6 @@ public class XceliteSheetImpl implements XceliteSheet {
             this.options = new XceliteOptions(options);
     }
 
-    private XceliteOptions adaptDataRowIndex (XceliteOptions options, int newFirstDataRowIndex) {
-        XceliteOptions lOptions = new XceliteOptions(options);
-        if (lOptions.getFirstDataRowIndex() == -1)
-            lOptions.setFirstDataRowIndex(newFirstDataRowIndex);
-        return lOptions;
-    }
-
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
         return new SimpleSheetReader(this, adaptDataRowIndex (options,0));
@@ -90,15 +83,29 @@ public class XceliteSheetImpl implements XceliteSheet {
         this.options = new XceliteOptions(options);
     }
 
+
+    private XceliteOptions adaptDataRowIndex (XceliteOptions options, int newFirstDataRowIndex) {
+        XceliteOptions lOptions = new XceliteOptions(options);
+        if (lOptions.getFirstDataRowIndex() == -1)
+            lOptions.setFirstDataRowIndex(newFirstDataRowIndex);
+        return lOptions;
+    }
+
     /*
+     For readers/writers expecting a header-row:
      If the first data row setting from XceliteOptions is smaller than the
      setting for the header-row index, then assume the first data row is the row
-     following the header row
+     following the header row.
      */
     @Override
-    public Iterator<Row> moveToFirstDataRow(XceliteOptions options, boolean createRows) {
+    public Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows) {
+        XceliteOptions options = marshall.getOptions();
+        boolean expectHeaderRow = marshall.expectsHeaderRow();
+        if (null != options.isHasHeaderRow()) {
+            expectHeaderRow = options.isHasHeaderRow();
+        }
         int firstDataRowIndex = options.getFirstDataRowIndex();
-        if (firstDataRowIndex <= options.getHeaderRowIndex()) {
+        if ((expectHeaderRow) && (firstDataRowIndex <= options.getHeaderRowIndex())) {
             firstDataRowIndex = options.getHeaderRowIndex() +1;
         }
         return skipRows (firstDataRowIndex, createRows);

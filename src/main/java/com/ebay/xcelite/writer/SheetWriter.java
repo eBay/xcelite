@@ -17,6 +17,7 @@ package com.ebay.xcelite.writer;
 
 
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
@@ -28,7 +29,7 @@ import java.util.Collection;
  * @since 1.0
  * created Sep 12, 2013
  */
-public interface SheetWriter<T> {
+public interface SheetWriter<T> extends DataMarshaller {
 
     /**
      * Takes a collection of the specified type and writes it to the
@@ -45,7 +46,7 @@ public interface SheetWriter<T> {
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setGenerateHeaderRow(boolean)} instead}
+     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
      */
     @Deprecated
     void generateHeaderRow(boolean generateHeaderRow);
@@ -56,7 +57,7 @@ public interface SheetWriter<T> {
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setGenerateHeaderRow(boolean)} instead}
+     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
      */
     void setGenerateHeaderRow(boolean generateHeaderRow);
 
@@ -66,19 +67,5 @@ public interface SheetWriter<T> {
      */
     XceliteSheet getSheet();
 
-    /**
-     * Gets the {@link XceliteOptions} object used to configure the writer's
-     * behavior
-     * @return configuration object
-     * @since 1.2
-     */
-    XceliteOptions getOptions();
 
-    /**
-     * Sets the {@link XceliteOptions} object used to configure the writer's
-     * behavior
-     * @param options configuration object
-     * @since 1.2
-     */
-    void setOptions(XceliteOptions options);
 }

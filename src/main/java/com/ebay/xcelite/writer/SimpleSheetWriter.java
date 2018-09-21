@@ -50,11 +50,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
+    public boolean expectsHeaderRow(){return false;}
 
-    //TODO version 2.x remove if possible
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet);
-        sheet.getOptions().setGenerateHeaderRow(false);
     }
 
     /**
@@ -79,13 +78,11 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
             final AtomicInteger j = new AtomicInteger(0);
             row.forEach(column -> {
                 Cell cell = excelRow.createCell(j.intValue());
-                if (options.isGenerateHeaderRow() && i.intValue() == 0) {
-                    cell.setCellStyle(boldStyle);
-                }
                 writeToCell(cell, column, null);
                 j.incrementAndGet();
             });
             i.incrementAndGet();
         });
     }
+
 }
