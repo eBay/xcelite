@@ -18,6 +18,7 @@ package com.ebay.xcelite.reader;
 import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
@@ -72,26 +73,31 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
     @Override
     public Collection<Collection<Object>> read() {
         List<Collection<Object>> rows = new ArrayList<>();
-        final AtomicInteger lastNonEmptyRowId = new AtomicInteger();
+        int lastNonEmptyRowId = 0;
+        Boolean firstIteration = true;
         Iterator<Row> rowIterator = sheet.moveToFirstDataRow(this, false);
         if (!rowIterator.hasNext())
             return rows;
-
+/*
         rowIterator.forEachRemaining(excelRow -> {
+            Collection<Object> row;*/
+
+        while (rowIterator.hasNext()) {
             Collection<Object> row;
-            if (isBlankRow(excelRow)) {
-                switch (options.getMissingRowPolicy()) {
-                    case THROW:
-                        throw new EmptyRowException();
-                    case EMPTY_OBJECT:
-                        row = new ArrayList<>();
-                        break;
-                    case NULL:
-                        row = null;
-                        break;
-                    default:
-                        row = null;
+
+            Row excelRow = rowIterator.next();
+            if (firstIteration) {
+                int rowNum = excelRow.getRowNum();
+                if (rows.size() < rowNum) {
+                    int firstDataRowIndex = XceliteSheetImpl.getFirstDataRowIndex(this);
+                    for (int i = firstDataRowIndex; i < rowNum; i++) {
+                        rows.add(handleEmptyRow(sheet.getNativeSheet().getRow(i)));
+                    }
                 }
+                firstIteration = false;
+            }
+            if (isBlankRow(excelRow)) {
+                row = handleEmptyRow(excelRow);
                 if (!options.getMissingRowPolicy().equals(SKIP)) {
                     if (shouldKeepObject(row, rowPostProcessors)) {
                         rows.add(row);
@@ -101,12 +107,30 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
                 row = fillObject(excelRow);
                 if (shouldKeepObject(row, rowPostProcessors)) {
                     rows.add(row);
-                    lastNonEmptyRowId.set(rows.size());
+                    lastNonEmptyRowId = rows.size();
                 }
             }
-        });
+        };
 
-        return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId.intValue());
+        return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId);
+    }
+
+    @SneakyThrows
+    private Collection<Object> handleEmptyRow(Row excelRow) {
+        Collection<Object> object;
+        switch (options.getMissingRowPolicy()) {
+            case THROW:
+                throw new EmptyRowException();
+            case EMPTY_OBJECT:
+                object = new ArrayList<>();
+                break;
+            case NULL:
+                object = null;
+                break;
+            default:
+                object = null;
+        }
+        return object;
     }
 
     @SneakyThrows

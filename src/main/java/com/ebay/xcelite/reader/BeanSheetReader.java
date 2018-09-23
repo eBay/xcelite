@@ -97,24 +97,6 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         this(sheet, sheet.getOptions(), type);
     }
 
-    @SneakyThrows
-    private T handleEmptyRow(Row excelRow) {
-        T object;
-        switch (options.getMissingRowPolicy()) {
-            case THROW:
-                throw new EmptyRowException();
-            case EMPTY_OBJECT:
-                object = fillObject(excelRow);
-                break;
-            case NULL:
-                object = null;
-                break;
-            default:
-                object = null;
-        }
-        return object;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     @SneakyThrows
@@ -163,6 +145,24 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         };
 
         return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId);
+    }
+
+    @SneakyThrows
+    private T handleEmptyRow(Row excelRow) {
+        T object;
+        switch (options.getMissingRowPolicy()) {
+            case THROW:
+                throw new EmptyRowException();
+            case EMPTY_OBJECT:
+                object = fillObject(excelRow);
+                break;
+            case NULL:
+                object = null;
+                break;
+            default:
+                object = null;
+        }
+        return object;
     }
 
     @SneakyThrows

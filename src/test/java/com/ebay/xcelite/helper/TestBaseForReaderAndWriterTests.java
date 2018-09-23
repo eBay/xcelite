@@ -32,6 +32,17 @@ public class TestBaseForReaderAndWriterTests {
     public static boolean writeToFile = true;
     public static XSSFWorkbook workbook;
 
+    @SneakyThrows
+    public static void setupSimple(XceliteOptions options, List<Collection<Object>>objs) {
+        Xcelite xcelite = new Xcelite();
+        XceliteSheet sheet = xcelite.createSheet("Tests");
+        SheetWriter bs = sheet.getSimpleWriter();
+        bs.setOptions(options);
+        bs.write(objs);
+        workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
+        if (writeToFile)
+            writeWorkbookToFile(workbook);
+    }
 
     @SneakyThrows
     public static void setupSimple(XceliteOptions options, Collection<Object>... rowObjects) {
@@ -92,27 +103,50 @@ public class TestBaseForReaderAndWriterTests {
         return rowVals;
     }
 
-public User[] createUserClassTestDataWithNullPadding(int nullBefore, int nullAfter) {
-    User users[] = new User[nullBefore+nullAfter+2];
+    public User[] createUserClassTestDataWithNullPadding(int nullBefore, int nullAfter) {
+        User users[] = new User[nullBefore+nullAfter+2];
 
-    for (int i = 0; i < nullBefore; i++)
-        users[i] = null;
+        for (int i = 0; i < nullBefore; i++)
+            users[i] = null;
 
-    User usr3 = new User();
-    usr3.setId(1L);
-    usr3.setFirstName("Max");
-    usr3.setLastName("Busch");
-    users[nullBefore] = usr3;
+        User usr3 = new User();
+        usr3.setId(1L);
+        usr3.setFirstName("Max");
+        usr3.setLastName("Busch");
+        users[nullBefore] = usr3;
 
-    User usr4 = new User();
-    usr4.setId(2L);
-    usr4.setFirstName("Moritz");
-    usr4.setLastName("Busch");
-    users[nullBefore + 1] = usr4;
-    for (int i = 0; i < nullAfter; i++)
-        users[nullBefore + 2 + i] = null;
-    return users;
-}
+        User usr4 = new User();
+        usr4.setId(2L);
+        usr4.setFirstName("Moritz");
+        usr4.setLastName("Busch");
+        users[nullBefore + 1] = usr4;
+        for (int i = 0; i < nullAfter; i++)
+            users[nullBefore + 2 + i] = null;
+        return users;
+    }
+
+    public List<Collection<Object>> createSimpleUserTestDataWithNullPadding(int nullBefore, int nullAfter) {
+        List<Collection<Object>> users = new ArrayList<>();
+
+        for (int i = 0; i < nullBefore; i++)
+            users.add(null);
+
+        List<Object> usr3 = new ArrayList<>();
+        usr3.add(1L);
+        usr3.add("Max");
+        usr3.add("Busch");
+        users.add(usr3);
+
+        List<Object> usr4 = new ArrayList<>();
+        usr4.add(2L);
+        usr4.add("Moritz");
+        usr4.add("Busch");
+        users.add(usr4);
+
+        for (int i = 0; i < nullAfter; i++)
+            users.add(null);
+        return users;
+    }
 
     @SneakyThrows
     public List getData(Class clazz, XceliteOptions options, InputStream in) {
@@ -180,6 +214,21 @@ public User[] createUserClassTestDataWithNullPadding(int nullBefore, int nullAft
     }
 
     @SneakyThrows
+    public void validateSimpleUserData(List<Collection<Object>> data, List<Collection<Object>> testData) {
+        List<Object> first = (List<Object>)data.get(0);
+        List<Object> testFirst = (List<Object>)testData.get(0);
+        assertEquals(first.get(0), ((Number)testFirst.get(0)).doubleValue(), "Id mismatch");
+        assertEquals(testFirst.get(1), first.get(1),  "Name mismatch");
+        assertEquals(testFirst.get(2), first.get(2),  "Surname mismatch");
+
+        List<Object> second = (List<Object>)data.get(1);
+        List<Object> testSecond = (List<Object>)testData.get(1);
+        assertEquals(second.get(0), ((Number)testSecond.get(0)).doubleValue(), "Id mismatch");
+        assertEquals(testSecond.get(1), second.get(1), "Name mismatch");
+        assertEquals(testSecond.get(2), second.get(2),  "Surname mismatch");
+    }
+
+    @SneakyThrows
     public void validateSimpleData(List<Collection<Object>> data, String testData[][]) {
         List<Object> first = (List<Object>)data.get(0);
         assertEquals(testData[0][0], first.get(0), "Name mismatch");
@@ -195,14 +244,14 @@ public User[] createUserClassTestDataWithNullPadding(int nullBefore, int nullAft
     @SneakyThrows
     public void validateSimpleUserData(List<Collection<Object>> data, List<Object> testData[]) {
         List<Object> first = (List<Object>)data.get(0);
-        assertEquals(((Number)testData[0].get(0)).doubleValue(), first.get(0), "Id mismatch");
-        assertEquals(testData[0].get(1), first.get(1), "Name mismatch");
-        assertEquals(testData[0].get(2), first.get(2), "Surname mismatch");
+        assertEquals(first.get(0), ((Number)testData[0].get(0)).doubleValue(), "Id mismatch");
+        assertEquals(first.get(1),testData[0].get(1),  "Name mismatch");
+        assertEquals(first.get(2),testData[0].get(2),  "Surname mismatch");
 
         List<Object> second = (List<Object>)data.get(1);
-        assertEquals(((Number)testData[1].get(0)).doubleValue(), second.get(0), "Id mismatch");
-        assertEquals(testData[1].get(1), second.get(1), "Name mismatch");
-        assertEquals(testData[1].get(2), second.get(2), "Surname mismatch");
+        assertEquals(second.get(0), ((Number)testData[1].get(0)).doubleValue(),  "Id mismatch");
+        assertEquals(second.get(1), testData[1].get(1),  "Name mismatch");
+        assertEquals(second.get(2), testData[1].get(2), "Surname mismatch");
     }
 
     public void validateUserBeanData(User input, Map<String, Object> readValues) {
