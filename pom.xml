@@ -71,7 +71,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-        <apache-poi.version>3.17</apache-poi.version>
+        <apache-poi.version>4.0.0</apache-poi.version>
 	</properties>
 
 	<build>
@@ -253,7 +253,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.1.1</version>
+			<version>5.3.1</version>
 			<scope>test</scope>
 		</dependency>
 
