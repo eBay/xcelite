@@ -1,4 +1,8 @@
 ### Release-Checklist:
+    - Be sure to be in the right folder/IntelliJ window
+    - pull in changes from isnow-repo 
+    - adapt version information in pom.xml
+    - edit RELEASE.md
     - create release tag in IntelliJ
     - mvn release:prepare
     - mvn release:perform
@@ -16,7 +20,6 @@
         <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-
 
             <servers>
                 <server>

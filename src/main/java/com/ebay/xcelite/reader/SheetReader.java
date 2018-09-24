@@ -16,6 +16,7 @@
 package com.ebay.xcelite.reader;
 
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
 import java.util.Collection;
@@ -28,19 +29,20 @@ import java.util.Collection;
  * @since 1.0
  */
 
-public interface SheetReader<T> {
+public interface SheetReader<T> extends DataMarshaller {
 
   /**
    * Reads the sheet and returns a collection of the specified type.
    *
    * @return collection of the specified type
+   * @since 1.0
    */
   Collection<T> read();
 
   /**
    * Whether to skip the first row or not when reading the sheet.
    * @deprecated since 1.2. Use {@link #getOptions()} instead and set
-   * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+   * {@link XceliteOptions#setHeaderRowIndex(Integer) setSkipLinesBeforeHeader}
    * to 1
    *
    * @param skipHeaderRow true to skip the header row, false otherwise
@@ -48,19 +50,13 @@ public interface SheetReader<T> {
   @Deprecated
   void skipHeaderRow(boolean skipHeaderRow);
 
-  /**
-   * Gets the {@link XceliteOptions} object used to configure the reader's
-   * behavior
-   * @return configuration object
-   */
-  XceliteOptions getOptions();
 
   /**
-   * Gets the sheet.
-   *
-   * @return the sheet
+   * Gets the {@link XceliteSheet} object this reader is operating on
+   * @return sheet this reader reads from
    */
   XceliteSheet getSheet();
+
 
   /**
    * Adds a row post processor. The row post processors will be executed in

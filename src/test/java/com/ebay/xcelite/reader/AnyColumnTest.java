@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.ebay.xcelite;
+package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.model.AnyColumnBean;
 import com.ebay.xcelite.model.AnyColumnBeanDoneWrong;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Thanthathon.b
  */
- class AnyColumnTest {
+ public class AnyColumnTest {
 
     private String columnNames[] = new String[]{
             "NAME", "SURNAME", "BIRTHDATE", "SEXID", "SEX"
@@ -50,8 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     };
 
     @Test
-    @DisplayName("Must correctly parse header row without annotated column headers")
-    void mustReadColumnHeadersOK() {
+    @DisplayName("Must correctly parse header row with @AnyColumn annotated column headers")
+    public void mustReadColumnHeadersOK() {
         List<String> testColNames = new ArrayList<>(Arrays.asList(columnNames));
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
@@ -65,9 +66,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     }
 
     @Test
-    @DisplayName("Must correctly parse data without annotated column headers")
+    @DisplayName("Must correctly parse data with @AnyColumn annotated column headers")
     @SuppressWarnings("unchecked")
-    void mustReadDataOK() {
+    public void mustReadDataOK() {
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<AnyColumnBean> beanReader = sheet.getBeanReader(AnyColumnBean.class);
@@ -84,7 +85,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     @Test
     @DisplayName("Must throw an exception because of multiple @AnyColumn annotations")
     @SuppressWarnings("unchecked")
-    void mustThrowOnInvalidBean() {
+    public void mustThrowOnInvalidBean() {
         Executable testClosure = () -> {
             Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
             XceliteSheet sheet = xcelite.getSheet(0);

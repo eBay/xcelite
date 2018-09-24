@@ -15,14 +15,25 @@
 */
 package com.ebay.xcelite.sheet;
 
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.writer.SheetWriter;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
- * Class description...
+ * Interface to a class around a POI native sheet that represents one sheet
+ * of an Excel workbook. User can request a {@link SheetReader} or
+ * {@link SheetWriter} from it to read or write to/from the underlying
+ * Excel sheet. Readers and Writers inherit the XceliteSheet's
+ * {@link XceliteOptions options}.
+ *
+ * Users should not use constructors to get a XceliteSheet, but use
+ * the methods in {@link com.ebay.xcelite.Xcelite} to retrieve or
+ * create XceliteSheets on their workbooks.
  *
  * @author kharel (kharel@ebay.com)
  * @since 1.0
@@ -38,5 +49,15 @@ public interface XceliteSheet {
 
     SheetReader<Collection<Object>> getSimpleReader();
 
+    Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows);
+
+    Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows);
+
+    Iterator<Row> skipRows (int rowsToSkip, boolean createRows);
+
     Sheet getNativeSheet();
+
+    XceliteOptions getOptions();
+
+    void setOptions(XceliteOptions options);
 }

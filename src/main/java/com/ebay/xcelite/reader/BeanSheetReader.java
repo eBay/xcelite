@@ -27,9 +27,9 @@ import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.policies.MissingRowPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-
-import lombok.Getter;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -39,8 +39,10 @@ import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 import static org.reflections.ReflectionUtils.withName;
 
 /**
@@ -48,7 +50,15 @@ import static org.reflections.ReflectionUtils.withName;
  * of an Excel sheet as a {@link java.util.Collection}. Each entry into that Collection
  * represents one row in the Excel sheet.
  *
+ * By default, a BeanSheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #BeanSheetReader(XceliteSheet, XceliteOptions, Class)} constructor to
+ * use - for one reader only - a completely different set of options.
+ *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 9, 2013
  */
 public class BeanSheetReader<T> extends AbstractSheetReader<T> {
@@ -57,9 +67,13 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
+    public boolean expectsHeaderRow(){return true;}
 
     /**
-     * Construct a BeanSheetReader with custom options
+     * Construct a BeanSheetReader with custom options. The Reader will create
+     * a copy of the options object, therefore later changes of this object will not
+     * influence the behavior of this reader
+     *
      * @param sheet the {@link XceliteSheet} to read from
      * @param options the {@link XceliteOptions} to configure the reader
      * @param type class of the beans
@@ -75,12 +89,12 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     /**
-     * Construct a BeanSheetReader with default options
+     * Construct a BeanSheetReader with options from the {@link XceliteSheet}
      * @param sheet the {@link XceliteSheet} to read from
      * @param type class of the beans
      */
     public BeanSheetReader(XceliteSheet sheet, Class<T> type) {
-        this(sheet, new XceliteOptions(), type);
+        this(sheet, sheet.getOptions(), type);
     }
 
     @SuppressWarnings("unchecked")
@@ -88,33 +102,35 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     @SneakyThrows
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
+        int lastNonEmptyRowId = 0;
+        Boolean firstIteration = true;
 
-        Sheet s = sheet.getNativeSheet();
-        rowIterator = moveToFirstRow(s, options);
+        rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
         if (!rowIterator.hasNext())
             return data;
 
         buildHeader();
         validateColumns();
-        rowIterator = skipRowsAfterColumnDefinition(s, options);
+        rowIterator = sheet.moveToFirstDataRow(this, false);
 
-        rowIterator.forEachRemaining(excelRow -> {
+        while (rowIterator.hasNext()) {
             T object;
 
-            if (isBlankRow(excelRow)) {
-                switch (options.getMissingRowPolicy()) {
-                    case THROW:
-                        throw new EmptyRowException();
-                    case RETURN_EMPTY_OBJECT:
-                        object = fillObject(excelRow);
-                        break;
-                    case RETURN_NULL:
-                        object = null;
-                        break;
-                    default:
-                        object = null;
+            Row excelRow = rowIterator.next();
+            if (firstIteration) {
+                int rowNum = excelRow.getRowNum();
+                if (data.size() < rowNum) {
+                    int firstDataRowIndex = XceliteSheetImpl.getFirstDataRowIndex(this);
+                    for (int i = firstDataRowIndex; i < rowNum; i++) {
+                        data.add(handleEmptyRow(sheet.getNativeSheet().getRow(i)));
+                    }
                 }
-                if (!options.getMissingRowPolicy().equals(MissingRowPolicy.SKIP)) {
+                firstIteration = false;
+            }
+
+            if (isBlankRow(excelRow)) {
+                object = handleEmptyRow(excelRow);
+                if (!options.getMissingRowPolicy().equals(SKIP)) {
                     if (shouldKeepObject(object, rowPostProcessors)) {
                         data.add(object);
                     }
@@ -124,15 +140,34 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 if (shouldKeepObject(object, rowPostProcessors)) {
                     data.add(object);
                 }
+                lastNonEmptyRowId = data.size();
             }
-        });
+        };
 
-        return data;
+        return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId);
+    }
+
+    @SneakyThrows
+    private T handleEmptyRow(Row excelRow) {
+        T object;
+        switch (options.getMissingRowPolicy()) {
+            case THROW:
+                throw new EmptyRowException();
+            case EMPTY_OBJECT:
+                object = fillObject(excelRow);
+                break;
+            case NULL:
+                object = null;
+                break;
+            default:
+                object = null;
+        }
+        return object;
     }
 
     @SneakyThrows
     private T fillObject(Row row) {
-        T object = type.newInstance();
+        T object = getNewObject();
 
         for (int i = 0; i < headerColumns.keySet().size(); i++) {
             String columnName = headerColumns.get(i);
@@ -160,6 +195,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return ReflectionUtils.getAllFields(aClass, withName(name)).iterator().next();
     }
 
+    @SneakyThrows
+    T getNewObject(){
+        return type.newInstance();
+    }
+
     /**
      * check that every @column is found in header
      */
@@ -167,13 +207,19 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         if (anyColumn != null) {
             return;
         }
-        Collection<String> declaredHeaders = mapper
-                .getColumnsMap()
-                .values()
-                .stream()
-                .map(c -> c.getName())
-                .collect(Collectors.toSet());
+        Collection<String> declaredHeaders = mapper.getDeclaredHeaderNames();
         Collection<String> headers = headerColumns.values();
+        if (!options.isHeaderParsingIsCaseSensitive()) {
+            headers = headers.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+            declaredHeaders =   declaredHeaders.stream().map(n -> {
+                n = (n == null)? null: n.toLowerCase();
+                return n;}
+            ).collect(Collectors.toList());
+        }
+
         if (!headers.containsAll(declaredHeaders)) {
             throw new ColumnNotFoundException(declaredHeaders.iterator().next());
         }
@@ -236,26 +282,19 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         String value = String.valueOf(cellValue);
         if ((fieldType.equals(Double.class)) || (fieldType.equals(double.class))) {
             return Double.valueOf(value);
-        }
-        if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
+        } else if ((fieldType.equals(Integer.class)) || (fieldType.equals(int.class))) {
             return Double.valueOf(value).intValue();
-        }
-        if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
+        } else if ((fieldType.equals(Short.class)) || (fieldType.equals(short.class))) {
             return Double.valueOf(value).shortValue();
-        }
-        if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
+        } else if ((fieldType.equals(Long.class)) || (fieldType.equals(long.class))) {
             return Double.valueOf(value).longValue();
-        }
-        if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
+        } else if ((fieldType.equals(Float.class)) || (fieldType.equals(float.class))) {
             return Double.valueOf(value).floatValue();
-        }
-        if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
+        } else if ((fieldType.equals(Character.class)) || (fieldType.equals(char.class))) {
             return value.charAt(0);
-        }
-        if (fieldType.equals(Date.class)) {
+        } else if (fieldType.equals(Date.class)) {
             return DateUtil.getJavaDate(Double.valueOf(value));
-        }
-        if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
+        } else if ((fieldType.equals(Boolean.class)) || (fieldType.equals(boolean.class))) {
             return Boolean.valueOf(value);
         }
         return value;
@@ -278,7 +317,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 }
                 headerColumns.put(i, cellValue);
             }
-        };
+        }
     }
 
     private boolean checkHasThrowPolicyMustThrow(Row row, int colIdx) {
@@ -298,18 +337,33 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     }
 
     private class ColumnsMapper {
-        @Getter
         private final Map<String, Col> columnsMap;
+        private final Map<String, Col> lowerCaseColumnsMap;
 
         ColumnsMapper(Set<Col> columns) {
             columnsMap = new LinkedHashMap<>();
+            lowerCaseColumnsMap = new LinkedHashMap<>();
             for (Col col : columns) {
                 columnsMap.put(col.getName(), col);
+                lowerCaseColumnsMap.put(col.getName().toLowerCase(), col);
             }
         }
 
         Col getColumn(String name) {
-            return columnsMap.get(name);
+            if (options.isHeaderParsingIsCaseSensitive() || (null == name)) {
+                return columnsMap.get(name);
+            } else {
+                return lowerCaseColumnsMap.get(name.toLowerCase());
+            }
+        }
+
+        Set<String> getDeclaredHeaderNames() {
+            Set<String> declaredHeaders = columnsMap
+                    .values()
+                    .stream()
+                    .map(c -> c.getName())
+                    .collect(Collectors.toSet());
+            return declaredHeaders;
         }
     }
 

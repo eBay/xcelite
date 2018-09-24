@@ -15,49 +15,56 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
+import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.AbstractDataMarshaller;
+import com.ebay.xcelite.sheet.XceliteSheet;
+import lombok.Getter;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.sheet.XceliteSheet;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-
 /**
- * Class description...
+ * Abstract implementation of the {@link SheetReader} interface. Extending
+ * classes must override {@link SheetReader#read()}
+ *
+ * By default, a SheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #AbstractSheetReader(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one reader only - a completely different set of options.
  *
  * @author kharel (kharel@ebay.com)
- * created Nov 11, 2013
  * @since 1.0
- *
+ * created Nov 11, 2013
  */
-public abstract class AbstractSheetReader<T> implements SheetReader<T> {
-    @Getter
-    protected final XceliteSheet sheet;
 
+@Getter
+public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller implements SheetReader<T> {
+    protected final XceliteSheet sheet;
     final List<RowPostProcessor<T>> rowPostProcessors;
 
-    @Getter
-    protected final XceliteOptions options;
+    protected XceliteOptions options;
 
+    //TODO version 2.x remove if possible
     public AbstractSheetReader(XceliteSheet sheet) {
         this (sheet, new XceliteOptions());
     }
 
     public AbstractSheetReader(XceliteSheet sheet, XceliteOptions options) {
         this.sheet = sheet;
-        this.options = options;
+        this.options = new XceliteOptions(options);
         rowPostProcessors = new ArrayList<>();
     }
 
     /**
      * @deprecated since 1.2 use the constructor using {@link XceliteOptions}
-     * and set {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * and set {@link XceliteOptions#setFirstDataRowIndex(Integer) setFirstDataRowIndex}
      * to 1
      * @param sheet The sheet to read from
      * @param skipHeaderRow whether or not one header row should be skipped
@@ -65,19 +72,18 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Deprecated
     public AbstractSheetReader(XceliteSheet sheet, boolean skipHeaderRow) {
         this (sheet);
-        if (skipHeaderRow)
-            options.setSkipRowsBeforeColumnDefinitionRow(1);
+        skipHeaderRow (skipHeaderRow);
     }
 
     public static Object readValueFromCell(Cell cell) {
         if (cell == null) return null;
         Object cellValue = null;
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case ERROR:
                 break;
             case FORMULA:
                 // Get the type of Formula
-                switch (cell.getCachedFormulaResultTypeEnum()) {
+                switch (cell.getCachedFormulaResultType()) {
                     case ERROR:
                         cellValue = null;
                         break;
@@ -86,6 +92,9 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
                         break;
                     case NUMERIC:
                         cellValue = cell.getNumericCellValue();
+                        break;
+                    case BOOLEAN:
+                        cellValue = cell.getBooleanCellValue();
                         break;
                     default:
                         cellValue = cell.getStringCellValue();
@@ -105,7 +114,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
 
     /**
      * @deprecated since 1.2. Use {@link #getOptions()} instead and set
-     * {@link XceliteOptions#setSkipRowsBeforeColumnDefinitionRow(Integer) setSkipLinesBeforeHeader}
+     * {@link XceliteOptions#setFirstDataRowIndex(Integer) setFirstDataRowIndex}
      * to 1
      * @param skipHeaderRow true to skip the header row, false otherwise
      */
@@ -113,7 +122,7 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
     @Deprecated
     public void skipHeaderRow(boolean skipHeaderRow) {
         if (skipHeaderRow)
-            options.setSkipRowsBeforeColumnDefinitionRow(1);
+            options.setFirstDataRowIndex(1);
     }
 
     @Override
@@ -149,40 +158,31 @@ public abstract class AbstractSheetReader<T> implements SheetReader<T> {
         return keepObject;
     }
 
-    static Iterator<Row> skipRowsAfterColumnDefinition(Sheet nativeSheet, XceliteOptions options) {
-        if (options.getSkipRowsAfterColumnDefinitionRow() < 0)
-            return nativeSheet.rowIterator();
-        return skipRows (nativeSheet,
-                options.getSkipRowsBeforeColumnDefinitionRow()
-                        + options.getSkipRowsAfterColumnDefinitionRow()
-                        + 1);
+    Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
+        if (lastNonEmptyRowId == data.size())
+            return data;
+        switch (options.getTrailingEmptyRowPolicy()) {
+            case SKIP:
+                return data.subList(0, lastNonEmptyRowId);
+            case THROW:
+                throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
+            case NULL:
+                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                    data.set(i, null);
+                }
+                return data;
+            case EMPTY_OBJECT:
+                for (int i = lastNonEmptyRowId; i < data.size(); i++) {
+                    data.set(i, getNewObject());
+                }
+                return data;
+        }
+        return data;
     }
 
-    static Iterator<Row> moveToFirstRow(Sheet nativeSheet, XceliteOptions options) {
-        if (options.getSkipRowsBeforeColumnDefinitionRow() <= 0)
-            return nativeSheet.rowIterator();
-        return skipRows (nativeSheet, options.getSkipRowsBeforeColumnDefinitionRow());
-    }
+    abstract T getNewObject();
 
-    /*
-     Empty rows sadly are returned as null. Therefore, we need to find the  last  logical row
-     that corresponds to the last skipped row.
-     After that, iterate the row iterator as many times to skip lines and set it to the row
-     before the wanted row. Seems clumsy, maybe think about a better way.
-     */
-    static Iterator<Row> skipRows (Sheet nativeSheet, int rowsToSkip) {
-        int lastRowNum = 0;
-        for (int i = 0; i < rowsToSkip; i++) {
-            Row r = nativeSheet.getRow(i);
-            if (null != r)
-                lastRowNum = r.getRowNum();
-        }
-        Iterator<Row> rowIterator= nativeSheet.rowIterator();
-        boolean stop = false;
-        while ((rowIterator.hasNext()) && (!stop)) {
-            Row r = rowIterator.next();
-            stop = (r.getRowNum() >= lastRowNum);
-        }
-        return rowIterator;
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
     }
 }

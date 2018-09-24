@@ -21,6 +21,10 @@ import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 
+/**
+ *
+ * @since 1.0
+ */
 @Getter
 public final class CellStyles {
 

@@ -19,6 +19,7 @@ package com.ebay.xcelite.exceptions;
  * Base class for Xcelite-specific exceptions
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 9, 2013
  */
 public class XceliteException extends RuntimeException {
