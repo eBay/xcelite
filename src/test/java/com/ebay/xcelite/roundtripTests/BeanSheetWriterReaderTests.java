@@ -27,7 +27,7 @@ public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests 
         XceliteOptions options = new XceliteOptions();
 
         User users[] = createUserClassTestDataWithNullPadding(0, 0);
-        setupBeans(options, users);
+        setupBeans(options, (Object[])users);
 
         List<User> readData = getData(User.class, options );
         Assertions.assertEquals(users.length, readData.size(), "number of read rows is wrong");
@@ -41,7 +41,7 @@ public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests 
         XceliteOptions options = new XceliteOptions();
 
         User users[] = createUserClassTestDataWithNullPadding(1, 0);
-        setupBeans(options, users);
+        setupBeans(options, (Object[])users);
 
         List<User> readData = getData(User.class, options );
         Assertions.assertEquals(users.length, readData.size(), "number of read rows is wrong");
@@ -55,8 +55,8 @@ public class BeanSheetWriterReaderTests extends TestBaseForReaderAndWriterTests 
         XceliteOptions options = new XceliteOptions();
         options.setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy.NULL);
 
-        User users[] = createUserClassTestDataWithNullPadding(1, 0);
-        setupBeans(options, users);
+        User users[] = createUserClassTestDataWithNullPadding(1, 1);
+        setupBeans(options, (Object[])users);
 
         List<User> readData = getData(User.class, options );
         Assertions.assertEquals(users.length, readData.size(), "number of read rows is wrong");

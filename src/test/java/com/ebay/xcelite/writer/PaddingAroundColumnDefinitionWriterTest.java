@@ -58,7 +58,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         Person beans[] = new Person[2];
         beans[0] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[1] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setupBeans(options, beans);
+        setupBeans(options, (Object[])beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 2, 0);
         Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
@@ -77,7 +77,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[0] = null;
         beans[1] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
-        setupBeans(options, beans);
+        setupBeans(options, (Object[])beans);
 
         List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
@@ -142,7 +142,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         beans[2] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
 
         assertThrows(PolicyViolationException.class, () -> {
-            setupBeans(options, beans);
+            setupBeans(options, (Object[])beans);
             List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         });
     }

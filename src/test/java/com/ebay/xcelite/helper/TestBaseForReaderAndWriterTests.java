@@ -29,7 +29,7 @@ public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = true;
+    public static boolean writeToFile = false;
     public static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -68,7 +68,8 @@ public class TestBaseForReaderAndWriterTests {
     public List<Map<String, Object>> extractCellValues (
             XSSFWorkbook workbook,
             int skipBeforeHeader,
-            int skipAfterHeader) {
+            int skipAfterHeader,
+            boolean hasHeaderRow) {
         List<Map<String, Object>> rowVals = new ArrayList<>();
         List<String> columnNames = new ArrayList<>();
         Sheet excelSheet = workbook.getSheet("Tests");
@@ -79,12 +80,14 @@ public class TestBaseForReaderAndWriterTests {
             rowId++;
             iter.next();
         }
-        Row header = iter.next();
-        rowId++;
-        header.cellIterator().forEachRemaining(cell -> {
-            Object val = AbstractSheetReader.readValueFromCell(cell);
-            columnNames.add(val.toString());
-        });
+        if (hasHeaderRow) {
+            Row header = iter.next();
+            rowId++;
+            header.cellIterator().forEachRemaining(cell -> {
+                Object val = AbstractSheetReader.readValueFromCell(cell);
+                columnNames.add(val.toString());
+            });
+        }
         while (--skipAfterHeader >= 0) {
             rowId++;
             iter.next();
@@ -100,6 +103,41 @@ public class TestBaseForReaderAndWriterTests {
                 }
             }
         };
+        return rowVals;
+    }
+
+    public List<Map<String, Object>> extractCellValues (
+            XSSFWorkbook workbook,
+            int skipBeforeHeader,
+            int skipAfterHeader) {
+        return extractCellValues (workbook,skipBeforeHeader,skipAfterHeader, true);
+    }
+
+
+    public List<Collection<Object>> extractSimpleCellValues (
+            XSSFWorkbook workbook,
+            int skipBeforeData) {
+        List<Collection<Object>> rowVals = new ArrayList<>();
+        Sheet excelSheet = workbook.getSheet("Tests");
+        Iterator<Row> iter = excelSheet.rowIterator();
+        int rowId = 0;
+        // move to first row
+        while (--skipBeforeData >= 0) {
+            rowId++;
+            iter.next();
+        }
+        for (int i = rowId; i <= excelSheet.getLastRowNum(); i++) {
+            Row row = excelSheet.getRow(i);
+            List<Object> columnsMap = new ArrayList<>();
+            rowVals.add(columnsMap);
+            if (null != row) {
+                Iterator<Cell> cellIter = row.cellIterator();
+                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                    columnsMap.add(AbstractSheetReader.readValueFromCell(cellIter.next()));
+                }
+            }
+        };
+
         return rowVals;
     }
 
@@ -214,16 +252,41 @@ public class TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
+    public void validateSimpleUserData2(List<Collection<Object>>data, List<Map<String, Object>> readValues) {
+        List<Object> first = (List<Object>)data.get(0);
+        Map<String, Object> testFirst = readValues.get(0);
+        Assertions.assertEquals(first.get(0), testFirst.get("id"), "Id mismatch");
+        Assertions.assertEquals(first.get(1), testFirst.get("Firstname"),  "Name mismatch");
+        Assertions.assertEquals(first.get(2), testFirst.get("Lastname"),  "Surname mismatch");
+        if (null == first.get(3))
+            assertNull(testFirst.get("BirthDate"));
+        else
+            Assertions.assertEquals(first.get(3), DateUtil.getJavaDate((double)testFirst.get("BirthDate")), "Birthdate mismatch");
+        Assertions.assertEquals(((double)first.get(3)), testFirst.get("id"));
+
+        List<Object> second = (List<Object>)data.get(0);
+        Map<String, Object> testSecond = readValues.get(0);
+        Assertions.assertEquals(second.get(0), testSecond.get("id"), "Id mismatch");
+        Assertions.assertEquals(second.get(1), testSecond.get("Firstname"),  "Name mismatch");
+        Assertions.assertEquals(second.get(2), testSecond.get("Lastname"),  "Surname mismatch");
+        if (null == second.get(3))
+            assertNull(testSecond.get("BirthDate"));
+        else
+            Assertions.assertEquals(second.get(3), DateUtil.getJavaDate((double)testSecond.get("BirthDate")), "Birthdate mismatch");
+        Assertions.assertEquals(((double)second.get(3)), testSecond.get("id"));
+    }
+
+    @SneakyThrows
     public void validateSimpleUserData(List<Collection<Object>> data, List<Collection<Object>> testData) {
         List<Object> first = (List<Object>)data.get(0);
         List<Object> testFirst = (List<Object>)testData.get(0);
-        assertEquals(first.get(0), ((Number)testFirst.get(0)).doubleValue(), "Id mismatch");
+        assertEquals(((Number)first.get(0)).doubleValue(), ((Number)testFirst.get(0)).doubleValue(), "Id mismatch");
         assertEquals(testFirst.get(1), first.get(1),  "Name mismatch");
         assertEquals(testFirst.get(2), first.get(2),  "Surname mismatch");
 
         List<Object> second = (List<Object>)data.get(1);
         List<Object> testSecond = (List<Object>)testData.get(1);
-        assertEquals(second.get(0), ((Number)testSecond.get(0)).doubleValue(), "Id mismatch");
+        assertEquals(((Number)second.get(0)).doubleValue(), ((Number)testSecond.get(0)).doubleValue(), "Id mismatch");
         assertEquals(testSecond.get(1), second.get(1), "Name mismatch");
         assertEquals(testSecond.get(2), second.get(2),  "Surname mismatch");
     }
