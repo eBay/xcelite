@@ -1,31 +1,19 @@
-/*
- * Copyright 2018 Thanthathon.b.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.ebay.xcelite;
 
+import com.ebay.xcelite.exceptions.EmptyCellException;
+import com.ebay.xcelite.helper.AbstractTestBaseForWriterTests;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.reader.BeanSheetReader;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +21,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Test various combinations of completely empty or not empty rows before and after
- * the column definition row
- *
- * @author Johannes
- */
-public class PaddingAroundColumnDefinitionTest {
+public class BeanReaderTests extends AbstractTestBaseForWriterTests {
     private SimpleDateFormat df = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     private static String usTestData[][] = {
@@ -48,50 +30,52 @@ public class PaddingAroundColumnDefinitionTest {
     };
 
     @Test
-    @DisplayName("Must correctly recognize  column headers with empty rows before")
-    public void readHeaderWithEmptyRowsBeforeMustOK() throws ParseException {
+    @DisplayName("MissingCellPolicy default - Must correctly read a header row where some columns are not mapped to annotated properties")
+    void mustReadHeaderRowWithMissingCellsOK() {
         XceliteOptions options = new XceliteOptions();
         options.setSkipRowsBeforeColumnDefinitionRow(3);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition.xlsx");
-        validateData(upper);
-    }
-
-
-    @Test
-    @DisplayName("Must correctly recognize column headers with not empty rows before")
-    public void readHeaderWithRowsBeforeMustOK() throws ParseException {
-        XceliteOptions options = new XceliteOptions();
-        options.setSkipRowsBeforeColumnDefinitionRow(3);
-
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition2.xlsx");
+        List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
         validateData(upper);
     }
 
     @Test
-    @DisplayName("Must correctly recognize column headers with empty rows before and after")
-    public void readHeaderWithEmptyRowsBeforeAfterMustOK() throws ParseException {
+    @DisplayName("MissingCellPolicy.RETURN_BLANK_AS_NULL - Must correctly read a header row where some columns are not mapped to annotated properties")
+    void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_BLANK_AS_NULL_OK() {
         XceliteOptions options = new XceliteOptions();
         options.setSkipRowsBeforeColumnDefinitionRow(3);
-        options.setSkipRowsAfterColumnDefinitionRow(1);
+        options.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
+        List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
         validateData(upper);
     }
-
 
     @Test
-    @DisplayName("Must correctly recognize column headers with not empty rows before and after")
-    public void readHeaderWithRowsBeforeAfterMustOK() throws ParseException {
+    @DisplayName("MissingCellPolicy.RETURN_NULL_AND_BLANK - Must correctly read a header row where some columns are not mapped to annotated properties")
+    void mustReadHeaderRowWithMissingCellsWithMissingCellPolicy_RETURN_NULL_AND_BLANK_OK() {
         XceliteOptions options = new XceliteOptions();
         options.setSkipRowsBeforeColumnDefinitionRow(3);
-        options.setSkipRowsAfterColumnDefinitionRow(1);
+        options.setMissingCellPolicy(MissingCellPolicy.RETURN_NULL_AND_BLANK);
 
-        List<CamelCase> upper = getData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
+        List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
         validateData(upper);
     }
 
-    private List<CamelCase> getData(XceliteOptions options, String filePath) throws ParseException {
+    @Test
+    @DisplayName("MissingCellPolicy.THROW - Must correctly throw reading a header row where some columns are not mapped to annotated properties")
+    public void mustThrowReadingHeaderRowWithMissingCellsOK() {
+        XceliteOptions options = new XceliteOptions();
+        options.setSkipRowsBeforeColumnDefinitionRow(3);
+        options.setMissingCellPolicy(MissingCellPolicy.THROW);
+
+        assertThrows(EmptyCellException.class, () -> {
+            List<CamelCase> upper = getData(options, "src/test/resources/ColumnDefinitionRowHasEmptyCells.xlsx");
+            validateData(upper);
+        });
+    }
+
+    @SneakyThrows
+    private List<CamelCase> getData(XceliteOptions options, String filePath)  {
         Xcelite xcelite = new Xcelite(new File(filePath));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<CamelCase> beanReader = new BeanSheetReader<>(sheet, options, CamelCase.class);
@@ -99,7 +83,8 @@ public class PaddingAroundColumnDefinitionTest {
         return data;
     }
 
-    private void validateData(List<CamelCase> data) throws ParseException {
+    @SneakyThrows
+    private void validateData(List<CamelCase> data) {
         CamelCase first = data.get(0);
         assertEquals(usTestData[0][0], first.getName(), "Name mismatch");
         assertEquals(usTestData[0][1], first.getSurname(), "Surname mismatch");

@@ -21,10 +21,13 @@ import com.google.common.base.Splitter;
 import java.util.Collection;
 
 /**
- * An abstraction of delimiter column value converter. Implemented by
- * {@link com.ebay.xcelite.converters.CSVColumnValueConverter CSVColumnValueConverter}
+ * An abstract implementation of {@link ColumnValueConverter} for a delimiter column value converter.
+ * Extended by {@link com.ebay.xcelite.converters.CSVColumnValueConverter CSVColumnValueConverter}.
+ *
+ * Concrete implementations must override {@link #getDelimiter()} and {@link #getCollection(Iterable)}
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Sep 14, 2013
  */
 public abstract class DelimiterColumnValueConverter implements ColumnValueConverter<String, Collection<?>> {

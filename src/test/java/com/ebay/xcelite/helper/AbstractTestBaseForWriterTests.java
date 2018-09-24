@@ -1,8 +1,11 @@
-package com.ebay.xcelite;
+package com.ebay.xcelite.helper;
 
+import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.reader.AbstractSheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;
+import lombok.Data;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,13 +17,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
-class AbstractTestBaseForWriterTests{
+public class AbstractTestBaseForWriterTests{
     // set to true to look at the resulting spreadsheet files
     private static final boolean writeToFile = false;
-    static XSSFWorkbook workbook;
+    protected static XSSFWorkbook workbook;
 
     @SneakyThrows
-    static void setup(Object bean) {
+    protected static void setup(Object bean) {
         Xcelite xcelite = new Xcelite();
         ArrayList beans = new ArrayList();
         XceliteSheet sheet = xcelite.createSheet("Tests");
@@ -32,7 +35,7 @@ class AbstractTestBaseForWriterTests{
             writeWorkbookToFile(workbook);
     }
 
-    Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
+    protected Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
         List<String> columnNames = new ArrayList<>();
         Map<String, Object> columnsMap = new LinkedHashMap<>();
         Sheet excelSheet = workbook.getSheet("Tests");

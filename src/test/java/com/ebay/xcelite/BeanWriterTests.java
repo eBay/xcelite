@@ -1,5 +1,6 @@
 package com.ebay.xcelite;
 
+import com.ebay.xcelite.helper.AbstractTestBaseForWriterTests;
 import com.ebay.xcelite.model.BeanWriterTestsBean;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.SpreadsheetVersion;

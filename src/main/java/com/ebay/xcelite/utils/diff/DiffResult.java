@@ -21,6 +21,7 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 20, 2013
  */
 public interface DiffResult<T> {
