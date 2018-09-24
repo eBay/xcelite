@@ -21,30 +21,30 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 21, 2013
- * 
  */
 public class Collections<T> {
 
-  private final Collection<T> a;
-  private final Collection<T> b;
-  private final Collection<T> difference;
-  
-  public Collections(Collection<T> a, Collection<T> b, Collection<T> difference) {
-    this.a = a;
-    this.b = b;
-    this.difference = difference;
-  }
+    private final Collection<T> a;
+    private final Collection<T> b;
+    private final Collection<T> difference;
 
-  public Collection<T> a() {
-    return a;
-  }
+    public Collections(Collection<T> a, Collection<T> b, Collection<T> difference) {
+        this.a = a;
+        this.b = b;
+        this.difference = difference;
+    }
 
-  public Collection<T> b() {
-    return b;
-  }
+    public Collection<T> a() {
+        return a;
+    }
 
-  public Collection<T> difference() {
-    return difference;
-  }  
+    public Collection<T> b() {
+        return b;
+    }
+
+    public Collection<T> difference() {
+        return difference;
+    }
 }

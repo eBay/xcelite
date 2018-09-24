@@ -18,18 +18,18 @@ package com.ebay.xcelite.reader;
 /**
  * An object which let you access to the object created after the excel row was
  * processed.
- * 
+ *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Feb 2, 2014
- * 
  */
 public interface RowPostProcessor<T> {
 
-  /**
-   * Allows you to manipulate the object right after it was deserialized from row.
-   * 
-   * @param object the object which was created from row
-   * @return true to keep the object, false to discard it
-   */
-  boolean process(T object);
+    /**
+     * Allows you to manipulate the object right after it was deserialized from row.
+     *
+     * @param object the object which was created from row
+     * @return true to keep the object, false to discard it
+     */
+    boolean process(T object);
 }

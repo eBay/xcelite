@@ -15,129 +15,127 @@
 */
 package com.ebay.xcelite.column;
 
-import static org.reflections.ReflectionUtils.withAnnotation;
+import com.ebay.xcelite.annotate.NoConverterClass;
+import com.ebay.xcelite.annotations.AnyColumn;
+import com.ebay.xcelite.annotations.Column;
+import com.ebay.xcelite.annotations.Row;
+import com.ebay.xcelite.exceptions.ColumnNotFoundException;
+import com.ebay.xcelite.exceptions.XceliteException;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.reflections.ReflectionUtils;
+import static java.util.Optional.of;
+import static org.reflections.ReflectionUtils.getAllFields;
+import static org.reflections.ReflectionUtils.withAnnotation;
 
-import com.ebay.xcelite.annotate.NoConverterClass;
-import com.ebay.xcelite.annotations.AnyColumn;
-import com.ebay.xcelite.annotations.Column;
-import com.ebay.xcelite.annotations.Row;
-import com.ebay.xcelite.exceptions.XceliteException;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-
+/**
+ * Class description...
+ * @since 1.0
+ */
 public class ColumnsExtractor {
 
-  private final Class<?> type;
-  private Set<Col> columns;
-  private Col anyColumn;
-  private Set<Col> colsOrdering;
+    @Getter
+    private LinkedHashSet<Col> columns;
 
-  public ColumnsExtractor(Class<?> type) {
-    this.type = type;
-    columns = Sets.newLinkedHashSet();
-    columnsOrdering();
-  }
+    @Getter
+    private Col anyColumn;
+    private final Class<?> type;
+    private LinkedHashSet<Col> colsOrdering;
 
-  private void columnsOrdering() {
-    Row rowAnnotation = type.getAnnotation(Row.class);
-    if (rowAnnotation == null || rowAnnotation.colsOrder() == null || rowAnnotation.colsOrder().length == 0) return;
-    colsOrdering = Sets.newLinkedHashSet();
-    for (String column : rowAnnotation.colsOrder()) {
-      colsOrdering.add(new Col(column));
+    public ColumnsExtractor(Class<?> type) {
+        this.type = type;
+        columns = new LinkedHashSet<>();
+        columnsOrdering();
     }
-  }
 
-  @SuppressWarnings("unchecked")
-  public void extract() {    
-    Set<Field> columnFields = ReflectionUtils.getAllFields(type, withAnnotation(Column.class));
-    for (Field columnField : columnFields) {
-      Column annotation = columnField.getAnnotation(Column.class);
-      Col col = null;
-      if (annotation.name().isEmpty()) {
-        col = new Col(columnField.getName(), columnField.getName());        
-      } else {
-        col = new Col(annotation.name(), columnField.getName());        
-      }      
-      
-      if (annotation.ignoreType()) {
-        col.setType(String.class);
-      } else {
-        col.setType(columnField.getType());
-      }
-      if (!annotation.dataFormat().isEmpty()) {
-        col.setDataFormat(annotation.dataFormat());
-      }
-      if (annotation.converter() != NoConverterClass.class) {
-        col.setConverter(annotation.converter());
-      }
-      columns.add(col);
-    }   
-    
-    if (colsOrdering != null) {
-      orderColumns();
+    private void columnsOrdering() {
+        Row rowAnnotation = type.getAnnotation(Row.class);
+        if (rowAnnotation == null || rowAnnotation.colsOrder().length == 0) {
+            return;
+        }
+        colsOrdering = new LinkedHashSet<>();
+        for (String column : rowAnnotation.colsOrder()) {
+            colsOrdering.add(new Col(column));
+        }
     }
-    
-    extractAnyColumn();
-  }
-  
-  @SuppressWarnings("unchecked")
-  private void extractAnyColumn() {
-    Set<Field> anyColumnFields = ReflectionUtils.getAllFields(type, withAnnotation(AnyColumn.class));    
-    if (anyColumnFields.size() > 0) {
-      if (anyColumnFields.size() > 1) {
-        throw new XceliteException("Multiple AnyColumn fields are not allowed");
-      }
-      Field anyColumnField = anyColumnFields.iterator().next();
-      if (!anyColumnField.getType().isAssignableFrom(Map.class)) {
-        throw new XceliteException(
-            String.format("AnyColumn field \"%s\" should be of type Map.class or assignable from Map.class",
-                anyColumnField.getName()));
-      }
-      anyColumn = new Col(anyColumnField.getName(), anyColumnField.getName());
-      anyColumn.setAnyColumn(true);
-      AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
-      anyColumn.setType(annotation.as());
-      if (annotation.converter() != NoConverterClass.class) {
-        anyColumn.setConverter(annotation.converter());
-      }
-    }    
-  }
 
-  private void orderColumns() {
-    // build temporary columns map and then use it to fill fieldName in colsOrdering set
-    Map<String, Col> map = Maps.newHashMap();
-    for (Col col : columns) {
-      map.put(col.getName(), col);
-    }
-    
-    for (Col col : colsOrdering) {
-      if (columns.contains(col)) {
-        Col column = map.get(col.getName());        
-        column.copyTo(col);
-      } else {
-        throw new RuntimeException(String.format("Unrecognized column \"%s\" in Row columns ordering", col.getName()));
-      }
-    }
-    
-    if (colsOrdering.size() != columns.size()) {
-      throw new RuntimeException(String.format("Not all columns are specified in Row columns ordering"));
-    }
-    columns = colsOrdering;
-  }
+    @SuppressWarnings("unchecked")
+    public void extract() {
+        getAllFields(type, withAnnotation(Column.class))
+            .forEach(columnField -> {
+                Column annotation = columnField.getAnnotation(Column.class);
+                Col col = of(annotation)
+                        .filter(column -> !column.name().isEmpty())
+                        .map(column -> new Col(column.name(), columnField.getName()))
+                        .orElse(new Col(columnField.getName(), columnField.getName()));
 
-  public LinkedHashSet<Col> getColumns() {
-    return (LinkedHashSet<Col>) columns;
-  }
+                if (annotation.ignoreType()) {
+                    col.setType(String.class);
+                } else {
+                    col.setType(columnField.getType());
+                }
+                if (!annotation.dataFormat().isEmpty()) {
+                    col.setDataFormat(annotation.dataFormat());
+                }
+                if (!annotation.converter().equals(NoConverterClass.class)) {
+                    col.setConverter(annotation.converter());
+                }
+                columns.add(col);
+            });
 
-  public Col getAnyColumn() {
-    return anyColumn;
-  }
+        if (colsOrdering != null) {
+            orderColumns();
+        }
+
+        anyColumn = extractAnyColumn(type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Col extractAnyColumn(final Class<?> type) {
+        Col anyColumn = null;
+        Set<Field> anyColumnFields = getAllFields(type, withAnnotation(AnyColumn.class));
+
+        if (anyColumnFields.size() == 1) {
+            Field anyColumnField = anyColumnFields.iterator().next();
+            if (!anyColumnField.getType().isAssignableFrom(Map.class)) {
+                throw new XceliteException(
+                        String.format("AnyColumn field \"%s\" should be of type Map.class or assignable from Map.class",
+                                anyColumnField.getName()));
+            }
+            anyColumn = new Col(anyColumnField.getName(), anyColumnField.getName());
+            anyColumn.setAnyColumn(true);
+            AnyColumn annotation = anyColumnField.getAnnotation(AnyColumn.class);
+            anyColumn.setType(annotation.as());
+            if (!annotation.converter().equals(NoConverterClass.class)) {
+                anyColumn.setConverter(annotation.converter());
+            }
+        } else if (anyColumnFields.size() > 1) {
+            throw new XceliteException("Multiple @AnyColumn fields are not allowed");
+        }
+        return anyColumn;
+    }
+
+    private void orderColumns() {
+        // build temporary columns map and then use it to fill fieldName in colsOrdering set
+        Map<String, Col> map = columns.stream().collect(Collectors.toMap(Col::getName, col -> col));
+
+        colsOrdering.forEach(col -> {
+            if (columns.contains(col)) {
+                Col column = map.get(col.getName());
+                column.copyTo(col);
+            } else {
+                throw new ColumnNotFoundException(col.getName());
+            }
+        });
+
+        if (colsOrdering.size() != columns.size()) {
+            throw new XceliteException("Not all columns are specified in annotation @Row, attribute 'colsOrder'");
+        }
+        columns = colsOrdering;
+    }
 }

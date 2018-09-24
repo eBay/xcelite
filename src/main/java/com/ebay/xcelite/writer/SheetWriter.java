@@ -15,15 +15,57 @@
 */
 package com.ebay.xcelite.writer;
 
-import java.util.Collection;
 
+import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 
-public interface SheetWriter<T> {
+import java.util.Collection;
+/**
+ * Generic interface for writer classes that can serialize collections of Java objects
+ * to Excel workbooks.
+ *
+ * @author kharel (kharel@ebay.com)
+ * @since 1.0
+ * created Sep 12, 2013
+ */
+public interface SheetWriter<T> extends DataMarshaller {
 
-  void write(Collection<T> data);
-  
-  void generateHeaderRow(boolean generateHeaderRow);
-  
-  XceliteSheet getSheet();
+    /**
+     * Takes a collection of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @since 1.0
+     */
+    void write(Collection<T> data);
+
+    /**
+     * Determines whether this writer will generate a header row with the
+     * column defining attributes from the {@link com.ebay.xcelite.annotations.Column}
+     * annotations on the bean's properties
+     *
+     * @param generateHeaderRow if set to `true`, generate a header row
+     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     */
+    @Deprecated
+    void generateHeaderRow(boolean generateHeaderRow);
+
+    /**
+     * Determines whether this writer will generate a header row with the
+     * column defining attributes from the {@link com.ebay.xcelite.annotations.Column}
+     * annotations on the bean's properties
+     *
+     * @param generateHeaderRow if set to `true`, generate a header row
+     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     */
+    void setGenerateHeaderRow(boolean generateHeaderRow);
+
+    /**
+     * Gets the {@link XceliteSheet} object this writer is operating on
+     * @return sheet this writer writes to.
+     */
+    XceliteSheet getSheet();
+
+
 }

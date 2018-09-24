@@ -15,42 +15,101 @@
 */
 package com.ebay.xcelite.writer;
 
-import java.util.Collection;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-
+import com.ebay.xcelite.exceptions.PolicyViolationException;
+import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
+import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
- * Class description...
+ * An concrete implementation of the {@link SheetWriter} interface that writes
+ * 2-dimensional collections of simple, unannotated Java beans to Excel sheets.
+ * Each entry in the outer collection represents one row in the spreadsheet
+ * while each entry in the inner collection represents one cell (column) in the row.
+ *
+ * This writer class does not write a header row, as no column names are defined.
+ *
+ * Preferably, this class should not directly be instantiated, but you should
+ * call {@link XceliteSheet#getSimpleWriter()}
+ *
+ * By default, a SimpleSheetWriter copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetWriter, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #SimpleSheetWriter(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one writer only - a completely different set of options.
+
  *
  * @author kharel (kharel@ebay.com)
+ * @since 1.0
  * created Nov 10, 2013
- * 
  */
-public class SimpleSheetWriter extends SheetWriterAbs<Collection<Object>> {
-  
-  public SimpleSheetWriter(XceliteSheet sheet) {
-    super(sheet, false);
-  }
+public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
+    public boolean expectsHeaderRow(){return false;}
 
-  @Override
-  public void write(Collection<Collection<Object>> data) {
-    int i = 0;
-    for (Collection<Object> row : data) {
-      Row excelRow = sheet.getNativeSheet().createRow(i);
-      int j = 0;
-      for (Object column : row) {
-        Cell cell = excelRow.createCell(j);
-        if (writeHeader && i == 0) {
-          cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle());
-        }
-        writeToCell(cell, column, null);        
-        ++j;
-      }
-      ++i;
+    public SimpleSheetWriter(XceliteSheet sheet) {
+        super(sheet);
     }
-  }  
+
+    /**
+     * Construct a {@link SimpleSheetWriter} on the given {@link XceliteSheet sheet} using
+     * the given {@link XceliteOptions options}. Values from the options parameter
+     * are copied over, later changes to the options object will not affect the
+     * options of this writer.
+     * @param sheet the sheet to construct the SimpleSheetWriter on.
+     * @param options options for this SimpleSheetWriter.
+     */
+    public SimpleSheetWriter(XceliteSheet sheet, XceliteOptions options) {
+        super(sheet, options);
+    }
+
+    @Override
+    public void write(Collection<Collection<Object>> data) {
+        int rowIndex = 0;
+
+        for (Collection<Object> row: data) {
+            if (null == row) {
+                switch(options.getMissingRowPolicy()) {
+                    case SKIP: {
+                        continue;
+                    }
+                    case NULL: {
+                        sheet.getNativeSheet().createRow(rowIndex++);
+                        continue;
+                    }
+                    case EMPTY_OBJECT: {
+                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
+                            sheet.getNativeSheet().createRow(rowIndex++);
+                            continue;
+                        } else {
+                            row = new ArrayList<>();
+                        }
+                        break;
+                    }
+                    case THROW: {
+                        throw new PolicyViolationException("Null object found and " +
+                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
+                    }
+                }
+
+            }
+            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
+            final AtomicInteger j = new AtomicInteger(0);
+            row.forEach(column -> {
+                Cell cell = excelRow.createCell(j.intValue());
+                writeToCell(cell, column, null);
+                j.incrementAndGet();
+            });
+            rowIndex++;
+        };
+    }
 }
