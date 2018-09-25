@@ -157,13 +157,12 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                         continue;
                     }
                     case NULL: {
-                        rowIndex++;
+                        sheet.getNativeSheet().createRow(rowIndex++);
                         continue;
                     }
                     case EMPTY_OBJECT: {
                         if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex);
-                            rowIndex++;
+                            sheet.getNativeSheet().createRow(rowIndex++);
                             continue;
                         } else {
                             Class clazz = getBeansClass(data);

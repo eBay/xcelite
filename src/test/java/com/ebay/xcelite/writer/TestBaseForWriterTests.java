@@ -38,22 +38,6 @@ public class TestBaseForWriterTests extends TestBaseForReaderAndWriterTests {
     }
 
     @SneakyThrows
-    public static void setupSimple(XceliteOptions options, Collection<Object>... rowObjects) {
-        ArrayList objs = new ArrayList();
-        for (Collection<Object> row : rowObjects) {
-            objs.add(row);
-        }
-        Xcelite xcelite = new Xcelite();
-        XceliteSheet sheet = xcelite.createSheet("Tests");
-        SheetWriter bs = sheet.getSimpleWriter();
-        bs.setOptions(options);
-        bs.write(objs);
-        workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
-            writeWorkbookToFile(workbook);
-    }
-
-    @SneakyThrows
     public static void setupSimple(Object... inBeans) {
         setupSimple(new XceliteOptions(), inBeans);
     }

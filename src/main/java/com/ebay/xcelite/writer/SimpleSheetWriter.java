@@ -15,13 +15,17 @@
 */
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
+import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -70,18 +74,43 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
     @Override
     public void write(Collection<Collection<Object>> data) {
-        final AtomicInteger i = new AtomicInteger(0);
+        int rowIndex = 0;
 
-        data.forEach(row -> {
-            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+        for (Collection<Object> row: data) {
+            if (null == row) {
+                switch(options.getMissingRowPolicy()) {
+                    case SKIP: {
+                        continue;
+                    }
+                    case NULL: {
+                        sheet.getNativeSheet().createRow(rowIndex++);
+                        continue;
+                    }
+                    case EMPTY_OBJECT: {
+                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
+                            sheet.getNativeSheet().createRow(rowIndex++);
+                            continue;
+                        } else {
+                            row = new ArrayList<>();
+                        }
+                        break;
+                    }
+                    case THROW: {
+                        throw new PolicyViolationException("Null object found and " +
+                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
+                    }
+                }
+
+            }
+            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
             final AtomicInteger j = new AtomicInteger(0);
             row.forEach(column -> {
                 Cell cell = excelRow.createCell(j.intValue());
                 writeToCell(cell, column, null);
                 j.incrementAndGet();
             });
-            i.incrementAndGet();
-        });
+            rowIndex++;
+        };
     }
 
     /**

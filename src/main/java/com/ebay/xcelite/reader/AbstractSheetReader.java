@@ -78,12 +78,12 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
     public static Object readValueFromCell(Cell cell) {
         if (cell == null) return null;
         Object cellValue = null;
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case ERROR:
                 break;
             case FORMULA:
                 // Get the type of Formula
-                switch (cell.getCachedFormulaResultTypeEnum()) {
+                switch (cell.getCachedFormulaResultType()) {
                     case ERROR:
                         cellValue = null;
                         break;
@@ -172,7 +172,7 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
                 }
                 return data;
             case EMPTY_OBJECT:
-                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                for (int i = lastNonEmptyRowId; i < data.size(); i++) {
                     data.set(i, getNewObject());
                 }
                 return data;

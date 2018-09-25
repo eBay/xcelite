@@ -24,7 +24,7 @@ public class TestUtil {
 
 
     public static String getCellValue(Cell cell) {
-        CellType type = cell.getCellTypeEnum();
+        CellType type = cell.getCellType();
         String retVal = null;
         switch (type) {
             case STRING:

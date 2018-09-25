@@ -3,11 +3,11 @@
 
 	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.2.3-SNAPSHOT</version>
+	<version>1.2.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>xcelite</name>
-	<description>Xcelite is an ORM like Java library which allows you to easily
+	<description>Xcelite is an ORM-like Java library which allows you to easily
 		serialize and deserialize Java beans to/from Excel spreadsheets</description>
 	<url>http://xcelite.io</url>
 	<organization>
@@ -49,7 +49,7 @@
 	</distributionManagement>
 
 	<issueManagement>
-		<system>Github issues</system>
+		<system>Github Issues</system>
 		<url>https://github.com/xcelite-io/xcelite/issues</url>
 	</issueManagement>
 
@@ -71,7 +71,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-        <apache-poi.version>3.17</apache-poi.version>
+		<apache-poi.version>4.0.0</apache-poi.version>
 	</properties>
 
 	<build>
@@ -230,12 +230,11 @@
 			<version>0.9.11</version>
 		</dependency>
 
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -253,7 +252,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.1.1</version>
+			<version>5.3.1</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -268,17 +267,6 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-	<!-- Only used for pulling in the Xcelite compat lib, for build logs:
-
-	https://jitpack.io/com/github/iSnow/Xcelite-compatability-1.0.4/1.0.4.9/build.log
-	-->
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
 
 	<profiles>
 		<profile>
