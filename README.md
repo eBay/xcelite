@@ -131,7 +131,7 @@ private List<String> mailAddresses;
 The CSVColumnValueConverter takes a collection of objects and serializes it to a comma seperated String.  
 Alternately when deserializing, the converter takes a comma seperated String and deserializes it to a collection of Objects.  
 So writing a collection of users will result with a cloumn named "Emails" and the column data will look someting like that:  
-john@mail.com,danny@mail.com,jerry@mail.com  
+john@mail.com,danny@mail.com,jerry@mail.com,love3400wind@163.com  
 
 When reading the sheet to a collection of Users, the column "Emails" will be deserialized to an ArrayList.
 If you prefer a different collection implementation rather than the default ArrayList, you can always extend the CSVColumnValueConverter and override the getCollection() method to return your preferred implementation.
