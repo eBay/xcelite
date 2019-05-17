@@ -221,7 +221,15 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
 
         if (!headers.containsAll(declaredHeaders)) {
-            throw new ColumnNotFoundException(declaredHeaders.iterator().next());
+            declaredHeaders.removeAll(headers);
+            declaredHeaders = declaredHeaders.stream().filter((h) -> {
+                Col col = mapper.getColumn(h);
+                Field field = getField(this.type, col.getFieldName());
+                return (!field.getAnnotation(com.ebay.xcelite.annotations.Column.class).optional());
+            }).collect(Collectors.toSet());
+            if (declaredHeaders.size() > 0) {
+                throw new ColumnNotFoundException(declaredHeaders.stream().limit(10).collect(Collectors.joining()));
+            }
         }
     }
 
