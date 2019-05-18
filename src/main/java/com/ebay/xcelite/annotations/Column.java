@@ -53,6 +53,11 @@ public @interface Column {
     String dataFormat() default "";
 
     /**
+     * If true, no exception is thrown if the column is missing in the target Excel file
+     */
+    boolean optional() default false;
+
+    /**
      * Converter class to use when serializing/deserializing the data. Class must
      * implement
      * {@link com.ebay.xcelite.converters.ColumnValueConverter
