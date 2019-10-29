@@ -128,6 +128,7 @@ public class Xcelite {
      * @return the list of sheets (a list of {@link XceliteSheet} objects)
      * or throws a {@link XceliteException} if no sheets exist
      */
+    // TODO for version 2.0, remove the exception, return empty list
     public List<XceliteSheet> getSheets() {
         if (workbook.getNumberOfSheets() == 0) {
             throw new XceliteException("Could not find any sheet");
