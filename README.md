@@ -17,7 +17,21 @@
   * [Using Xcelite with other build systems](#using-xcelite-with-other-build-systems)
 
 ### Introduction
-[Xcelite](http://www.xcelite.io/) is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+[Xcelite](http://www.xcelite.io/) is an ORM-like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+
+The workflow for reading is always:
+* create an Xcelite object on an input source like a file or `InputStream`
+* select the sheet from which to read
+* get a `SheetReader` from the sheet
+* read data
+* close the Xcelite object
+
+Similarly, the workflow for writing data to Excel files is:
+* create an Xcelite object on an output sink like an `OutputStream` 
+* select the sheet to which to write
+* get a `SheetWriter` from the sheet
+* write data
+* close the Xcelite object
 
 ### Quick Start
 #### Reading
