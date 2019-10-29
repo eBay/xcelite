@@ -36,7 +36,7 @@ public @interface Column {
 
     /**
      * The actual name of the column that will be written to excel file. If no
-     * name specified, the annotated field name will be taken.
+     * name specified, the name of the field will be taken.
      */
     String name() default "";
 
