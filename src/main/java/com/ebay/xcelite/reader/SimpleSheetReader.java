@@ -20,7 +20,6 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 
@@ -74,7 +72,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
     public Collection<Collection<Object>> read() {
         List<Collection<Object>> rows = new ArrayList<>();
         int lastNonEmptyRowId = 0;
-        Boolean firstIteration = true;
+        boolean firstIteration = true;
         Iterator<Row> rowIterator = sheet.moveToFirstDataRow(this, false);
         if (!rowIterator.hasNext())
             return rows;
@@ -110,7 +108,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
                     lastNonEmptyRowId = rows.size();
                 }
             }
-        };
+        }
 
         return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId);
     }
