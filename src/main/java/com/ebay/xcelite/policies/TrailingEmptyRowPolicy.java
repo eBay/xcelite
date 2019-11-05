@@ -2,8 +2,8 @@ package com.ebay.xcelite.policies;
 
 /**
  * Used to specify the different possible policies to handle null and
- * trailing blank rows following data blocks for readers and trailing
- * null objects for writers.
+ * trailing blank rows following data blocks for readers and for writers,
+ * null objects at the end of the input object collection.
  *
  * Default is SKIP.
  *
@@ -16,7 +16,7 @@ package com.ebay.xcelite.policies;
  */
 public enum TrailingEmptyRowPolicy {
     /**
-     * SheetReaders return null for blank rows after the data block,
+     * SheetReaders return null objects for blank rows after the data block,
      * SheetWriters write a null row (row gets created, but no
      * cells in it) for null objects at the end of the object collection.
      **/
