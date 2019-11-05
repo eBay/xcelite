@@ -42,35 +42,35 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Thanthathon.b
  */
- public class AnyColumnTest {
+class AnyColumnTest {
 
-    private String columnNames[] = new String[]{
+    private String[] columnNames = new String[]{
             "NAME", "SURNAME", "BIRTHDATE", "SEXID", "SEX"
     };
 
-    private static Object testData[][] = {
-            {"Crystal",	"Maiden",	"01/02/1990",	2.0,	"Female"},
-            {"Witch",	"Doctor",	"01/01/1990",	1.0,	"Male"}
+    private static Object[][] testData = {
+            {"Crystal", "Maiden", "01/02/1990", 2.0, "Female"},
+            {"Witch", "Doctor", "01/01/1990", 1.0, "Male"}
     };
 
-    private static String employeeProjects1[] = {
+    private static String[] employeeProjects1 = {
             null,
             "Testing",
             "Website Relaunch",
             null,
             null
     };
-    private static String employeeProjects2[][] = {
-            {"Website Relaunch", "Testing",          null},
-            {null,               "Migration",       "Testing"},
-            {"Testing",           null,             "Website Relaunch"},
-            {null,                null,              null},
-            {null,               "Website Relaunch", null}
+    private static String[][] employeeProjects2 = {
+            {"Website Relaunch", "Testing", null},
+            {null, "Migration", "Testing"},
+            {"Testing", null, "Website Relaunch"},
+            {null, null, null},
+            {null, "Website Relaunch", null}
     };
 
     @Test
     @DisplayName("Must correctly parse header row with @AnyColumn annotated column headers")
-    public void mustReadColumnHeadersOK() {
+    void mustReadColumnHeadersOK() {
         List<String> testColNames = new ArrayList<>(Arrays.asList(columnNames));
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
@@ -86,7 +86,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     @Test
     @DisplayName("Must correctly parse data with @AnyColumn annotated column headers")
     @SuppressWarnings("unchecked")
-    public void mustReadDataOK() {
+    void mustReadDataOK() {
         Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
         XceliteSheet sheet = xcelite.getSheet(0);
         SheetReader<AnyColumnBean> beanReader = sheet.getBeanReader(AnyColumnBean.class);
@@ -103,7 +103,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     @Test
     @DisplayName("Must throw an exception because of multiple @AnyColumn annotations")
     @SuppressWarnings("unchecked")
-    public void mustThrowOnInvalidBean() {
+    void mustThrowOnInvalidBean() {
         Executable testClosure = () -> {
             Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
             XceliteSheet sheet = xcelite.getSheet(0);
@@ -123,15 +123,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
     }
 
-    @Test
-    @DisplayName("Must correctly overwrite fields with @AnyColumn and repeated column headers")
-    @SuppressWarnings("unchecked")
     /**
      * When `anyColumnCreatesCollection` from XceliteOptions is `false`, must correctly
      * overwrite fields with @AnyColumn and repeated column headers
      * @since 1.3
      */
-    public void mustReadAnyColumnDataOkNoCollections() {
+    @Test
+    @DisplayName("Must correctly overwrite fields with @AnyColumn and repeated column headers")
+    @SuppressWarnings("unchecked")
+    void mustReadAnyColumnDataOkNoCollections() {
         XceliteOptions options = new XceliteOptions();
         options.setAnyColumnCreatesCollection(false);
         Xcelite xcelite = new Xcelite(new File("src/test/resources/employees.xlsx"));
@@ -148,15 +148,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         }
     }
 
-    @Test
-    @DisplayName("Must correctly create collections for fields with @AnyColumn and repeated column headers")
-    @SuppressWarnings("unchecked")
     /**
      * When `anyColumnCreatesCollection` from XceliteOptions is `true`, must correctly
      * create Collections for fields with @AnyColumn and repeated column headers
      * @since 1.3
      */
-    public void mustReadAnyColumnDataOkWithCollections() {
+    @Test
+    @DisplayName("Must correctly create collections for fields with @AnyColumn and repeated column headers")
+    @SuppressWarnings("unchecked")
+    void mustReadAnyColumnDataOkWithCollections() {
         XceliteOptions options = new XceliteOptions();
         options.setAnyColumnCreatesCollection(true);
         options.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
