@@ -263,6 +263,14 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 cellValue = converter.deserialize(cellValue);
             }
         }
+        if (options.isAnyColumnCreatesCollection()){
+            List holder = (List)map.get(columnName);
+            if (null == holder) {
+                holder = new ArrayList();
+            }
+            holder.add(cellValue);
+            cellValue = holder;
+        }
         map.put(columnName, cellValue);
     }
 

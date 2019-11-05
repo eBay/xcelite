@@ -20,6 +20,9 @@ import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.model.AnyColumnBean;
 import com.ebay.xcelite.model.AnyColumnBeanDoneWrong;
+import com.ebay.xcelite.model.AnyColumnEmployeeBean;
+import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.Assertions;
@@ -48,6 +51,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
     private static Object testData[][] = {
             {"Crystal",	"Maiden",	"01/02/1990",	2.0,	"Female"},
             {"Witch",	"Doctor",	"01/01/1990",	1.0,	"Male"}
+    };
+
+    private static String employeeProjects1[] = {
+            null,
+            "Testing",
+            "Website Relaunch",
+            null,
+            null
+    };
+    private static String employeeProjects2[][] = {
+            {"Website Relaunch", "Testing",          null},
+            {null,               "Migration",       "Testing"},
+            {"Testing",           null,             "Website Relaunch"},
+            {null,                null,              null},
+            {null,               "Website Relaunch", null}
     };
 
     @Test
@@ -105,4 +123,54 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
     }
 
+    @Test
+    @DisplayName("Must correctly overwrite fields with @AnyColumn and repeated column headers")
+    @SuppressWarnings("unchecked")
+    /**
+     * When `anyColumnCreatesCollection` from XceliteOptions is `false`, must correctly
+     * overwrite fields with @AnyColumn and repeated column headers
+     * @since 1.3
+     */
+    public void mustReadAnyColumnDataOkNoCollections() {
+        XceliteOptions options = new XceliteOptions();
+        options.setAnyColumnCreatesCollection(false);
+        Xcelite xcelite = new Xcelite(new File("src/test/resources/employees.xlsx"));
+        xcelite.setOptions(options);
+        XceliteSheet sheet = xcelite.getSheet(0);
+        SheetReader<AnyColumnEmployeeBean> beanReader = sheet.getBeanReader(AnyColumnEmployeeBean.class);
+        Collection<AnyColumnEmployeeBean> datasets = beanReader.read();
+        int cnt = 0;
+        for (AnyColumnEmployeeBean row : datasets) {
+            List<Object> dataColValues = new ArrayList(row.getProjects().values());
+            Assertions.assertEquals(1, dataColValues.size(), "mismatching number of columns");
+            Assertions.assertEquals(employeeProjects1[cnt], dataColValues.get(0), "mismatching columns");
+            cnt++;
+        }
+    }
+
+    @Test
+    @DisplayName("Must correctly create collections for fields with @AnyColumn and repeated column headers")
+    @SuppressWarnings("unchecked")
+    /**
+     * When `anyColumnCreatesCollection` from XceliteOptions is `true`, must correctly
+     * create Collections for fields with @AnyColumn and repeated column headers
+     * @since 1.3
+     */
+    public void mustReadAnyColumnDataOkWithCollections() {
+        XceliteOptions options = new XceliteOptions();
+        options.setAnyColumnCreatesCollection(true);
+        options.setMissingCellPolicy(MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        Xcelite xcelite = new Xcelite(new File("src/test/resources/employees.xlsx"));
+        xcelite.setOptions(options);
+        XceliteSheet sheet = xcelite.getSheet(0);
+        SheetReader<AnyColumnEmployeeBean> beanReader = sheet.getBeanReader(AnyColumnEmployeeBean.class);
+        Collection<AnyColumnEmployeeBean> datasets = beanReader.read();
+        int cnt = 0;
+        for (AnyColumnEmployeeBean row : datasets) {
+            List<Object> dataColValues = new ArrayList(row.getProjects().values().iterator().next());
+            List<String> testRow = Arrays.asList(employeeProjects2[cnt]);
+            Assertions.assertEquals(testRow, dataColValues, "mismatching columns");
+            cnt++;
+        }
+    }
 }
