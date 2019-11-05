@@ -48,27 +48,62 @@ public class Xcelite {
     @Getter
     protected XceliteOptions options;
 
+    /**
+     * Create a Xcelite object containing a newly-created POI-workbook
+     * and having default {@link XceliteOptions}.
+     */
     public Xcelite() {
         workbook = new XSSFWorkbook();
         options = new XceliteOptions();
     }
 
+    /**
+     * Create a Xcelite object containing a newly-created POI-workbook
+     * and having custom {@link XceliteOptions} via the `options`
+     * parameter.
+     * @param options Custom options to use on all
+     * {@link com.ebay.xcelite.reader.SheetReader} and
+     * {@link com.ebay.xcelite.writer.SheetWriter} objects derived from
+     * this Xcelite instance
+     */
     public Xcelite(XceliteOptions options) {
         workbook = new XSSFWorkbook();
         this.options = options;
     }
 
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.InputStream}
+     * and having default {@link XceliteOptions}.
+     * @param inputStream the InputStream to read data from
+     */
     @SneakyThrows
     public Xcelite(InputStream inputStream) {
         workbook = new XSSFWorkbook(inputStream);
     }
 
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.InputStream} and having custom {@link XceliteOptions}
+     * via the `options` parameter.
+     * @param inputStream the InputStream to read data from
+     * @param options Custom options to use on all
+     * {@link com.ebay.xcelite.reader.SheetReader} and
+     * {@link com.ebay.xcelite.writer.SheetWriter} objects derived from
+     * this Xcelite instance
+     */
     @SneakyThrows
     public Xcelite(InputStream inputStream, XceliteOptions options) {
         workbook = new XSSFWorkbook(inputStream);
         this.options = options;
     }
 
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.File}
+     * and having default {@link XceliteOptions}.
+     * @param file the File to read data from
+     */
     @SneakyThrows
     public Xcelite(File file) {
         this.file = file;
