@@ -1,3 +1,9 @@
+1.2.35 [(Link to github)](https://github.com/iSnow/xcelite/releases/tag/v1.2.5)
+=====================================
+- Added `optional` parameter to @Column annotation to denote columns that might or might not be present. If a column is annotated as `optional` and it is missing, their value will be `null`, but no exception will be thrown. 
+- Updated dependencies.
+
+
 1.2.3 [(Link to github)](https://github.com/iSnow/xcelite/releases/tag/v1.2.3)
 =====================================
 - All configuration of Xcelite, XceliteSheet and Readers/Writers is now done through a XceliteOptions object

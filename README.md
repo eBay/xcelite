@@ -17,9 +17,46 @@
   * [Using Xcelite with other build systems](#using-xcelite-with-other-build-systems)
 
 ### Introduction
-[Xcelite](http://www.xcelite.io/) is an ORM like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+[Xcelite](http://www.xcelite.io/) is an ORM-like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
+
+The workflow for reading is always:
+* create an Xcelite object on an input source like a file or `InputStream`
+* select the sheet from which to read
+* get a `SheetReader` from the sheet
+* read data
+* close the Xcelite object
+
+Similarly, the workflow for writing data to Excel files is:
+* create an Xcelite object on an output sink like an `OutputStream` 
+* select the sheet to which to write
+* get a `SheetWriter` from the sheet
+* write data
+* close the Xcelite object
 
 ### Quick Start
+#### Reading
+How do I simply read a sheet in an existing MS Excel file to a two-dimensional collection?
+```java
+Xcelite xcelite = new Xcelite(new File("data.xlsx"));
+XceliteSheet nativeSheet = xcelite.getSheet("data_sheet");
+SheetReader<Collection<Object>> simpleReader = nativeSheet.getSimpleReader();
+Collection<Collection<Object>> data = simpleReader.read();
+```
+If the first row in the MS Excel sheet is a header, you can skip it by writing:
+```java
+simpleReader.skipHeaderRow(true);
+```
+
+Cool! How about reading to a collection of Java beans?
+```java
+Xcelite xcelite = new Xcelite(new File("users_doc.xlsx"));
+XceliteSheet nativeSheet = xcelite.getSheet("users");
+SheetReader<User> reader = nativeSheet.getBeanReader(User.class);
+Collection<User> users = reader.read();
+```
+Note that Xcelite will try to map only the `@Column` annotated properties. If for an annotated property no column is found in the MS Excel sheet it will be ignored.  
+Sheet columns which are not mapped to a `@Column` annotated property will be ignored as well.
+
 #### Writing
 I simply want to write a two-dimensional collection. How can I do that?
 ```java
@@ -31,7 +68,7 @@ List<Collection<Object>> data = new ArrayList<>();
 simpleWriter.write(data);   
 xcelite.write(new File("data.xlsx"));
 ```
-This will create an excel document with single nativeSheet named "data_sheet".
+This will create an Excel document with single sheet named "data_sheet".
 
 OK lets get serious, i have this POJO bean
 ```java
@@ -43,7 +80,7 @@ public class User {
   private Date birthDate; 
 }
 ```
-How do i serialize a collection of this bean to excel?
+How do i serialize a collection of this bean to an Excel file?
 
 First, lets add annotations so Xcelite knows which properties to serialize:
 ```java
@@ -63,15 +100,15 @@ public class User {
 }
 ```
 The `@Column` annotation on a property indicates that you want it to be serialized to MS Excel format.  
-By default, if no `name` attribute is provided the MS Excel column name will be taken from the property name.
+By default, if no `name` attribute is provided the column name in the Excel sheet will be taken from the property name.
 
-Now we'll write the same data as before but this time using `BeanWriter` writer instead of `SimpleWriter`:
+Now we'll write the same data as before but this time, we are using `BeanWriter` writer instead of `SimpleWriter`:
 ```java
 Xcelite xcelite = new Xcelite();    
 XceliteSheet nativeSheet = xcelite.createSheet("users");
 SheetWriter<User> writer = nativeSheet.getBeanWriter(User.class);
 List<User> users = new ArrayList<>();
-// ...fill up users
+// ...fill in data
 writer.write(users); 
 xcelite.write(new File("users_doc.xlsx"));
 ```
@@ -103,35 +140,13 @@ public class User {
 // ...
 }
 ```
-#### Reading
-How do I simply read a sheet in an existing MS Excel file to a two-dimensional collection?
-```java
-Xcelite xcelite = new Xcelite(new File("data.xlsx"));
-XceliteSheet nativeSheet = xcelite.getSheet("data_sheet");
-SheetReader<Collection<Object>> simpleReader = nativeSheet.getSimpleReader();
-Collection<Collection<Object>> data = simpleReader.read();
-```
-If the first row in the nativeSheet is a header, you can skip it by writing:
-```java
-simpleReader.skipHeaderRow(true);
-```
 
-Cool! How about reading to a collection of Java beans?
-```java
-Xcelite xcelite = new Xcelite(new File("users_doc.xlsx"));
-XceliteSheet nativeSheet = xcelite.getSheet("users");
-SheetReader<User> reader = nativeSheet.getBeanReader(User.class);
-Collection<User> users = reader.read();
-```
-Note that Xcelite will try to map only the `@Column` annotated properties. If for an annotated property no column is found in the nativeSheet it will be ignored.  
-Sheet columns which are not mapped to a `@Column` annotated property will be ignored as well.
-
-### Advanced Stuff
+### Advanced Topics
 #### Using Converters
 
 Lets say your bean contains a list of values or some object of your own. By default, Xcelite will serialize using the `toString()`-method of the object or list, and sometimes this might not be what you want.  
 The converter mechanism allows you to serialize/deserialize the object in any way you want.  
-To demostrate lets add a list to our `User` bean and use the built-in `CSVColumnValueConverter` converter:
+To demonstrate, lets add a list to our `User` bean and use the built-in `CSVColumnValueConverter` converter:
 
 ```java
 @Column(name = "Emails", converter = CSVColumnValueConverter.class)
@@ -143,7 +158,7 @@ So writing a collection of users will result with a column named "Emails" and th
 
     john@mail.com,danny@mail.com,jerry@mail.com  
 
-When reading the nativeSheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
+When reading the MS Excel sheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
 If you prefer a different collection implementation rather than the default `ArrayList`, you can always extend the `CSVColumnValueConverter` and override the `getCollection()` method to return your preferred implementation.
 
 ##### Custom Converters
@@ -165,10 +180,11 @@ public class UpperLowerCaseConverter implements ColumnValueConverter<String, Str
 @Column (name="Firstname", converter = UpperLowerCaseConverter.class)
 private String firstName;
 ```
-#### Dynamic Columns
-What if you don't know in advance which columns your Excel nativeSheet will hold? For example when your application reads dynamic content and save it to Excel.  
-Obviously, a bean won't do any good because you don't know what properties and columns to define.  
-For that purpose you can use the @AnyColumn annotation to annotate a ```Map<String, Object>``` property. The map will hold any column you want where the key represents the column name and the value represents the column value.
+#### Serializing Maps to dynamic Columns
+What if you want to serialize a member variable of type `Map`?
+In this case, you don't know in advance which columns your MS Excel sheet will hold, as that would depend on the keys of the Map.   
+ 
+For that purpose you can use the `@AnyColumn` annotation to annotate a ```Map<String, Object>``` property. The map will hold any column you want where the keys represents the column names and the values represents the column values.
 ```java
 @AnyColumn
 private Map<String, Object> dynamicCols;
@@ -182,15 +198,15 @@ private Map<String, List<String>> dynamicCols;
 
 What about reading from Excel sheets using dynamic columns?  
 
-Well, luckily it works both ways. If your bean contains an @AnyColumn property, any column in your Excel nativeSheet that is not mapped to a specific property in your bean will be injected to the @AnyColumn annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
-By default, Xcelite will use HashMap implementation for the Map when deserializing. If you'de prefer a different implementation use the 'as' attribute.  
+Well, luckily it works both ways. If your bean contains an `@AnyColumn` property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the `@AnyColumn` annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
+By default, Xcelite will use `HashMap` as the implementation when deserializing. If you'd prefer a different implementation use the 'as' attribute.  
 For instance, if you want your map to be sorted by column names using a TreeMap, just do:
 ```java
 @AnyColumn(converter = CSVColumnValueConverter.class, as = TreeMap.class)
 private Map<String, List<String>> dynamicCols;
 ```
 
-In addition, if you want some nativeSheet columns to be skipped from been injected to the map, use:
+In addition, if you want some sheet columns to be skipped from the deserialization, use:
 
 ```java
 @AnyColumn(ignoreCols = { "column1", "column2" })
@@ -198,7 +214,7 @@ private Map<String, List<String>> dynamicCols;
 ```
 
 #### Row Post Processors
-When reading an Excel nativeSheet you sometimes want to manipulate the data while reading. For example, you want to discard some row or object, or change some data in the deserialized object.  
+When reading an MS Excel sheet you sometimes want to manipulate the data while reading. For example, you want to discard some row or object, or change some data in the deserialized object.  
 In order to accomplish that you can add a `RowPostProcessor` to your reader.  
 A `RowPostProcessor` is a simple interface which contain a single method `process()` which gets the deserialized Object as an argument and return boolean whether to keep the Object or not.  
 ```java
@@ -250,15 +266,15 @@ Add xcelite as a dependency:
 <dependency>
 	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.2.3</version>
+	<version>1.2.5</version>
 </dependency>
 ```
 
 #### Using Xcelite in Your Gradle Project
 Add xcelite as a dependency:
 ```gradle
-compile group: 'io.xcelite.spreadsheet', name: 'xcelite', version: '1.2.3'
+compile group: 'io.xcelite.spreadsheet', name: 'xcelite', version: '1.2.5'
 ```
 
 #### Using Xcelite with other build systems
-See https://mvnrepository.com/artifact/io.xcelite.spreadsheet/xcelite/1.2.3
+See https://mvnrepository.com/artifact/io.xcelite.spreadsheet/xcelite/1.2.5

@@ -36,7 +36,7 @@ public @interface Column {
 
     /**
      * The actual name of the column that will be written to excel file. If no
-     * name specified, the annotated field name will be taken.
+     * name specified, the name of the field will be taken.
      */
     String name() default "";
 
@@ -51,6 +51,11 @@ public @interface Column {
      * format.
      */
     String dataFormat() default "";
+
+    /**
+     * If true, no exception is thrown if the column is missing in the target Excel file
+     */
+    boolean optional() default false;
 
     /**
      * Converter class to use when serializing/deserializing the data. Class must

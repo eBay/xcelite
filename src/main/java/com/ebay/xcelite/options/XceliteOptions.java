@@ -39,8 +39,9 @@ public class XceliteOptions {
     }
 
     /**
-     * Returns the row index of the row defining the annotated bean
-     * properties. This index is zero-based.
+     * Returns the row index of the row defining the header names (
+     * which get translated into annotated bean properties).
+     * This index is zero-based.
      *
      * @return column index of the header row.
      * @since 1.2
@@ -51,8 +52,9 @@ public class XceliteOptions {
 
 
     /**
-     * Sets the row index of the row defining the annotated bean
-     * properties. This index is zero-based.
+     * Sets the row index of the row defining the header names (
+     * which get translated into annotated bean properties).
+     * This index is zero-based.
      *
      * @param headerRowIndex column index of the header row
      * @since 1.2
