@@ -1,4 +1,4 @@
-1.3.0 [(Link to github)](https://github.com/iSnow/xcelite/releases/tag/v1.2.5)
+1.3.0 [(Link to github)](https://github.com/iSnow/xcelite/releases/tag/v1.3.0)
 =====================================
 - Added `anyColumnCreatesCollection` option to allow `@AnyColum` to switch between two behaviors (for `BeanSheetReaders` only) if an Excel sheet contains more than one column with the same column name:
   - false (default for versions <2.0): like in previous versions, only the last column value is returned, ie. if your sheet has three columns named "project name" that are part of an `@AnyColum` set, only the value of the last (right-most) column will be returned
