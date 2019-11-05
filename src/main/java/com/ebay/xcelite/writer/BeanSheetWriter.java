@@ -98,7 +98,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
     }
-
+/*
     @Override
     public void write(Collection<T> data) {
         if (hasHeaderRow()) {
@@ -109,7 +109,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         sheet.moveToFirstDataRow(this, true);
         writeData(data);
     }
-
+*/
     /**
      * Takes one object instance of the specified type and writes it to the
      * {@link XceliteSheet} object this writer is operating on.
@@ -135,11 +135,13 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             } else {
                 fieldValueObj = field.get(data);
             }
+            checkHasThrowPolicyMustThrow(fieldValueObj, col);
             Cell cell = excelRow.createCell(i);
             writeToCell(cell, col, fieldValueObj);
         }
     }
 
+    /*
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeData(Collection<T> data) {
@@ -150,8 +152,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             }
         }
         addColumns(columnsToAdd, true);
-        for (T t: data) {
-            if (null == t) {
+        for (T dataObject: data) {
+            if (null == dataObject) {
                 switch(options.getMissingRowPolicy()) {
                     case SKIP: {
                         continue;
@@ -166,7 +168,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                             continue;
                         } else {
                             Class clazz = getBeansClass(data);
-                            t = (T) clazz.newInstance();
+                            dataObject = (T) clazz.newInstance();
                         }
                         break;
                     }
@@ -177,26 +179,11 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 }
 
             }
-            Row row = sheet.getNativeSheet().createRow(rowIndex++);
-            int i = 0;
-            for (Col col: columns) {
-                Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
-                Field field = fields.iterator().next();
-                field.setAccessible(true);
-                Object fieldValueObj;
-                if (col.isAnyColumn()) {
-                    Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(t);
-                    fieldValueObj = anyColumnMap.get(col.getName());
-                } else {
-                    fieldValueObj = field.get(t);
-                }
-                checkHasThrowPolicyMustThrow(fieldValueObj, col);
-                Cell cell = row.createCell(i);
-                writeToCell(cell, col, fieldValueObj);
-                i++;
-            }
+            Row row = sheet.getNativeSheet().createRow(rowIndex);
+            writeRow(dataObject, row ,rowIndex);
+            rowIndex++;
         }
-    }
+    }*/
 
 
     @SuppressWarnings("unchecked")
@@ -268,7 +255,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         }
     }
 
-    private Class getBeansClass(Collection<T> data) {
+    @Override
+    Class getBeansClass(Collection<T> data) {
         Class clazz = null;
         Iterator<T> iter = data.iterator();
         while ((iter.hasNext() && (null == clazz))) {

@@ -50,14 +50,6 @@ public interface SheetReader<T> extends DataMarshaller {
   @Deprecated
   void skipHeaderRow(boolean skipHeaderRow);
 
-
-  /**
-   * Gets the {@link XceliteSheet} object this reader is operating on
-   * @return sheet this reader reads from
-   */
-  XceliteSheet getSheet();
-
-
   /**
    * Adds a row post processor. The row post processors will be executed in
    * insertion order.
@@ -72,4 +64,11 @@ public interface SheetReader<T> extends DataMarshaller {
    * @param rowPostProcessor the post row processor to remove
    */
   void removeRowPostProcessor(RowPostProcessor<T> rowPostProcessor);
+
+
+  /**
+   * Gets the {@link XceliteSheet} object this reader is operating on
+   * @return sheet this reader reads from
+   */
+  XceliteSheet getSheet();
 }

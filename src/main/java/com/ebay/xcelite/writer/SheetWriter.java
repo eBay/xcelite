@@ -71,6 +71,7 @@ public interface SheetWriter<T> extends DataMarshaller {
      * @param generateHeaderRow if set to `true`, generate a header row
      * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
      */
+    @Deprecated
     void setGenerateHeaderRow(boolean generateHeaderRow);
 
     /**

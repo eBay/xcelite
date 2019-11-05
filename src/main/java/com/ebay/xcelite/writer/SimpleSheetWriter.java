@@ -25,6 +25,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -72,12 +73,13 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         super(sheet, options);
     }
 
+    /*
     @Override
     public void write(Collection<Collection<Object>> data) {
         int rowIndex = 0;
 
-        for (Collection<Object> row: data) {
-            if (null == row) {
+        for (Collection<Object> dataRow: data) {
+            if (null == dataRow) {
                 switch(options.getMissingRowPolicy()) {
                     case SKIP: {
                         continue;
@@ -91,7 +93,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
                             sheet.getNativeSheet().createRow(rowIndex++);
                             continue;
                         } else {
-                            row = new ArrayList<>();
+                            dataRow = new ArrayList<>();
                         }
                         break;
                     }
@@ -103,14 +105,16 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
 
             }
             Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
-            final AtomicInteger j = new AtomicInteger(0);
-            row.forEach(column -> {
-                Cell cell = excelRow.createCell(j.intValue());
-                writeToCell(cell, column, null);
-                j.incrementAndGet();
-            });
+            writeRow(dataRow, excelRow, rowIndex);
             rowIndex++;
         };
+    }
+
+     */
+
+    @Override
+    Class getBeansClass(Collection<Collection<Object>> data) {
+        return ArrayList.class;
     }
 
     /**

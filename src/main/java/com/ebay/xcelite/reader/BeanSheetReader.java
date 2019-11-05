@@ -228,7 +228,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 return (!field.getAnnotation(com.ebay.xcelite.annotations.Column.class).optional());
             }).collect(Collectors.toSet());
             if (declaredHeaders.size() > 0) {
-                throw new ColumnNotFoundException(declaredHeaders.stream().limit(10).collect(Collectors.joining()));
+                throw new ColumnNotFoundException(declaredHeaders.stream().limit(10).collect(Collectors.joining(", ")));
             }
         }
     }

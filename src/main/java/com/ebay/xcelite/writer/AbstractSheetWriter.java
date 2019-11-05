@@ -15,16 +15,20 @@
 */
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -115,18 +119,53 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
 
     @Deprecated
     @Override
+    @SneakyThrows
     public void write(final Collection<T> data) {
+        /*if (hasHeaderRow()) {
+            sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
+            rowIndex = sheet.getNativeSheet().getLastRowNum();
+            writeHeader();
+        }*/
         if (hasHeaderRow()) {
             writeHeader();
         }
-        final AtomicInteger i = new AtomicInteger(0);
-        data.forEach(row -> {
-            Row excelRow = sheet.getNativeSheet().createRow(i.intValue());
+        sheet.moveToFirstDataRow(this, true);
+        int rowIndex = 0;
+        for (T dataRow: data) {
+            if (null == dataRow) {
+                switch(options.getMissingRowPolicy()) {
+                    case SKIP: {
+                        continue;
+                    }
+                    case NULL: {
+                        sheet.getNativeSheet().createRow(rowIndex++);
+                        continue;
+                    }
+                    case EMPTY_OBJECT: {
+                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
+                            sheet.getNativeSheet().createRow(rowIndex++);
+                            continue;
+                        } else {
+                            Class clazz = getBeansClass(data);
+                            dataRow = (T) clazz.newInstance();
+                        }
+                        break;
+                    }
+                    case THROW: {
+                        throw new PolicyViolationException("Null object found and " +
+                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
+                    }
+                }
+
+            }
+            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
             final AtomicInteger j = new AtomicInteger(0);
-            writeRow(row, excelRow, i.intValue());
-            i.incrementAndGet();
-        });
+            writeRow(dataRow, excelRow, rowIndex);
+            rowIndex++;
+        }
     }
+
+    abstract Class getBeansClass(Collection<T> data);
 
     abstract void writeHeader();
 
