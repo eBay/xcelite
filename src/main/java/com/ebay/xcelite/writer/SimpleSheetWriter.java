@@ -55,6 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
+    @Override
     public boolean expectsHeaderRow(){return false;}
 
     public SimpleSheetWriter(XceliteSheet sheet) {

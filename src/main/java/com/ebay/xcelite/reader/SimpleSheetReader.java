@@ -48,6 +48,7 @@ import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
  * created Nov 8, 2013
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
+    @Override
     public boolean expectsHeaderRow(){return false;}
 
     /**

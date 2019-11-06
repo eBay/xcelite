@@ -67,6 +67,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
     private Iterator<Row> rowIterator;
+    @Override
     public boolean expectsHeaderRow(){return true;}
 
     /**

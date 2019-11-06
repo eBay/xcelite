@@ -42,7 +42,7 @@ import static org.reflections.ReflectionUtils.withName;
  * An concrete implementation of the {@link SheetWriter} interface that writes
  * collections of annotated Java beans to Excel sheets.
  *
- * This writer class writes a header row as the first row in wich each cell
+ * This writer class writes a header row as the first row in which each cell
  * gets its text from the {@link Column} annotations of the Java bean.
  *
  * Preferably, this class should not directly be instantiated, but you should
@@ -64,6 +64,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private final Col anyColumn;
     private Row headerRow;
     private int rowIndex = 0;
+    private CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+    @Override
     public boolean expectsHeaderRow(){return true;}
 
     /**
@@ -138,6 +140,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             checkHasThrowPolicyMustThrow(fieldValueObj, col);
             Cell cell = excelRow.createCell(i);
             writeToCell(cell, col, fieldValueObj);
+            i++;
         }
     }
 
@@ -236,8 +239,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     }
 
     private void addColumns(Set<Col> columnsToAdd, boolean append) {
-        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
-
         int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))

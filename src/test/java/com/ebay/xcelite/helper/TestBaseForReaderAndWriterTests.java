@@ -29,7 +29,7 @@ public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = false;
+    public static boolean writeToFile = true;
     public static XSSFWorkbook workbook;
 
     @SneakyThrows

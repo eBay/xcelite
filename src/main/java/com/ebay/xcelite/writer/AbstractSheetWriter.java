@@ -19,6 +19,7 @@ import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.AbstractDataMarshaller;
+import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.ebay.xcelite.sheet.XceliteSheetImpl.getFirstDataRowIndex;
 
 /**
  * An abstract implementation of {@link SheetWriter} writer classes that can serialize
@@ -130,7 +133,7 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
             writeHeader();
         }
         sheet.moveToFirstDataRow(this, true);
-        int rowIndex = 0;
+        int rowIndex = getFirstDataRowIndex(this);
         for (T dataRow: data) {
             if (null == dataRow) {
                 switch(options.getMissingRowPolicy()) {
