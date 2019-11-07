@@ -1,6 +1,6 @@
 language: java
 
-install: mvn install -DskipTests -Dgpg.skip
+install: mvn install -DskipTests -Dgpg.skip  -Dmaven.javadoc.skip=true -B -V
 
 after_success:
   - mvn clean test
