@@ -17,13 +17,16 @@ package com.ebay.xcelite.sheet;
 
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.*;
+import com.ebay.xcelite.styles.CellStylesBank;
 import com.ebay.xcelite.writer.*;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Wrapper class around a POI native sheet that represents one sheet
@@ -41,14 +44,16 @@ import java.util.Iterator;
  * created Nov 9, 2013
  */
 @Getter
-public class XceliteSheetImpl implements XceliteSheet {
+public class XceliteSheetImpl implements XceliteSheet<Sheet> {
     private final Sheet nativeSheet;
 
     private XceliteOptions options;
 
+    @Getter
+    protected CellStylesBank styles;
+
     public XceliteSheetImpl(Sheet nativeSheet) {
-        this.nativeSheet = nativeSheet;
-        options = new XceliteOptions();
+        this(nativeSheet, new XceliteOptions());
     }
 
     public XceliteSheetImpl(Sheet nativeSheet, XceliteOptions options) {
@@ -57,11 +62,17 @@ public class XceliteSheetImpl implements XceliteSheet {
             this.options = new XceliteOptions();
         else
             this.options = new XceliteOptions(options);
+        styles = new CellStylesBank(nativeSheet.getWorkbook());
     }
 
     @Override
     public SheetReader<Collection<Object>> getSimpleReader() {
         return new SimpleSheetReader(this, adaptDataRowIndex (options,0));
+    }
+
+    @Override
+    public Iterator<Row> getRowIterator() {
+        return new RowIterator();
     }
 
     @Override
@@ -79,6 +90,7 @@ public class XceliteSheetImpl implements XceliteSheet {
         return new BeanSheetWriter<>(this, adaptDataRowIndex (options,options.getHeaderRowIndex() + 1), type);
     }
 
+    @Override
     public void setOptions(XceliteOptions options) {
         this.options = new XceliteOptions(options);
     }
@@ -110,53 +122,87 @@ public class XceliteSheetImpl implements XceliteSheet {
         return firstDataRowIndex;
     }
 
-    /*
-     For readers/writers expecting a header-row:
-     If the first data row setting from XceliteOptions is smaller than the
-     setting for the header-row index, then assume the first data row is the row
-     following the header row.
+    /**
+     * Return a `RowIterator` that is already skipped over head and leading
+     * blank rows so the next call to `next()` will return the first data
+     * row
+     * @param marshall DataMarshaller that determines the location of the
+     *                 header row
+     * @return An iterator over `Row`s
      */
     @Override
-    public Iterator<Row> moveToFirstDataRow(DataMarshaller marshall, boolean createRows) {
+    public Iterator<Row> getDataRowsIterator(DataMarshaller marshall) {
+        RowIterator iter = new RowIterator();
         int firstDataRowIndex = getFirstDataRowIndex(marshall);
-        return skipRows (firstDataRowIndex, createRows);
+        if (firstDataRowIndex == 0)
+            return iter;
+        return iter.skipToBeforeRow(firstDataRowIndex);
     }
 
     @Override
-    public Iterator<Row> moveToHeaderRow(int headerRowIndex, boolean createRows) {
-        if (headerRowIndex <= 0) {
-            return nativeSheet.rowIterator();
+    public Collection<Row> createRowsUptoAndIncludingRow(int fromRowNum, int toRowNum) {
+        if (toRowNum < fromRowNum)
+            throw new IllegalArgumentException("Last row index cannot be lower than first " +
+                    "row index");
+        List<Row> retVal = new ArrayList<>();
+        Row r;
+        for (int i = fromRowNum; i <= toRowNum; i++) {
+            r = getOrCreateRow(i, true);
+            retVal.add(r);
         }
-        return skipRows (headerRowIndex, createRows);
+        return retVal;
     }
 
-    /*
-     Empty rows sadly are returned as null by POI and not contained in the rowiterator.
-     Therefore, we need to find the last logical row that corresponds to the last skipped row.
-     After that, iterate the row iterator as many times to skip lines and set it to the row
-     before the wanted row. Seems clumsy, maybe think about a better way.
-     */
     @Override
-    public Iterator<Row> skipRows (int rowsToSkip, boolean createRows) {
-        if ((rowsToSkip == 1) && (null == nativeSheet.getRow(0))) {
-            return nativeSheet.rowIterator();
+    public Row getOrCreateRow(int rowNum, boolean createRows) {
+        Row r = nativeSheet.getRow(rowNum);
+        if (null != r)
+            return r;
+        else if (createRows) {
+            return nativeSheet.createRow(rowNum);
         }
-        int lastRowNum = 0;
-        for (int i = 0; i < rowsToSkip; i++) {
-            Row r = nativeSheet.getRow(i);
-            if (null != r)
-                lastRowNum = r.getRowNum();
-            else if (createRows) {
-                r = nativeSheet.createRow(i);
-                lastRowNum = r.getRowNum();
+        return null;
+    }
+
+    @Override
+    public String getSheetName() {
+        return nativeSheet.getSheetName();
+    }
+
+    @Override
+    public int getLastRowNumber() {
+        return nativeSheet.getLastRowNum()+1;
+    }
+
+    public class RowIterator implements Iterator<Row> {
+        private int currentRow = 0;
+        private int lastRow;
+
+        RowIterator() {
+            Sheet sheet = XceliteSheetImpl.this.getNativeSheet();
+            Row lastExcelRow = sheet.getRow(sheet.getLastRowNum());
+            lastRow = lastExcelRow.getRowNum();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return lastRow >= currentRow;
+        }
+
+        @Override
+        public Row next() {
+            return XceliteSheetImpl.this.getNativeSheet().getRow(currentRow++);
+        }
+
+        Iterator<Row> skipToBeforeRow(int skipToBeforeRowNum) {
+            if (currentRow >= skipToBeforeRowNum)
+                throw new IllegalStateException("Already after row "+skipToBeforeRowNum);
+            if (skipToBeforeRowNum <= 0)
+                return this;
+            while (hasNext() && (currentRow < skipToBeforeRowNum)) {
+                next();
             }
+            return this;
         }
-        Iterator<Row> rowIterator= nativeSheet.rowIterator();
-        boolean stop = (lastRowNum >= rowsToSkip);
-        while ((rowIterator.hasNext()) && (!stop)) {
-            Row r = rowIterator.next();
-            stop = (r.getRowNum() >= lastRowNum);
-        }
-        return rowIterator;
     }
 }

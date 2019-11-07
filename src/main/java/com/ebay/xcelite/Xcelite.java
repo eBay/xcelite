@@ -67,7 +67,7 @@ public class Xcelite {
      * this Xcelite instance
      */
     public Xcelite(XceliteOptions options) {
-        workbook = new XSSFWorkbook();
+        this();
         this.options = options;
     }
 
@@ -77,9 +77,8 @@ public class Xcelite {
      * and having default {@link XceliteOptions}.
      * @param inputStream the InputStream to read data from
      */
-    @SneakyThrows
     public Xcelite(InputStream inputStream) {
-        workbook = new XSSFWorkbook(inputStream);
+        this(inputStream, new XceliteOptions());
     }
 
     /**

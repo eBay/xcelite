@@ -41,9 +41,10 @@ public class XceliteOptions {
     }
 
     /**
-     * Returns the row index of the row defining the header names (
-     * which get translated into annotated bean properties).
-     * This index is zero-based.
+     * Returns the row index of the row defining the header names
+     * (which get translated into annotated bean properties).
+     * This index is zero-based, so `headerRowIndex`-value of 3
+     * creates 3 empty rows before the header row.
      *
      * @return column index of the header row.
      * @since 1.2

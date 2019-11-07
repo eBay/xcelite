@@ -19,6 +19,7 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import org.apache.poi.ss.usermodel.Row;
 
 import java.util.Collection;
 /**
@@ -41,12 +42,25 @@ public interface SheetWriter<T> extends DataMarshaller {
     void write(Collection<T> data);
 
     /**
+     * Takes one instance of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    void writeRow(T data, Row excelRow, int rowIndex);
+
+    /**
      * Determines whether this writer will generate a header row with the
      * column defining attributes from the {@link com.ebay.xcelite.annotations.Column}
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     * @since 1.0
+     * @deprecated since 1.2. Use {@link
+     *       com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
     @Deprecated
     void generateHeaderRow(boolean generateHeaderRow);
@@ -57,15 +71,19 @@ public interface SheetWriter<T> extends DataMarshaller {
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     *
+     * @deprecated since 1.2. Use {@link
+     *       com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
+    @Deprecated
     void setGenerateHeaderRow(boolean generateHeaderRow);
 
     /**
      * Gets the {@link XceliteSheet} object this writer is operating on
      * @return sheet this writer writes to.
+     *
+     * @since 1.0
      */
     XceliteSheet getSheet();
-
 
 }

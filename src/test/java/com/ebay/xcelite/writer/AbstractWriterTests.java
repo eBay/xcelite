@@ -11,6 +11,16 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The setup() to this tests creates an Excel workbook with one sheet. On that sheet,
+ * there are three columns:
+ * - one created from a boolean primitive
+ * - one created from a Boolean object
+ * - one created from a String
+ *
+ * Nota bene: the unit under test is called in the setup() function, the tests validate
+ * by reading
+ */
 class AbstractWriterTests extends TestBaseForWriterTests {
     private static AbstractWriterTestsBean bean = new AbstractWriterTestsBean();
 
