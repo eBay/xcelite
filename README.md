@@ -20,7 +20,7 @@
 
 Status:
 
-https://img.shields.io/github/license/xcelite-io/xcelite.svg | [![build_status](https://travis-ci.com/xcelite-io/xcelite.svg?branch=master)](https://travis-ci.com/xcelite-io/xcelite)
+[![License](https://img.shields.io/github/license/xcelite-io/xcelite.svg)] | [![build_status](https://travis-ci.com/xcelite-io/xcelite.svg?branch=master)](https://travis-ci.com/xcelite-io/xcelite)
 
 -----
 
