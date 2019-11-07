@@ -97,13 +97,12 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         this(sheet, sheet.getOptions(), type);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @SneakyThrows
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
         int lastNonEmptyRowId = 0;
-        Boolean firstIteration = true;
+        boolean firstIteration = true;
 
         rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
         if (!rowIterator.hasNext())
@@ -142,7 +141,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 }
                 lastNonEmptyRowId = data.size();
             }
-        };
+        }
 
         return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId);
     }
@@ -263,6 +262,14 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
                 cellValue = converter.deserialize(cellValue);
             }
         }
+        if (options.isAnyColumnCreatesCollection()){
+            List holder = (List)map.get(columnName);
+            if (null == holder) {
+                holder = new ArrayList();
+            }
+            holder.add(cellValue);
+            cellValue = holder;
+        }
         map.put(columnName, cellValue);
     }
 
@@ -366,12 +373,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
 
         Set<String> getDeclaredHeaderNames() {
-            Set<String> declaredHeaders = columnsMap
+            return columnsMap
                     .values()
                     .stream()
-                    .map(c -> c.getName())
+                    .map(Col::getName)
                     .collect(Collectors.toSet());
-            return declaredHeaders;
         }
     }
 

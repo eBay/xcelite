@@ -158,7 +158,7 @@ So writing a collection of users will result with a column named "Emails" and th
 
     john@mail.com,danny@mail.com,jerry@mail.com  
 
-When reading the MS Excel sheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
+When reading the Excel sheet to a collection of `Users`, the column "Emails" will be deserialized to an `ArrayList`.
 If you prefer a different collection implementation rather than the default `ArrayList`, you can always extend the `CSVColumnValueConverter` and override the `getCollection()` method to return your preferred implementation.
 
 ##### Custom Converters
@@ -180,33 +180,62 @@ public class UpperLowerCaseConverter implements ColumnValueConverter<String, Str
 @Column (name="Firstname", converter = UpperLowerCaseConverter.class)
 private String firstName;
 ```
-#### Serializing Maps to dynamic Columns
-What if you want to serialize a member variable of type `Map`?
-In this case, you don't know in advance which columns your MS Excel sheet will hold, as that would depend on the keys of the Map.   
- 
-For that purpose you can use the `@AnyColumn` annotation to annotate a ```Map<String, Object>``` property. The map will hold any column you want where the keys represents the column names and the values represents the column values.
+#### Dynamic Columns
+##### Reading from an Excel Sheet with partially unknown Column Names
+What if you know in advance only partially which columns your Excel sheet will hold? For example, a sheet with 
+employee information might hold fixed columns for name and organizational unit, but additionally a number of 
+additional columns depending which department created the sheet.
+
+For that purpose you can use the `@AnyColumn` annotation to annotate a ```Map<String, Object>``` property. 
+The map can hold any column -- the key represents the column name whereas the value represents the column value.
+
 ```java
+@Column(name="name")
+String name;
+
+@Column(name="org_unit")
+String unit;
+
 @AnyColumn
 private Map<String, Object> dynamicCols;
 ```
 
-The map value can be of any type. If the type is not a `Number` or `Date` Xcelite will use the `toString()` of the object upon serializtion. If this is not what you want you can use a converter same way as before:
-```java
-@AnyColumn(converter = CSVColumnValueConverter.class)
-private Map<String, List<String>> dynamicCols;
-```
+If your bean contains an `@AnyColumn` property, any column in your Excel sheet that is *right* to the columns mapped to specific 
+properties in your bean will be injected to the `@AnyColumn` annotated `Map` property. If a converter is declared, 
+then the value will be deserialized using the converter before injected to the map. This also means you only can have
+one  `@AnyColumn` per Bean class and it consumes all the columns to the right.
 
-What about reading from Excel sheets using dynamic columns?  
+One special case comes up if you have two or more columns with the same header name in your `@AnyColumn` set. As the column 
+header name acts as the key of the resulting `Map` property, only the last column value is returned, ie. if your sheet
+has three columns named "project name" that are part of an @AnyColum set, only the value of the last 
+(right-most) column will be returned. As this is frequently not what you want, a configuration option exists, 
+`anyColumnCreatesCollection` (default: `false`), that if set to `true` allows to switch the value type of the 
+`@AnyColumn` annotation to `Collection`. 
 
-Well, luckily it works both ways. If your bean contains an `@AnyColumn` property, any column in your Excel sheet that is not mapped to a specific property in your bean will be injected to the `@AnyColumn` annotated Map property. If a converter is declared then the value will be deserialized using the converter before injected to the map.  
-By default, Xcelite will use `HashMap` as the implementation when deserializing. If you'd prefer a different implementation use the 'as' attribute.  
+By default, Xcelite will use `HashMap` as the implementation when deserializing. If you'd prefer a different 
+implementation use the `as` attribute.  
+
 For instance, if you want your map to be sorted by column names using a TreeMap, just do:
 ```java
 @AnyColumn(converter = CSVColumnValueConverter.class, as = TreeMap.class)
 private Map<String, List<String>> dynamicCols;
 ```
 
-In addition, if you want some sheet columns to be skipped from the deserialization, use:
+##### Writing to an Excel Sheet if your Bean class contains a `Map` member variable
+The `@AnyColumn` annotation also works for writing. The entries of your `Map` member variable get serialized into
+individual columns of the Excel sheet - the Map-keys become the column headers, the Map-values the cell values. The 
+same limitations as for reading apply: only one `Map` per Bean class and the variable columns will appear to the
+right of the fixed (individually mapped) columns.
+
+Values of the `@AnyColumn`-annotated `Map`-type member variable can be of any type . If the type of an 
+entry of the Map is not a `Number` or `Date` Xcelite will use the `toString()` of the object upon serialization. 
+If this is not what you want you can use a converter same way as before:
+```java
+@AnyColumn(converter = CSVColumnValueConverter.class)
+private Map<String, List<String>> dynamicCols;
+```
+##### Skipping Columns while using `@AnyColumn`
+In addition, if you want some sheet columns to be skipped from the serialization/deserialization, use:
 
 ```java
 @AnyColumn(ignoreCols = { "column1", "column2" })
