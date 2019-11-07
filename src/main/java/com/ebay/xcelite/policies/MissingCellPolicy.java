@@ -13,9 +13,9 @@ import org.apache.poi.ss.usermodel.Row;
  */
 public enum MissingCellPolicy {
     /**     *
-     * Readers: Empty String formatted cells will be returned as "", other empty cells
-     * where the Java object does not allow for emptiness will be returned as
-     * null
+     * Readers: Empty String formatted cells will be returned as "", the
+     * zero-length empty string, other empty cells where matching the Java class
+     * does not allow for emptiness will be returned as null
      *
      * Writers: Empty string member variables will be written as empty cells, null
      * member variables will be written as null.

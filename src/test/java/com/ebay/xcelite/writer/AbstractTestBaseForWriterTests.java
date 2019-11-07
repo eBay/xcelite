@@ -1,12 +1,11 @@
-package com.ebay.xcelite.helper;
+package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.TestSettings;
 import com.ebay.xcelite.Xcelite;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.AbstractSheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.writer.SheetWriter;
-import lombok.Data;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,39 +18,64 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 public class AbstractTestBaseForWriterTests{
-    protected static XSSFWorkbook workbook;
+    static XSSFWorkbook workbook;
 
     @SneakyThrows
-    protected static void setup(Object bean) {
+    public static void setup(XceliteOptions options, Object... inBeans) {
         Xcelite xcelite = new Xcelite();
         ArrayList beans = new ArrayList();
         XceliteSheet sheet = xcelite.createSheet("Tests");
-        beans.add(bean);
-        SheetWriter bs = sheet.getBeanWriter(bean.getClass());
+        Class clazz = null;
+        for (Object bean : inBeans) {
+            beans.add(bean);
+            if (null != bean)
+                clazz = bean.getClass();
+        }
+        SheetWriter bs = sheet.getBeanWriter(clazz);
+        bs.setOptions(options);
         bs.write(beans);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
         if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 
-    protected Map<String, Object> extractCellValues (XSSFWorkbook workbook) {
+    List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook) {
+        return extractCellValues (workbook, 0,0);
+    }
+
+    List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook, int skipBeforeHeader, int skipAfterHeader) {
+        List<Map<String, Object>> rowVals = new ArrayList<>();
         List<String> columnNames = new ArrayList<>();
-        Map<String, Object> columnsMap = new LinkedHashMap<>();
         Sheet excelSheet = workbook.getSheet("Tests");
         Iterator<Row> iter = excelSheet.rowIterator();
+        int rowId = 0;
         // move to header row
+        while (--skipBeforeHeader >= 0) {
+            rowId++;
+            iter.next();
+        }
         Row header = iter.next();
+        rowId++;
         header.cellIterator().forEachRemaining(cell -> {
             Object val = AbstractSheetReader.readValueFromCell(cell);
             columnNames.add(val.toString());
         });
-        iter.forEachRemaining(row -> {
-            Iterator<Cell> cellIter = row.cellIterator();
-            for (int i = 0; i < row.getPhysicalNumberOfCells(); i++) {
-                columnsMap.put(columnNames.get(i), AbstractSheetReader.readValueFromCell(cellIter.next()));
+        while (--skipAfterHeader >= 0) {
+            rowId++;
+            iter.next();
+        }
+        for (int i = rowId; i <= excelSheet.getLastRowNum(); i++) {
+            Row row = excelSheet.getRow(i);
+            Map<String, Object> columnsMap = new LinkedHashMap<>();
+            rowVals.add(columnsMap);
+            if (null != row) {
+                Iterator<Cell> cellIter = row.cellIterator();
+                for (int j = 0; j < row.getPhysicalNumberOfCells(); j++) {
+                    columnsMap.put(columnNames.get(j), AbstractSheetReader.readValueFromCell(cellIter.next()));
+                }
             }
-        });
-        return columnsMap;
+        };
+        return rowVals;
     }
 
     @SneakyThrows

@@ -20,7 +20,6 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.SneakyThrows;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 
@@ -48,6 +46,7 @@ import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
  * created Nov 8, 2013
  */
 public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
+    @Override
     public boolean expectsHeaderRow(){return false;}
 
     /**
@@ -70,71 +69,22 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
         this(sheet, sheet.getOptions());
     }
 
+    /**
+     * No-Op for SimpleSheetReader, we don't handle headers
+     */
     @Override
-    public Collection<Collection<Object>> read() {
-        List<Collection<Object>> rows = new ArrayList<>();
-        int lastNonEmptyRowId = 0;
-        Boolean firstIteration = true;
-        Iterator<Row> rowIterator = sheet.moveToFirstDataRow(this, false);
-        if (!rowIterator.hasNext())
-            return rows;
-/*
-        rowIterator.forEachRemaining(excelRow -> {
-            Collection<Object> row;*/
+    void buildHeader(Row row) {}
 
-        while (rowIterator.hasNext()) {
-            Collection<Object> row;
+    /**
+     * No-Op for SimpleSheetReader, we don't handle headers
+     */
+    @Override
+    void validateColumns() {}
 
-            Row excelRow = rowIterator.next();
-            if (firstIteration) {
-                int rowNum = excelRow.getRowNum();
-                if (rows.size() < rowNum) {
-                    int firstDataRowIndex = XceliteSheetImpl.getFirstDataRowIndex(this);
-                    for (int i = firstDataRowIndex; i < rowNum; i++) {
-                        rows.add(handleEmptyRow(sheet.getNativeSheet().getRow(i)));
-                    }
-                }
-                firstIteration = false;
-            }
-            if (isBlankRow(excelRow)) {
-                row = handleEmptyRow(excelRow);
-                if (!options.getMissingRowPolicy().equals(SKIP)) {
-                    if (shouldKeepObject(row, rowPostProcessors)) {
-                        rows.add(row);
-                    }
-                }
-            } else {
-                row = fillObject(excelRow);
-                if (shouldKeepObject(row, rowPostProcessors)) {
-                    rows.add(row);
-                    lastNonEmptyRowId = rows.size();
-                }
-            }
-        };
-
-        return applyTrailingEmptyRowPolicy(rows, lastNonEmptyRowId);
-    }
 
     @SneakyThrows
-    private Collection<Object> handleEmptyRow(Row excelRow) {
-        Collection<Object> object;
-        switch (options.getMissingRowPolicy()) {
-            case THROW:
-                throw new EmptyRowException();
-            case EMPTY_OBJECT:
-                object = new ArrayList<>();
-                break;
-            case NULL:
-                object = null;
-                break;
-            default:
-                object = null;
-        }
-        return object;
-    }
-
-    @SneakyThrows
-    private Collection<Object> fillObject(Row excelRow) {
+    @Override
+    public Collection<Object> fillObject(Row excelRow) {
         Collection<Object> row = getNewObject();
         Iterator<Cell> cellIterator = excelRow.cellIterator();
 
@@ -145,6 +95,7 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
         return row;
     }
 
+    @Override
     @SneakyThrows
     Collection<Object> getNewObject(){
         return new ArrayList<>();

@@ -42,7 +42,7 @@ import static org.reflections.ReflectionUtils.withName;
  * An concrete implementation of the {@link SheetWriter} interface that writes
  * collections of annotated Java beans to Excel sheets.
  *
- * This writer class writes a header row as the first row in wich each cell
+ * This writer class writes a header row as the first row in which each cell
  * gets its text from the {@link Column} annotations of the Java bean.
  *
  * Preferably, this class should not directly be instantiated, but you should
@@ -64,6 +64,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private final Col anyColumn;
     private Row headerRow;
     private int rowIndex = 0;
+    private CellStyle boldStyle;
+    @Override
     public boolean expectsHeaderRow(){return true;}
 
     /**
@@ -79,6 +81,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         extractor.extract();
         columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
+        boldStyle = sheet.getStyles().get().getBoldStyle();
     }
 
     /**
@@ -97,78 +100,40 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         extractor.extract();
         columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
+        boldStyle = sheet.getStyles().get().getBoldStyle();
     }
 
-    @Override
-    public void write(Collection<T> data) {
-        if (hasHeaderRow()) {
-            sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
-            rowIndex = sheet.getNativeSheet().getLastRowNum();
-            writeHeader();
-        }
-        sheet.moveToFirstDataRow(this, true);
-        writeData(data);
-    }
-
+    /**
+     * Takes one object instance of the specified type and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data of the specified type
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    private void writeData(Collection<T> data) {
-        Set<Col> columnsToAdd = new TreeSet();
-        for (T t: data) {
-            if (anyColumn != null) {
-                appendAnyColumns(t, columnsToAdd);
+    @Override
+    public void writeRow(T data, Row excelRow, int rowIndex) {
+        int i = 0;
+        for (Col col: columns) {
+            Set<Field> fields = ReflectionUtils.getAllFields(data.getClass(), withName(col.getFieldName()));
+            Field field = fields.iterator().next();
+            field.setAccessible(true);
+            Object fieldValueObj;
+            if (col.isAnyColumn()) {
+                Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(data);
+                fieldValueObj = anyColumnMap.get(col.getName());
+            } else {
+                fieldValueObj = field.get(data);
             }
-        }
-        addColumns(columnsToAdd, true);
-
-        for (T t: data) {
-            if (null == t) {
-                switch(options.getMissingRowPolicy()) {
-                    case SKIP: {
-                        continue;
-                    }
-                    case NULL: {
-                        sheet.getNativeSheet().createRow(rowIndex++);
-                        continue;
-                    }
-                    case EMPTY_OBJECT: {
-                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex++);
-                            continue;
-                        } else {
-                            Class clazz = getBeansClass(data);
-                            t = (T) clazz.newInstance();
-                        }
-                        break;
-                    }
-                    case THROW: {
-                        throw new PolicyViolationException("Null object found and " +
-                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
-                    }
-                }
-
-            }
-            Row row = sheet.getNativeSheet().createRow(rowIndex++);
-            int i = 0;
-            for (Col col: columns) {
-                Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(col.getFieldName()));
-                Field field = fields.iterator().next();
-                field.setAccessible(true);
-                Object fieldValueObj;
-                if (col.isAnyColumn()) {
-                    Map<String, Object> anyColumnMap = (Map<String, Object>) field.get(t);
-                    fieldValueObj = anyColumnMap.get(col.getName());
-                } else {
-                    fieldValueObj = field.get(t);
-                }
-                checkHasThrowPolicyMustThrow(fieldValueObj, col);
-                Cell cell = row.createCell(i);
-                writeToCell(cell, col, fieldValueObj);
-                i++;
-            }
+            checkHasThrowPolicyMustThrow(fieldValueObj, col);
+            Cell cell = excelRow.createCell(i);
+            writeToCell(cell, col, fieldValueObj);
+            i++;
         }
     }
-
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
@@ -182,46 +147,28 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             fieldValueObj = converter.serialize(fieldValueObj);
         }
         if (col.getDataFormat() != null) {
-            cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getCustomDataFormatStyle(
+            cell.setCellStyle(sheet.getStyles().get().getCustomDataFormatStyle(
                     col.getDataFormat()));
         }
 
         if (col.getType().equals(Date.class)) {
             if (col.getDataFormat() == null) {
-                cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle());
+                cell.setCellStyle(sheet.getStyles().get().getDateStyle());
             }
         }
 
         writeToCell(cell, fieldValueObj, col.getType());
     }
 
+    @Override
     void writeHeader() {
-        headerRow = sheet.getNativeSheet().createRow(rowIndex);
-        rowIndex++;
-        addColumns(columns, false);
+        sheet.createRowsUptoAndIncludingRow(0, options.getHeaderRowIndex());
+        headerRow = sheet.getOrCreateRow(options.getHeaderRowIndex(), false);
+        addColumnsToHeaderRow(columns, false);
+        rowIndex = sheet.getLastRowNumber();
     }
 
-    @SuppressWarnings("unchecked")
-    @SneakyThrows
-    private void appendAnyColumns(T t, Set<Col> columnToAdd) {
-        Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
-        Field anyColumnField = fields.iterator().next();
-        anyColumnField.setAccessible(true);
-        Map<String, Object> fieldValueObj = (Map<String, Object>) anyColumnField.get(t);
-        for (Map.Entry<String, Object> entry: fieldValueObj.entrySet()) {
-            Col column = new Col(entry.getKey(), anyColumnField.getName());
-            column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
-            column.setAnyColumn(true);
-            if (!anyColumn.getConverter().equals(NoConverterClass.class)) {
-                column.setConverter(anyColumn.getConverter());
-            }
-            columnToAdd.add(column);
-        }
-    }
-
-    private void addColumns(Set<Col> columnsToAdd, boolean append) {
-        CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
-
+    private void addColumnsToHeaderRow(Set<Col> columnsToAdd, boolean append) {
         int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))
@@ -230,7 +177,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 if (headerRow == null)
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);
-                cell.setCellType(CellType.STRING);
                 cell.setCellStyle(boldStyle);
                 cell.setCellValue(column.getName());
                 i++;
@@ -239,17 +185,19 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         }
     }
 
-    private Class getBeansClass(Collection<T> data) {
-        Class clazz = null;
+    /*
+    @Override
+    Class<T> getBeansClass(Collection<T> data) {
+        Class<T> clazz = null;
         Iterator<T> iter = data.iterator();
         while ((iter.hasNext() && (null == clazz))) {
             T obj = iter.next();
             if (null != obj)
-                clazz = obj.getClass();
+                clazz = (Class<T>)obj.getClass();
         }
         return clazz;
     }
-
+*/
     private void checkHasThrowPolicyMustThrow(Object fieldValueObj, Col col) {
         if ((null == fieldValueObj)
                 && (options.getMissingCellPolicy().equals(MissingCellPolicy.THROW))) {

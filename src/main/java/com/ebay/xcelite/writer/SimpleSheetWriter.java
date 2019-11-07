@@ -15,17 +15,12 @@
 */
 package com.ebay.xcelite.writer;
 
-import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.styles.CellStylesBank;
-import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Each entry in the outer collection represents one row in the spreadsheet
  * while each entry in the inner collection represents one cell (column) in the row.
  *
- * This writer class does not write a header row, as no column names are defined.
+ * This writer class by default does not write a header row, as no column names are defined.
  *
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getSimpleWriter()}
@@ -54,11 +49,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * created Nov 10, 2013
  */
 public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
+    @Override
     public boolean expectsHeaderRow(){return false;}
 
     public SimpleSheetWriter(XceliteSheet sheet) {
         super(sheet);
     }
+
 
     /**
      * Construct a {@link SimpleSheetWriter} on the given {@link XceliteSheet sheet} using
@@ -72,44 +69,40 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         super(sheet, options);
     }
 
+/*
     @Override
-    public void write(Collection<Collection<Object>> data) {
-        int rowIndex = 0;
-
-        for (Collection<Object> row: data) {
-            if (null == row) {
-                switch(options.getMissingRowPolicy()) {
-                    case SKIP: {
-                        continue;
-                    }
-                    case NULL: {
-                        sheet.getNativeSheet().createRow(rowIndex++);
-                        continue;
-                    }
-                    case EMPTY_OBJECT: {
-                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex++);
-                            continue;
-                        } else {
-                            row = new ArrayList<>();
-                        }
-                        break;
-                    }
-                    case THROW: {
-                        throw new PolicyViolationException("Null object found and " +
-                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
-                    }
-                }
-
-            }
-            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
-            final AtomicInteger j = new AtomicInteger(0);
-            row.forEach(column -> {
-                Cell cell = excelRow.createCell(j.intValue());
-                writeToCell(cell, column, null);
-                j.incrementAndGet();
-            });
-            rowIndex++;
-        };
+    Class<Collection<Object>> getBeansClass(Collection<Collection<Object>> data) {
+        return beanClass;
     }
+
+ */
+    /**
+     * Takes an object collection and writes it to the
+     * {@link XceliteSheet} object this writer is operating on.
+     *
+     * @param data Object collection representing one row
+     * @param excelRow the row object in the spreadsheet to write to
+     * @param rowIndex row index of the row object in the spreadsheet to write to
+     * @since 1.0
+     */
+    @Override
+    public void writeRow(Collection data, Row excelRow, int rowIndex) {
+        final AtomicInteger j = new AtomicInteger(0);
+        data.forEach(column -> {
+            Cell cell = excelRow.createCell(j.intValue());
+            if (hasHeaderRow() && rowIndex == 0) {
+                CellStyle boldStyle = sheet.getStyles().get().getBoldStyle();
+                cell.setCellStyle(boldStyle);
+            }
+            writeToCell(cell, column, null);
+            j.incrementAndGet();
+        });
+    }
+
+    /*
+    No-Op for SimpleSheetWriter
+     */
+    @Override
+    void writeHeader() {}
+
 }

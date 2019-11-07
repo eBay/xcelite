@@ -22,6 +22,7 @@ public class XceliteOptions {
     private MissingCellPolicy missingCellPolicy = MissingCellPolicy.RETURN_BLANK_AS_NULL;
     private MissingRowPolicy missingRowPolicy = MissingRowPolicy.NULL;
     private TrailingEmptyRowPolicy trailingEmptyRowPolicy = TrailingEmptyRowPolicy.SKIP;
+    private boolean anyColumnCreatesCollection = false;
 
     public XceliteOptions() {}
 
@@ -35,12 +36,15 @@ public class XceliteOptions {
         this.firstDataRowIndex = other.firstDataRowIndex;
         this.missingCellPolicy = other.missingCellPolicy;
         this.missingRowPolicy = other.missingRowPolicy;
-        trailingEmptyRowPolicy = other.trailingEmptyRowPolicy;
+        this.trailingEmptyRowPolicy = other.trailingEmptyRowPolicy;
+        this.anyColumnCreatesCollection = other.anyColumnCreatesCollection;
     }
 
     /**
-     * Returns the row index of the row defining the annotated bean
-     * properties. This index is zero-based.
+     * Returns the row index of the row defining the header names
+     * (which get translated into annotated bean properties).
+     * This index is zero-based, so `headerRowIndex`-value of 3
+     * creates 3 empty rows before the header row.
      *
      * @return column index of the header row.
      * @since 1.2
@@ -51,8 +55,9 @@ public class XceliteOptions {
 
 
     /**
-     * Sets the row index of the row defining the annotated bean
-     * properties. This index is zero-based.
+     * Sets the row index of the row defining the header names (
+     * which get translated into annotated bean properties).
+     * This index is zero-based.
      *
      * @param headerRowIndex column index of the header row
      * @since 1.2
@@ -182,7 +187,8 @@ public class XceliteOptions {
 
     /**
      * Used to specify the policy to handle null and trailing blank rows following
-     * data blocks for readers and trailing null objects for writers.
+     * data blocks for readers and trailing null objects for writers. Note: for
+     * SheetWriters, it cannot filter out empty objects if set to SKIP
      *
      * @return trailingEmptyRowPolicy the policy for trailing null and blank rows
      *
@@ -194,14 +200,59 @@ public class XceliteOptions {
 
     /**
      * Used to specify the policy to handle null and trailing blank rows following
-     * data blocks for readers and trailing null objects for writers.
+     * data blocks for readers and trailing null objects for writers. Note: for
+     * SheetWriters, it cannot filter out empty objects if set to SKIP
      *
-     * @param trailingEmptyRowPolicy set olicy for trailing null and blank rows
+     * @param trailingEmptyRowPolicy set policy for trailing null and blank rows
      *
      * @since 1.2
      */
     public void setTrailingEmptyRowPolicy(TrailingEmptyRowPolicy trailingEmptyRowPolicy) {
         this.trailingEmptyRowPolicy = trailingEmptyRowPolicy;
+    }
+
+    /**
+     * Used to specify whether a `@AnyColumn` annotation creates a {@link java.util.Collection}
+     * or a single object. In the latter case, multiple Excel columns *with the same name*
+     * will overwrite each other's value objects on reading. Setting this to `true` will
+     * always return a Collection for each column key.
+     *
+     * Default behavior is to create an object to stay compatible with the original version
+     * but this will change in version 2 where the default will switch to returning a
+     * collection.
+     *
+     * This setting has no influence on {@link com.ebay.xcelite.writer.SheetWriter}s or
+     * {@link com.ebay.xcelite.reader.SimpleSheetReader}s
+     *
+     * @return whether a `@AnyColumn` annotation creates a {@link java.util.Collection}
+     * or a single object
+     *
+     * @since 1.3
+     */
+    public boolean isAnyColumnCreatesCollection() {
+        return anyColumnCreatesCollection;
+    }
+
+    /**
+     * Used to specify whether a `@AnyColumn` annotation creates a {@link java.util.Collection}
+     * or a single object. In the latter case, multiple Excel columns *with the same name*
+     * will overwrite each other's value objects on reading. Setting this to `true` will
+     * always return a Collection for each column key.
+     *
+     * Default behavior is to create an object to stay compatible with the original version
+     * but this will change in version 2 where the default will switch to returning a
+     * collection.
+     *
+     * This setting has no influence on {@link com.ebay.xcelite.writer.SheetWriter}s or
+     * {@link com.ebay.xcelite.reader.SimpleSheetReader}s
+     *
+     * @param anyColumnCreatesCollection true: a `@AnyColumn` annotation creates a
+     * {@link java.util.Collection}, false: a single object
+     *
+     * @since 1.3
+     */
+    public void setAnyColumnCreatesCollection(boolean anyColumnCreatesCollection) {
+        this.anyColumnCreatesCollection = anyColumnCreatesCollection;
     }
 
 }

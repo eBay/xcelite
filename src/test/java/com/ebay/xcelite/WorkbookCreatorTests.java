@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
  */
 public class WorkbookCreatorTests {
 
-    // set to true to see the created test workbooks
-    private static final boolean WRITE_TO_TEST_FILES = true;
     TestWorkbookCreator creator;
     private String fileName=null;
 
@@ -110,7 +108,7 @@ public class WorkbookCreatorTests {
     @AfterEach
     @SneakyThrows
     public void removeFile() {
-        if (!WRITE_TO_TEST_FILES)
+        if (!TestSettings.WRITE_TO_TEST_FILES)
             return;
         if (null == fileName)
             return;

@@ -1,5 +1,6 @@
 package com.ebay.xcelite.helper;
 
+import com.ebay.xcelite.TestSettings;
 import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
@@ -19,6 +20,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -28,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
-    // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = false;
     public static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -40,7 +43,7 @@ public class TestBaseForReaderAndWriterTests {
         bs.setOptions(options);
         bs.write(objs);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 
@@ -56,7 +59,7 @@ public class TestBaseForReaderAndWriterTests {
         bs.setOptions(options);
         bs.write(objs);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 
@@ -119,6 +122,8 @@ public class TestBaseForReaderAndWriterTests {
             int skipBeforeData) {
         List<Collection<Object>> rowVals = new ArrayList<>();
         Sheet excelSheet = workbook.getSheet("Tests");
+        if (excelSheet.getLastRowNum() == 0)
+            return new ArrayList<>();
         Iterator<Row> iter = excelSheet.rowIterator();
         int rowId = 0;
         // move to first row
@@ -354,5 +359,15 @@ public class TestBaseForReaderAndWriterTests {
             data = byteArrayOutputStream.toByteArray();
         }
         return new Xcelite(new ByteArrayInputStream(data), options);
+    }
+    protected static File getResourceFile(String relativePath) throws URISyntaxException {
+        String lPath = relativePath;
+        if (!lPath.startsWith("/"))
+            lPath = "/"+lPath;
+        // Create file-URL of source file:
+        URL sourceFileUrl = TestBaseForReaderAndWriterTests.class.getResource(lPath);
+        // normal case: resolve against resources path
+        Path path = Paths.get(sourceFileUrl.toURI());
+        return path.toFile();
     }
 }

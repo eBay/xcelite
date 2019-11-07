@@ -84,21 +84,21 @@ public class TestWorkbookCreator {
     /**
      * Default sheet names for the created workbook
      */
-    private String sheetNames[] = new String[]{
+    private String[] sheetNames = new String[]{
             "Sheet 1", "Test data", "Sheet 3", "Sheet 4"
     };
 
     /**
      * Default column names
      */
-    private String columnNames[] = new String[]{
+    private String[] columnNames = new String[]{
             "SURNAME", "SEXID", "BIRTHDATE", "NAME"
     };
 
     /**
      * Default column types
      */
-    private CellType columnTypes[] = new CellType[]{
+    private CellType[] columnTypes = new CellType[]{
             CellType.STRING, CellType.NUMERIC, CellType.NUMERIC, CellType.STRING
     };
 
@@ -108,7 +108,7 @@ public class TestWorkbookCreator {
         workbook = new XSSFWorkbook();
     }
 
-    public Sheet getTestSheet() {
+    private Sheet getTestSheet() {
         return workbook.getSheetAt(testSheetIndex);
     }
 
@@ -138,7 +138,7 @@ public class TestWorkbookCreator {
         fillSheet(sheet);
     }
 
-    public void fillSheet(Sheet sheet) {
+    private void fillSheet(Sheet sheet) {
         int numDataColumns = columnNames.length;
         int curRow = 0;
 
@@ -179,7 +179,7 @@ public class TestWorkbookCreator {
         rowData.add(dataVal);
     }
 
-    private static void createSheets (Workbook wb, String sheetNames[], int testSheetIndex) {
+    private static void createSheets (Workbook wb, String[] sheetNames, int testSheetIndex) {
         if (testSheetIndex >= sheetNames.length) {
             throw new RuntimeException("testSheetIndex cannot be bigger than number of sheets");
         }
@@ -242,7 +242,7 @@ public class TestWorkbookCreator {
     private static Object fillCell(
             Cell cell,
             int colIdx,
-            CellType columnTypes[],
+            CellType[] columnTypes,
             boolean randomErrorCells,
             boolean randomBlankCells) {
         if (null == cell)
@@ -254,8 +254,8 @@ public class TestWorkbookCreator {
         } else if ((randomBlankCells) && (Math.random() > 0.7)) {
             type = CellType._NONE;
         }
-        if (type != CellType._NONE)
-            cell.setCellType(type);
+        if (type == CellType._NONE)
+            cell.setBlank();
 
         Object retVal = null;
         switch (type) {
