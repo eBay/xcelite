@@ -5,7 +5,12 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import documentation_examples.model.User;
 import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,4 +84,22 @@ public class BeanSheetWriterTests extends TestBaseForWriterTests {
     }
 
 
+    @Test
+    @DisplayName("Must correctly write header with bold formatting")
+    public void basicWriterTestCheckHeaderFormat() {
+        User users[] = createUserClassTestDataWithNullPadding(1, 0);
+
+        setupBeans(new XceliteOptions(), (Object[]) users);
+
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        Row r = sheet.getRow(0);
+        Iterator<Cell> iter = r.cellIterator();
+        while (iter.hasNext()) {
+            Cell c = iter.next();
+            CellStyle style = c.getCellStyle();
+            int fontIndex = style.getFontIndexAsInt();
+            XSSFFont font = workbook.getFontAt(fontIndex);
+            Assertions.assertTrue(font.getBold());
+        }
+    }
 }

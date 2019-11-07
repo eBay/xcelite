@@ -22,27 +22,20 @@ import com.ebay.xcelite.column.ColumnsExtractor;
 import com.ebay.xcelite.converters.ColumnValueConverter;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.EmptyCellException;
-import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
-import com.ebay.xcelite.policies.MissingRowPolicy;
-import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 import static org.reflections.ReflectionUtils.withName;
 
 /**
@@ -66,7 +59,7 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
     private final ColumnsMapper mapper;
     private final Class<T> type;
     private Map<Integer, String> headerColumns;
-    private Iterator<Row> rowIterator;
+    //private Iterator<Row> rowIterator;
     @Override
     public boolean expectsHeaderRow(){return true;}
 
@@ -98,76 +91,9 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         this(sheet, sheet.getOptions(), type);
     }
 
-    @SuppressWarnings("unchecked")
+    @SneakyThrows
     @Override
-    @SneakyThrows
-    public Collection<T> read() {
-        List<T> data = new ArrayList<>();
-        int lastNonEmptyRowId = 0;
-        Boolean firstIteration = true;
-
-        rowIterator = sheet.moveToHeaderRow(options.getHeaderRowIndex(), false);
-        if (!rowIterator.hasNext())
-            return data;
-
-        buildHeader();
-        validateColumns();
-        rowIterator = sheet.moveToFirstDataRow(this, false);
-
-        while (rowIterator.hasNext()) {
-            T object;
-
-            Row excelRow = rowIterator.next();
-            if (firstIteration) {
-                int rowNum = excelRow.getRowNum();
-                if (data.size() < rowNum) {
-                    int firstDataRowIndex = XceliteSheetImpl.getFirstDataRowIndex(this);
-                    for (int i = firstDataRowIndex; i < rowNum; i++) {
-                        data.add(handleEmptyRow(sheet.getNativeSheet().getRow(i)));
-                    }
-                }
-                firstIteration = false;
-            }
-
-            if (isBlankRow(excelRow)) {
-                object = handleEmptyRow(excelRow);
-                if (!options.getMissingRowPolicy().equals(SKIP)) {
-                    if (shouldKeepObject(object, rowPostProcessors)) {
-                        data.add(object);
-                    }
-                }
-            } else {
-                object = fillObject(excelRow);
-                if (shouldKeepObject(object, rowPostProcessors)) {
-                    data.add(object);
-                }
-                lastNonEmptyRowId = data.size();
-            }
-        };
-
-        return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId);
-    }
-
-    @SneakyThrows
-    private T handleEmptyRow(Row excelRow) {
-        T object;
-        switch (options.getMissingRowPolicy()) {
-            case THROW:
-                throw new EmptyRowException();
-            case EMPTY_OBJECT:
-                object = fillObject(excelRow);
-                break;
-            case NULL:
-                object = null;
-                break;
-            default:
-                object = null;
-        }
-        return object;
-    }
-
-    @SneakyThrows
-    private T fillObject(Row row) {
+    public T fillObject(Row row) {
         T object = getNewObject();
 
         for (int i = 0; i < headerColumns.keySet().size(); i++) {
@@ -196,15 +122,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return ReflectionUtils.getAllFields(aClass, withName(name)).iterator().next();
     }
 
-    @SneakyThrows
-    T getNewObject(){
-        return type.newInstance();
-    }
-
     /**
      * check that every @column is found in header
      */
-    private void validateColumns() {
+    @Override
+    protected void validateColumns() {
         if (anyColumn != null) {
             return;
         }
@@ -309,9 +231,9 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return value;
     }
 
-    private void buildHeader() {
+    @Override
+    protected void buildHeader(Row row) {
         headerColumns = new LinkedHashMap<>();
-        Row row = rowIterator.next();
         if (row == null) {
             throw new XceliteException("First row in sheet is empty. First row must contain header");
         }
@@ -345,6 +267,12 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         return false;
     }
 
+    @Override
+    @SneakyThrows
+    T getNewObject(){
+        return type.newInstance();
+    }
+
     private class ColumnsMapper {
         private final Map<String, Col> columnsMap;
         private final Map<String, Col> lowerCaseColumnsMap;
@@ -367,13 +295,11 @@ public class BeanSheetReader<T> extends AbstractSheetReader<T> {
         }
 
         Set<String> getDeclaredHeaderNames() {
-            Set<String> declaredHeaders = columnsMap
+            return columnsMap
                     .values()
                     .stream()
                     .map(c -> c.getName())
                     .collect(Collectors.toSet());
-            return declaredHeaders;
         }
     }
-
 }

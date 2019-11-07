@@ -16,6 +16,7 @@
 package com.ebay.xcelite.writer;
 
 import com.ebay.xcelite.exceptions.PolicyViolationException;
+import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.Person;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
 import com.ebay.xcelite.options.XceliteOptions;
@@ -48,19 +49,26 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
             {"Witch",	"Doctor",	"01/01/1990",	"male"}
     };
 
+
+    /**
+     * Create an Excel workbook with one sheet and write to it using a
+     * BeanSheetWriter. Header-row index is 3 (which is zero-based, so
+     * header-row is the 4th row). For reading, skip 3 lines to again
+     * land at the 4th row.
+     * @throws ParseException
+     */
     @Test
     @DisplayName("Must correctly write column headers with empty rows before")
     public void writeHeaderWithEmptyRowsBeforeMustOK() throws ParseException {
         XceliteOptions options = new XceliteOptions();
         options.setHeaderRowIndex(3);
-        //options.setFirstDataRowIndex(4);
 
         Person beans[] = new Person[2];
         beans[0] = new Person(usTestData[0][0], usTestData[0][1], df.parse(usTestData[0][2]), usTestData[0][3]);
         beans[1] = new Person(usTestData[1][0], usTestData[1][1], df.parse(usTestData[1][2]), usTestData[1][3]);
         setupBeans(options, (Object[])beans);
 
-        List<Map<String, Object>> data = extractCellValues (workbook, 2, 0);
+        List<Map<String, Object>> data = extractCellValues (workbook, 3, 0);
         Assertions.assertEquals(2, data.size(), "number of read rows is wrong");
         assertPropertiesMatch(beans[0], data.get(0));
         assertPropertiesMatch(beans[1], data.get(1));
@@ -86,7 +94,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         assertPropertiesMatch(beans[2], data.get(2));
     }
 
-   /* @Test
+    /*
+    @Test
     @DisplayName("MissingRowPolicy.EMPTY_OBJECT, MissingCellPolicy.RETURN_NULL_AND_BLANK - Must correctly write data with null objects as empty row")
     public void writeDateWithNullObjectMustWriteRowWitEmptyCells() throws ParseException {
         XceliteOptions options = new XceliteOptions();
@@ -108,10 +117,10 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         assertPropertiesMatch(beans[0], data.get(0));
         assertPropertiesMatch(beans[1], data.get(1));
         assertPropertiesMatch(beans[2], data.get(2));
-    }*/
+    }
+*/
 
-
-    /*@Test
+    @Test
     @DisplayName("MissingRowPolicy.NULL - Must correctly write data with null objects as null row")
     public void writeDateWithNullObjectMustWriteNullRow() throws ParseException {
         XceliteOptions options = new XceliteOptions();
@@ -127,7 +136,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         Assertions.assertEquals(3, data.size(), "number of read rows is wrong");
         assertPropertiesMatch(beans[1], data.get(1));
         assertPropertiesMatch(beans[2], data.get(2));
-    }*/
+    }
 
 
     @Test
@@ -146,7 +155,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
             List<Map<String, Object>> data = extractCellValues (workbook, 0, 0);
         });
     }
-/*
+
     @Test
     @DisplayName("Must correctly recognize column headers with empty rows before and after")
     public void readHeaderWithEmptyRowsBeforeAfterMustOK() throws ParseException {
@@ -155,7 +164,7 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         options.setFirstDataRowIndex(5);
 
         List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition3.xlsx");
-        validateCamelCaseData(upper);
+        validateCamelCaseData(upper, usTestData);
     }
 
 
@@ -167,8 +176,8 @@ public class PaddingAroundColumnDefinitionWriterTest extends TestBaseForWriterTe
         options.setFirstDataRowIndex(5);
 
         List<CamelCase> upper = getCamelCaseData(options, "src/test/resources/RowsBeforeColumnDefinition4.xlsx");
-        validateCamelCaseData(upper);
-    }*/
+        validateCamelCaseData(upper, usTestData);
+    }
 
 
     private void assertPropertiesMatch(Person input, Map<String, Object> readValues) {

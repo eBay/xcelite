@@ -19,6 +19,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,7 +33,7 @@ public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
     // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = true;
+    public static boolean writeToFile = false;
     public static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -354,5 +358,15 @@ public class TestBaseForReaderAndWriterTests {
             data = byteArrayOutputStream.toByteArray();
         }
         return new Xcelite(new ByteArrayInputStream(data), options);
+    }
+    protected static File getResourceFile(String relativePath) throws URISyntaxException {
+        String lPath = relativePath;
+        if (!lPath.startsWith("/"))
+            lPath = "/"+lPath;
+        // Create file-URL of source file:
+        URL sourceFileUrl = TestBaseForReaderAndWriterTests.class.getResource(lPath);
+        // normal case: resolve against resources path
+        Path path = Paths.get(sourceFileUrl.toURI());
+        return path.toFile();
     }
 }

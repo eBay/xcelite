@@ -43,11 +43,13 @@ public @interface AnyColumn {
      * excel file. Converter class must implement
      * {@link com.ebay.xcelite.converters.ColumnValueConverter
      * ColumnValueConverter}. Default is no converter.
+     * @since 1.0
      */
     Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;
 
     /**
      * Type to deserialize to. Default is {@link java.util.LinkedHashMap LinkedHashMap}.
+     * @since 1.0
      */
     @SuppressWarnings("rawtypes")
     Class<? extends Map> as() default LinkedHashMap.class;
@@ -55,6 +57,7 @@ public @interface AnyColumn {
     /**
      * Specifies which columns to ignore upon deserializtion. Ignored column will
      * not be added to the map.
+     * @since 1.0
      */
     String[] ignoreCols() default {};
 }

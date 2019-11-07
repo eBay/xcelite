@@ -19,17 +19,13 @@ import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
 import com.ebay.xcelite.sheet.AbstractDataMarshaller;
-import com.ebay.xcelite.sheet.DataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
-import com.ebay.xcelite.styles.CellStylesBank;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -96,7 +92,7 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
 
     void writeToCell(Cell cell, Object fieldValueObj, Class<?> dataType) {
         if (null == fieldValueObj) {
-            cell.setCellType(CellType.BLANK);
+            cell.setBlank();
             return;
         }
         Class<?> type = fieldValueObj.getClass();
@@ -124,15 +120,9 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
     @Override
     @SneakyThrows
     public void write(final Collection<T> data) {
-        /*if (hasHeaderRow()) {
-            sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
-            rowIndex = sheet.getNativeSheet().getLastRowNum();
-            writeHeader();
-        }*/
         if (hasHeaderRow()) {
             writeHeader();
         }
-        sheet.moveToFirstDataRow(this, true);
         int rowIndex = getFirstDataRowIndex(this);
         for (T dataRow: data) {
             if (null == dataRow) {
@@ -141,12 +131,12 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
                         continue;
                     }
                     case NULL: {
-                        sheet.getNativeSheet().createRow(rowIndex++);
+                        sheet.getOrCreateRow(rowIndex++, true);
                         continue;
                     }
                     case EMPTY_OBJECT: {
                         if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex++);
+                            sheet.getOrCreateRow(rowIndex++, true);
                             continue;
                         } else {
                             Class clazz = getBeansClass(data);
@@ -161,8 +151,7 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
                 }
 
             }
-            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
-            final AtomicInteger j = new AtomicInteger(0);
+            Row excelRow = sheet.getOrCreateRow(rowIndex, true);
             writeRow(dataRow, excelRow, rowIndex);
             rowIndex++;
         }
@@ -173,7 +162,7 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
     abstract void writeHeader();
 
     /**
-     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
+     * @deprecated since 1.2. Use {@link com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
     @Override
     public void generateHeaderRow(boolean generateHeaderRow) {
@@ -181,7 +170,7 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
     }
 
     /**
-     * @deprecated since 1.2. Use {@link #setGenerateHeaderRow(boolean) instead}
+     * @deprecated since 1.2. Use {@link com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
     @Deprecated
     @Override

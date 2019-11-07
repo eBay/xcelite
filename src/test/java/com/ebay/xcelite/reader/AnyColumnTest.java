@@ -20,6 +20,7 @@ import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.model.AnyColumnBean;
 import com.ebay.xcelite.model.AnyColumnBeanDoneWrong;
+import com.ebay.xcelite.model.AnyColumnBeanDoneWrongNotUsingMap;
 import com.ebay.xcelite.reader.SheetReader;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import org.junit.jupiter.api.Assertions;
@@ -93,10 +94,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
             Collection<AnyColumnBeanDoneWrong> datasets = beanReader.read();
             int cnt = 0;
             for (AnyColumnBeanDoneWrong row : datasets) {
-                List<Object> testColNames = new ArrayList<>(Arrays.asList(testData[cnt++]));
-                List<Object> dataColNames = new ArrayList(row.getColumns().values());
-                System.out.println(testColNames);
-                System.out.println(dataColNames);
+                new ArrayList<>(Arrays.asList(testData[cnt++]));
+                new ArrayList(row.getColumns().values());
             }
         };
 
@@ -105,4 +104,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
     }
 
+    @Test
+    @DisplayName("Must throw an exception because of @AnyColumn annotation on wrong type")
+    @SuppressWarnings("unchecked")
+    public void mustThrowOnInvalidBean2() {
+        Executable testClosure = () -> {
+            Xcelite xcelite = new Xcelite(new File("src/test/resources/UPPERCASE.xlsx"));
+            XceliteSheet sheet = xcelite.getSheet(0);
+            SheetReader<AnyColumnBeanDoneWrongNotUsingMap> beanReader = sheet.getBeanReader(AnyColumnBeanDoneWrongNotUsingMap.class);
+            Collection<AnyColumnBeanDoneWrongNotUsingMap> datasets = beanReader.read();
+            int cnt = 0;
+            for (AnyColumnBeanDoneWrongNotUsingMap row : datasets) {
+                new ArrayList<>(Arrays.asList(testData[cnt++]));
+                new ArrayList(row.getColumns());
+            }
+        };
+
+        assertThrows(XceliteException.class, testClosure, "Should have thrown an exception" +
+                " because of @AnyColumn annotation on `Set` member");
+    }
 }

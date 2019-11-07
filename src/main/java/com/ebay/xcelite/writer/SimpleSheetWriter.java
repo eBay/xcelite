@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Each entry in the outer collection represents one row in the spreadsheet
  * while each entry in the inner collection represents one cell (column) in the row.
  *
- * This writer class does not write a header row, as no column names are defined.
+ * This writer class by default does not write a header row, as no column names are defined.
  *
  * Preferably, this class should not directly be instantiated, but you should
  * call {@link XceliteSheet#getSimpleWriter()}
@@ -74,45 +74,6 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         super(sheet, options);
     }
 
-    /*
-    @Override
-    public void write(Collection<Collection<Object>> data) {
-        int rowIndex = 0;
-
-        for (Collection<Object> dataRow: data) {
-            if (null == dataRow) {
-                switch(options.getMissingRowPolicy()) {
-                    case SKIP: {
-                        continue;
-                    }
-                    case NULL: {
-                        sheet.getNativeSheet().createRow(rowIndex++);
-                        continue;
-                    }
-                    case EMPTY_OBJECT: {
-                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex++);
-                            continue;
-                        } else {
-                            dataRow = new ArrayList<>();
-                        }
-                        break;
-                    }
-                    case THROW: {
-                        throw new PolicyViolationException("Null object found and " +
-                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
-                    }
-                }
-
-            }
-            Row excelRow = sheet.getNativeSheet().createRow(rowIndex);
-            writeRow(dataRow, excelRow, rowIndex);
-            rowIndex++;
-        };
-    }
-
-     */
-
     @Override
     Class getBeansClass(Collection<Collection<Object>> data) {
         return ArrayList.class;
@@ -133,7 +94,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         data.forEach(column -> {
             Cell cell = excelRow.createCell(j.intValue());
             if (hasHeaderRow() && rowIndex == 0) {
-                CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+                CellStyle boldStyle = sheet.getStyles().get().getBoldStyle();
                 cell.setCellStyle(boldStyle);
             }
             writeToCell(cell, column, null);
@@ -144,5 +105,6 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
     /*
     No-Op for SimpleSheetWriter
      */
+    @Override
     void writeHeader() {}
 }

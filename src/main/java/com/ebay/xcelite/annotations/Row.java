@@ -35,6 +35,7 @@ public @interface Row {
      * Specifies the order for the Columns in excel file. The colsOrder is a list
      * of fields annotated with the {@link com.ebay.xcelite.annotations.Column
      * Column} annotation. Once specified, all Column fields must be listed.
+     * @since 1.0
      */
     String[] colsOrder() default {};
 }

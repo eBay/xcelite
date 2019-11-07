@@ -17,7 +17,8 @@ package com.ebay.xcelite;
 
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.sheet.*;
+import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -48,19 +49,19 @@ public class Xcelite {
     @Getter
     protected XceliteOptions options;
 
+
     public Xcelite() {
         workbook = new XSSFWorkbook();
         options = new XceliteOptions();
     }
 
     public Xcelite(XceliteOptions options) {
-        workbook = new XSSFWorkbook();
+        this();
         this.options = options;
     }
 
-    @SneakyThrows
     public Xcelite(InputStream inputStream) {
-        workbook = new XSSFWorkbook(inputStream);
+        this(inputStream, new XceliteOptions());
     }
 
     @SneakyThrows

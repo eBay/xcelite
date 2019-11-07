@@ -28,6 +28,11 @@ import java.util.Map;
  * created Sep 9, 2013
  */
 public final class CellStylesBank {
+    private Workbook workbook;
+
+    public CellStylesBank(Workbook workbook) {
+        this.workbook = workbook;
+    }
 
     private static Map<Workbook, CellStyles> cellStylesMap;
 
@@ -35,7 +40,7 @@ public final class CellStylesBank {
         cellStylesMap = new HashMap<>();
     }
 
-    public static CellStyles get(Workbook workbook) {
+    public CellStyles get() {
         if (cellStylesMap.containsKey(workbook)) {
             return cellStylesMap.get(workbook);
         }

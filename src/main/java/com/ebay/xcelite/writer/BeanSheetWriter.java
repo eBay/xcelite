@@ -64,7 +64,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
     private final Col anyColumn;
     private Row headerRow;
     private int rowIndex = 0;
-    private CellStyle boldStyle = CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getBoldStyle();
+    private CellStyle boldStyle;
     @Override
     public boolean expectsHeaderRow(){return true;}
 
@@ -81,6 +81,7 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         extractor.extract();
         columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
+        boldStyle = sheet.getStyles().get().getBoldStyle();
     }
 
     /**
@@ -99,19 +100,9 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         extractor.extract();
         columns = extractor.getColumns();
         anyColumn = extractor.getAnyColumn();
+        boldStyle = sheet.getStyles().get().getBoldStyle();
     }
-/*
-    @Override
-    public void write(Collection<T> data) {
-        if (hasHeaderRow()) {
-            sheet.moveToHeaderRow(options.getHeaderRowIndex(), true);
-            rowIndex = sheet.getNativeSheet().getLastRowNum();
-            writeHeader();
-        }
-        sheet.moveToFirstDataRow(this, true);
-        writeData(data);
-    }
-*/
+
     /**
      * Takes one object instance of the specified type and writes it to the
      * {@link XceliteSheet} object this writer is operating on.
@@ -144,51 +135,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         }
     }
 
-    /*
-    @SuppressWarnings("unchecked")
-    @SneakyThrows
-    private void writeData(Collection<T> data) {
-        Set<Col> columnsToAdd = new TreeSet();
-        for (T t: data) {
-            if (anyColumn != null) {
-                appendAnyColumns(t, columnsToAdd);
-            }
-        }
-        addColumns(columnsToAdd, true);
-        for (T dataObject: data) {
-            if (null == dataObject) {
-                switch(options.getMissingRowPolicy()) {
-                    case SKIP: {
-                        continue;
-                    }
-                    case NULL: {
-                        sheet.getNativeSheet().createRow(rowIndex++);
-                        continue;
-                    }
-                    case EMPTY_OBJECT: {
-                        if (options.getMissingCellPolicy().equals(MissingCellPolicy.RETURN_BLANK_AS_NULL)) {
-                            sheet.getNativeSheet().createRow(rowIndex++);
-                            continue;
-                        } else {
-                            Class clazz = getBeansClass(data);
-                            dataObject = (T) clazz.newInstance();
-                        }
-                        break;
-                    }
-                    case THROW: {
-                        throw new PolicyViolationException("Null object found and " +
-                                "MissingRowPolicy.THROW active. Object index: "+rowIndex);
-                    }
-                }
-
-            }
-            Row row = sheet.getNativeSheet().createRow(rowIndex);
-            writeRow(dataObject, row ,rowIndex);
-            rowIndex++;
-        }
-    }*/
-
-
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void writeToCell(Cell cell, Col col, Object fieldValueObj) {
@@ -201,25 +147,28 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             fieldValueObj = converter.serialize(fieldValueObj);
         }
         if (col.getDataFormat() != null) {
-            cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getCustomDataFormatStyle(
+            cell.setCellStyle(sheet.getStyles().get().getCustomDataFormatStyle(
                     col.getDataFormat()));
         }
 
         if (col.getType().equals(Date.class)) {
             if (col.getDataFormat() == null) {
-                cell.setCellStyle(CellStylesBank.get(sheet.getNativeSheet().getWorkbook()).getDateStyle());
+                cell.setCellStyle(sheet.getStyles().get().getDateStyle());
             }
         }
 
         writeToCell(cell, fieldValueObj, col.getType());
     }
 
+    @Override
     void writeHeader() {
-        headerRow = sheet.getNativeSheet().createRow(rowIndex);
-        rowIndex++;
-        addColumns(columns, false);
+        sheet.createRowsUptoAndIncludingRow(0, options.getHeaderRowIndex());
+        headerRow = sheet.getOrCreateRow(options.getHeaderRowIndex(), false);
+        addColumnsToHeaderRow(columns, false);
+        rowIndex = sheet.getLastRowNumber();
     }
 
+    /*
     @SuppressWarnings("unchecked")
     @SneakyThrows
     private void appendAnyColumns(T t, Set<Col> columnToAdd) {
@@ -237,8 +186,8 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
             columnToAdd.add(column);
         }
     }
-
-    private void addColumns(Set<Col> columnsToAdd, boolean append) {
+*/
+    private void addColumnsToHeaderRow(Set<Col> columnsToAdd, boolean append) {
         int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
         for (Col column: columnsToAdd) {
             if (append && columns.contains(column))

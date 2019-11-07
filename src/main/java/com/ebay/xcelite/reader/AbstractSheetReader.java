@@ -19,7 +19,9 @@ import com.ebay.xcelite.exceptions.EmptyRowException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -27,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 
 /**
  * Abstract implementation of the {@link SheetReader} interface. Extending
@@ -75,6 +79,47 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
         skipHeaderRow (skipHeaderRow);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    @SneakyThrows
+    public Collection<T> read() {
+        List<T> data = new ArrayList<>();
+        int lastNonEmptyRowId = 0;
+
+
+        if (expectsHeaderRow()) {
+            Row headerRow = sheet.getOrCreateRow(options.getHeaderRowIndex(), false);
+            buildHeader(headerRow);
+        }
+        validateColumns();
+        Iterator<Row> rowIterator = sheet.getDataRowsIterator(this);
+
+        int rowCnt = 0;
+        while (rowIterator.hasNext()) {
+            T object;
+
+            rowCnt++;
+            Row excelRow = rowIterator.next();
+            if (isBlankRow(excelRow)) {
+                object = handleEmptyRow(excelRow);
+                if (!options.getMissingRowPolicy().equals(SKIP)) {
+                    if (shouldKeepObject(object, rowPostProcessors)) {
+                        data.add(object);
+                    }
+                }
+                continue;
+            }
+
+            object = fillObject(excelRow);
+            if (shouldKeepObject(object, rowPostProcessors)) {
+                data.add(object);
+            }
+            lastNonEmptyRowId = rowCnt;
+        };
+
+        return applyTrailingEmptyRowPolicy(data, lastNonEmptyRowId);
+    }
+
     public static Object readValueFromCell(Cell cell) {
         if (cell == null) return null;
         Object cellValue = null;
@@ -112,6 +157,23 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
         return cellValue;
     }
 
+    @SneakyThrows
+    protected T handleEmptyRow(Row excelRow) {
+        T object;
+        switch (options.getMissingRowPolicy()) {
+            case THROW:
+                throw new EmptyRowException();
+            case EMPTY_OBJECT:
+                object = fillObject(excelRow);
+                break;
+            case NULL:
+                object = null;
+                break;
+            default:
+                object = null;
+        }
+        return object;
+    }
     /**
      * @deprecated since 1.2. Use {@link #getOptions()} instead and set
      * {@link XceliteOptions#setFirstDataRowIndex(Integer) setFirstDataRowIndex}
@@ -135,7 +197,17 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
         rowPostProcessors.remove(rowPostProcessor);
     }
 
+
+    /**
+     * Returns true if the row object is null or every cell in the
+     * row is null or empty
+     * @param row
+     * @return true if the row object is null or every cell in the
+     *  row is null or empty
+     */
     boolean isBlankRow(Row row) {
+        if (null == row)
+            return true;
         Iterator<Cell> cellIterator = row.cellIterator();
         boolean blankRow = true;
         while (cellIterator.hasNext()) {
@@ -158,21 +230,21 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
         return keepObject;
     }
 
-    Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowId) {
-        if (lastNonEmptyRowId == data.size())
+    Collection<T> applyTrailingEmptyRowPolicy(List<T> data, int lastNonEmptyRowNum) {
+        if (lastNonEmptyRowNum == data.size())
             return data;
         switch (options.getTrailingEmptyRowPolicy()) {
             case SKIP:
-                return data.subList(0, lastNonEmptyRowId);
+                return data.subList(0, lastNonEmptyRowNum);
             case THROW:
                 throw new EmptyRowException("Trailing empty rows found and TrailingEmptyRowPolicy.THROW active");
             case NULL:
-                for (int i = lastNonEmptyRowId + 1; i < data.size(); i++) {
+                for (int i = lastNonEmptyRowNum + 1; i < data.size(); i++) {
                     data.set(i, null);
                 }
                 return data;
             case EMPTY_OBJECT:
-                for (int i = lastNonEmptyRowId; i < data.size(); i++) {
+                for (int i = lastNonEmptyRowNum; i < data.size(); i++) {
                     data.set(i, getNewObject());
                 }
                 return data;
@@ -182,7 +254,14 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
 
     abstract T getNewObject();
 
+    abstract void buildHeader(Row row);
+
+    abstract void validateColumns();
+
+    @Override
     public void setOptions(XceliteOptions options) {
         this.options = new XceliteOptions(options);
     }
+
+    abstract T fillObject(Row excelRow);
 }

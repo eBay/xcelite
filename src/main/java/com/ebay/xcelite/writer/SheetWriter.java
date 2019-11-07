@@ -58,7 +58,9 @@ public interface SheetWriter<T> extends DataMarshaller {
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     * @since 1.0
+     * @deprecated since 1.2. Use {@link
+     *       com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
     @Deprecated
     void generateHeaderRow(boolean generateHeaderRow);
@@ -69,7 +71,9 @@ public interface SheetWriter<T> extends DataMarshaller {
      * annotations on the bean's properties
      *
      * @param generateHeaderRow if set to `true`, generate a header row
-     * @deprecated since 1.2. Use {@link XceliteOptions#setHasHeaderRow(boolean)} instead}
+     *
+     * @deprecated since 1.2. Use {@link
+     *       com.ebay.xcelite.options.XceliteOptions#setHasHeaderRow(boolean) instead}
      */
     @Deprecated
     void setGenerateHeaderRow(boolean generateHeaderRow);
@@ -77,8 +81,9 @@ public interface SheetWriter<T> extends DataMarshaller {
     /**
      * Gets the {@link XceliteSheet} object this writer is operating on
      * @return sheet this writer writes to.
+     *
+     * @since 1.0
      */
     XceliteSheet getSheet();
-
 
 }
