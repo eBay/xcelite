@@ -13,8 +13,10 @@ public abstract class AbstractDataMarshaller implements DataMarshaller {
      * ask the SheetReader/SheetWriter whether a header row
      * should be written (Beanreader/writer: yes,
      * Simplereader/writer: no)
-     * @return
+     *
+     * @return Whether a header row is expected
      */
+    @Override
     public boolean hasHeaderRow() {
         if (null != options.isHasHeaderRow()) {
             return options.isHasHeaderRow();

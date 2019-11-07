@@ -1,5 +1,6 @@
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.TestSettings;
 import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.helper.TestBaseForReaderAndWriterTests;
 import com.ebay.xcelite.model.CamelCase;
@@ -26,7 +27,7 @@ public class TestBaseForReaderTests extends TestBaseForReaderAndWriterTests {
     public static void setup(XceliteOptions options, Object... inBeans) {
         Xcelite xcelite = new Xcelite();
 
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 }

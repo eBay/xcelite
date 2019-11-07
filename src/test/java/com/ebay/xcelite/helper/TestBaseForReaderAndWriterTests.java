@@ -1,5 +1,6 @@
 package com.ebay.xcelite.helper;
 
+import com.ebay.xcelite.TestSettings;
 import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.model.CamelCase;
 import com.ebay.xcelite.model.UsStringCellDateConverter;
@@ -32,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 public class TestBaseForReaderAndWriterTests {
     public SimpleDateFormat usDateFormat = new SimpleDateFormat(UsStringCellDateConverter.DATE_PATTERN);
 
-    // set to true to look at the resulting spreadsheet files
-    public static boolean writeToFile = false;
     public static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -44,7 +43,7 @@ public class TestBaseForReaderAndWriterTests {
         bs.setOptions(options);
         bs.write(objs);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 
@@ -60,7 +59,7 @@ public class TestBaseForReaderAndWriterTests {
         bs.setOptions(options);
         bs.write(objs);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
     }
 
@@ -123,6 +122,8 @@ public class TestBaseForReaderAndWriterTests {
             int skipBeforeData) {
         List<Collection<Object>> rowVals = new ArrayList<>();
         Sheet excelSheet = workbook.getSheet("Tests");
+        if (excelSheet.getLastRowNum() == 0)
+            return new ArrayList<>();
         Iterator<Row> iter = excelSheet.rowIterator();
         int rowId = 0;
         // move to first row

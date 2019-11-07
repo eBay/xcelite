@@ -3,7 +3,8 @@
 - Added `anyColumnCreatesCollection` option to allow `@AnyColum` to switch between two behaviors (for `BeanSheetReaders` only) if an Excel sheet contains more than one column with the same column name:
   - false (default for versions <2.0): like in previous versions, only the last column value is returned, ie. if your sheet has three columns named "project name" that are part of an `@AnyColum` set, only the value of the last (right-most) column will be returned
   - true: (default for version 2.0 and up): all column values in `@AnyColum` sets are returned as `Collection`s, so that no data is lost
-
+- Big refactoring of SheetReader and SheetWriter subclasses to use common code bases
+- Some additional tests, esp. for Writers
 
 1.2.5 [(Link to github)](https://github.com/iSnow/xcelite/releases/tag/v1.2.5)
 =====================================

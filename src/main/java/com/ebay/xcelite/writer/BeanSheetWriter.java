@@ -168,25 +168,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         rowIndex = sheet.getLastRowNumber();
     }
 
-    /*
-    @SuppressWarnings("unchecked")
-    @SneakyThrows
-    private void appendAnyColumns(T t, Set<Col> columnToAdd) {
-        Set<Field> fields = ReflectionUtils.getAllFields(t.getClass(), withName(anyColumn.getFieldName()));
-        Field anyColumnField = fields.iterator().next();
-        anyColumnField.setAccessible(true);
-        Map<String, Object> fieldValueObj = (Map<String, Object>) anyColumnField.get(t);
-        for (Map.Entry<String, Object> entry: fieldValueObj.entrySet()) {
-            Col column = new Col(entry.getKey(), anyColumnField.getName());
-            column.setType(entry.getValue() == null ? String.class : entry.getValue().getClass());
-            column.setAnyColumn(true);
-            if (!anyColumn.getConverter().equals(NoConverterClass.class)) {
-                column.setConverter(anyColumn.getConverter());
-            }
-            columnToAdd.add(column);
-        }
-    }
-*/
     private void addColumnsToHeaderRow(Set<Col> columnsToAdd, boolean append) {
         int i = (headerRow == null || headerRow.getLastCellNum() == -1) ? 0 : headerRow.getLastCellNum();
         for (Col column: columnsToAdd) {
@@ -196,7 +177,6 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
                 if (headerRow == null)
                     throw new XceliteException("Cannot write header; header row is null");
                 Cell cell = headerRow.createCell(i);
-                cell.setCellType(CellType.STRING);
                 cell.setCellStyle(boldStyle);
                 cell.setCellValue(column.getName());
                 i++;
@@ -205,18 +185,19 @@ public class BeanSheetWriter<T> extends AbstractSheetWriter<T> {
         }
     }
 
+    /*
     @Override
-    Class getBeansClass(Collection<T> data) {
-        Class clazz = null;
+    Class<T> getBeansClass(Collection<T> data) {
+        Class<T> clazz = null;
         Iterator<T> iter = data.iterator();
         while ((iter.hasNext() && (null == clazz))) {
             T obj = iter.next();
             if (null != obj)
-                clazz = obj.getClass();
+                clazz = (Class<T>)obj.getClass();
         }
         return clazz;
     }
-
+*/
     private void checkHasThrowPolicyMustThrow(Object fieldValueObj, Col col) {
         if ((null == fieldValueObj)
                 && (options.getMissingCellPolicy().equals(MissingCellPolicy.THROW))) {

@@ -187,7 +187,8 @@ public class XceliteOptions {
 
     /**
      * Used to specify the policy to handle null and trailing blank rows following
-     * data blocks for readers and trailing null objects for writers.
+     * data blocks for readers and trailing null objects for writers. Note: for
+     * SheetWriters, it cannot filter out empty objects if set to SKIP
      *
      * @return trailingEmptyRowPolicy the policy for trailing null and blank rows
      *
@@ -199,7 +200,8 @@ public class XceliteOptions {
 
     /**
      * Used to specify the policy to handle null and trailing blank rows following
-     * data blocks for readers and trailing null objects for writers.
+     * data blocks for readers and trailing null objects for writers. Note: for
+     * SheetWriters, it cannot filter out empty objects if set to SKIP
      *
      * @param trailingEmptyRowPolicy set policy for trailing null and blank rows
      *

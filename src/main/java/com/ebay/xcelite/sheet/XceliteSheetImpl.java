@@ -96,7 +96,7 @@ public class XceliteSheetImpl implements XceliteSheet<Sheet> {
     }
 
 
-    private XceliteOptions adaptDataRowIndex (XceliteOptions options, int newFirstDataRowIndex) {
+    private static XceliteOptions adaptDataRowIndex(XceliteOptions options, int newFirstDataRowIndex) {
         XceliteOptions lOptions = new XceliteOptions(options);
         if (lOptions.getFirstDataRowIndex() == -1)
             lOptions.setFirstDataRowIndex(newFirstDataRowIndex);

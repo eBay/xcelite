@@ -1,5 +1,6 @@
 package com.ebay.xcelite.writer;
 
+import com.ebay.xcelite.TestSettings;
 import com.ebay.xcelite.Xcelite;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.reader.AbstractSheetReader;
@@ -17,8 +18,6 @@ import java.io.FileOutputStream;
 import java.util.*;
 
 public class AbstractTestBaseForWriterTests{
-    // set to true to look at the resulting spreadsheet files
-    static boolean writeToFile = false;
     static XSSFWorkbook workbook;
 
     @SneakyThrows
@@ -36,13 +35,8 @@ public class AbstractTestBaseForWriterTests{
         bs.setOptions(options);
         bs.write(beans);
         workbook = new XSSFWorkbook(new ByteArrayInputStream(xcelite.getBytes()));
-        if (writeToFile)
+        if (TestSettings.WRITE_TO_TEST_FILES)
             writeWorkbookToFile(workbook);
-    }
-
-    @SneakyThrows
-    public static void setup(Object... inBeans) {
-        setup(new XceliteOptions(), inBeans);
     }
 
     List<Map<String, Object>>extractCellValues (XSSFWorkbook workbook) {

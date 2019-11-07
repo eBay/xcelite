@@ -18,6 +18,7 @@ package com.ebay.xcelite.writer;
 import com.ebay.xcelite.exceptions.PolicyViolationException;
 import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.policies.MissingCellPolicy;
+import com.ebay.xcelite.policies.TrailingEmptyRowPolicy;
 import com.ebay.xcelite.sheet.AbstractDataMarshaller;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import lombok.Getter;
@@ -26,8 +27,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ebay.xcelite.sheet.XceliteSheetImpl.getFirstDataRowIndex;
@@ -116,15 +116,32 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
         }
     }
 
+    private List<T> removeTrailingNullObjects(Collection<T> data) {
+        ArrayList<T> dList = new ArrayList<>(data);
+        int idx = dList.size()-1;
+        while (idx >= 0) {
+            if (null != dList.get(idx))
+                break;
+            idx--;
+        }
+        return dList.subList(0, idx+1);
+    }
+
     @Deprecated
     @Override
     @SneakyThrows
     public void write(final Collection<T> data) {
+        Collection<T> lData;
+        if (options.getTrailingEmptyRowPolicy() == TrailingEmptyRowPolicy.SKIP) {
+            lData = removeTrailingNullObjects(data);
+        } else {
+            lData = data;
+        }
         if (hasHeaderRow()) {
             writeHeader();
         }
         int rowIndex = getFirstDataRowIndex(this);
-        for (T dataRow: data) {
+        for (T dataRow: lData) {
             if (null == dataRow) {
                 switch(options.getMissingRowPolicy()) {
                     case SKIP: {
@@ -139,7 +156,11 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
                             sheet.getOrCreateRow(rowIndex++, true);
                             continue;
                         } else {
-                            Class clazz = getBeansClass(data);
+                            Class<T> clazz = getBeansClass(lData);
+                            if (null == clazz)
+                                throw new PolicyViolationException("Null objects found and " +
+                                    "MissingRowPolicy.EMPTY_OBJECT active. Cannot instantiate " +
+                                    "object of unknown class");
                             dataRow = (T) clazz.newInstance();
                         }
                         break;
@@ -157,7 +178,16 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
         }
     }
 
-    abstract Class getBeansClass(Collection<T> data);
+    Class<T> getBeansClass(Collection<T> data) {
+        Class<T> clazz = null;
+        Iterator<T> iter = data.iterator();
+        while ((iter.hasNext() && (null == clazz))) {
+            T obj = iter.next();
+            if (null != obj)
+                clazz = (Class<T>)obj.getClass();
+        }
+        return clazz;
+    }
 
     abstract void writeHeader();
 
