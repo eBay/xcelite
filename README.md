@@ -16,7 +16,13 @@
   * [Using Xcelite in Your Gradle Project](#using-xcelite-in-your-gradle-project)
   * [Using Xcelite with other build systems](#using-xcelite-with-other-build-systems)
 
-Build status: [![build_status](https://travis-ci.com/xcelite-io/xcelite.svg?branch=master)](https://travis-ci.com/xcelite-io/xcelite)
+-----
+
+Status:
+
+[![build_status](https://travis-ci.com/xcelite-io/xcelite.svg?branch=master)](https://travis-ci.com/xcelite-io/xcelite)
+
+-----
 
 ### Introduction
 [Xcelite](http://www.xcelite.io/) is an ORM-like Java library which allows you to easily serialize and deserialize Java beans to/from Excel spreadsheets
