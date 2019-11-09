@@ -258,13 +258,13 @@
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
-			<version>0.9.11</version>
+			<version>${org.reflections.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>
-			<version>4.4</version>
+			<version>${commons-collections.version}</version>
 		</dependency>
 
 		<dependency>
@@ -277,13 +277,13 @@
 		<dependency>
 			<groupId>com.google.code.findbugs</groupId>
 			<artifactId>jsr305</artifactId>
-			<version>3.0.2</version>
+			<version>${findbugs-jsr305.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.4.2</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
