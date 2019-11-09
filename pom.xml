@@ -71,6 +71,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.release>1.8</maven.compiler.release>
 		<apache-poi.version>4.1.1</apache-poi.version>
 		<org.reflections.version>0.9.11</org.reflections.version>
 		<commons-collections.version>4.4</commons-collections.version>
@@ -97,8 +98,16 @@
 				<version>3.8.0</version>
 				<configuration>
 					<encoding>utf-8</encoding>
+					<release>${maven.compiler.release}</release>
 					<source>${maven.compiler.source}</source>
 					<target>${maven.compiler.target}</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${org.projectlombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
@@ -261,7 +270,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.10</version>
+			<version>${org.projectlombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
