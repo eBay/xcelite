@@ -17,16 +17,12 @@ package com.ebay.xcelite;
 
 import com.ebay.xcelite.exceptions.XceliteException;
 import com.ebay.xcelite.options.XceliteOptions;
-import com.ebay.xcelite.sheet.*;
+import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ooxml.POIXMLDocument;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -57,8 +53,9 @@ public class Xcelite {
      * Create a Xcelite object containing a newly-created POI-workbook
      * and having default {@link XceliteOptions}.
      */
+    @SneakyThrows
     public Xcelite() {
-        workbook = new XSSFWorkbook();
+        workbook = WorkbookFactory.create(true);
         options = new XceliteOptions();
     }
 
@@ -114,7 +111,9 @@ public class Xcelite {
     @SneakyThrows
     public Xcelite(File file) {
         this.file = file;
-        workbook = new XSSFWorkbook(new FileInputStream(file));
+        FileInputStream fi = new FileInputStream(file);
+        workbook = WorkbookFactory.create(fi);
+        fi.close();
     }
 
     /**
