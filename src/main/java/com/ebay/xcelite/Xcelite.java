@@ -20,7 +20,12 @@ import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ooxml.POIXMLDocument;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -93,7 +98,10 @@ public class Xcelite {
      */
     @SneakyThrows
     public Xcelite(InputStream inputStream, XceliteOptions options) {
-        workbook = new XSSFWorkbook(inputStream);
+        if (!inputStream.markSupported()) {
+            inputStream = new PushbackInputStream(inputStream, 8);
+        }
+        workbook = WorkbookFactory.create(inputStream);
         this.options = options;
     }
 

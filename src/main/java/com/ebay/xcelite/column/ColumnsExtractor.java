@@ -21,6 +21,11 @@ import com.ebay.xcelite.annotations.Column;
 import com.ebay.xcelite.annotations.Row;
 import com.ebay.xcelite.exceptions.ColumnNotFoundException;
 import com.ebay.xcelite.exceptions.XceliteException;
+import io.github.classgraph.AnnotationInfo;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
+import static org.reflections.ReflectionUtils.getAllFields;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -30,7 +35,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
-import static org.reflections.ReflectionUtils.getAllFields;
 import static org.reflections.ReflectionUtils.withAnnotation;
 
 /**
@@ -63,6 +67,38 @@ public class ColumnsExtractor {
             colsOrdering.add(new Col(column));
         }
     }
+
+    /*
+    private ClassInfo getScanResult(Class<?> type) {
+        String whiteList = type.getPackageName();
+        ScanResult scanResult = new ClassGraph()
+                    .verbose()
+                    .enableAllInfo()
+                    .whitelistPackages(whiteList)
+                    .scan();
+        String tName = type.getCanonicalName();
+        ClassInfo classInfo = scanResult.getClassInfo(tName);
+        return classInfo;
+    }
+
+    private Col getAnnotationValue(String fieldName, String colName, AnnotationInfo annotationInfo) {
+        String val = annotationInfo
+                .getDefaultParameterValues()
+                .getValue(colName)
+                .toString();
+        return (null == val)
+                ? new Col(fieldName, fieldName)
+                : new Col(fieldName, val);
+    }
+
+    private Col getAnnotationValue(Column annotation, Field columnField) {
+        Col col = Optional.of(annotation)
+                .filter(column -> !column.name().isEmpty())
+                .map(column -> new Col(column.name(), columnField.getName()))
+                .orElse(new Col(columnField.getName(), columnField.getName()));
+        return col;
+    }
+*/
 
     @SuppressWarnings("unchecked")
     public void extract() {

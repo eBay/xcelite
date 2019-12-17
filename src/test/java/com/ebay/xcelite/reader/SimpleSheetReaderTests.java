@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -72,5 +73,24 @@ public class SimpleSheetReaderTests extends TestBaseForReaderTests {
         Assertions.assertNotNull(cc.get(1));
         Assertions.assertNotNull(cc.get(10));
         validateSimpleData(cc, usTestData);
+    }
+
+
+    @Test
+    @DisplayName("Must correctly read data from Excel97 format")
+    public void readDataFromOLEbasedExcel() throws ParseException {
+        XceliteOptions options = new XceliteOptions();
+        options.setFirstDataRowIndex(5);
+
+        List<Collection<Object>> cc = getSimpleData(options, "src/test/resources/EmptyRowAfterHeader.xls");
+        int cnt = 0;
+        for (Collection row : cc) {
+            List lRow = new ArrayList(row);
+            String[] line = usTestData[cnt];
+            for (int i = 0; i < line.length; i++) {
+                Assertions.assertEquals(line[i], lRow.get(cnt));
+            }
+            cnt++;
+        }
     }
 }
