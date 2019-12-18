@@ -69,13 +69,6 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
         super(sheet, options);
     }
 
-/*
-    @Override
-    Class<Collection<Object>> getBeansClass(Collection<Collection<Object>> data) {
-        return beanClass;
-    }
-
- */
     /**
      * Takes an object collection and writes it to the
      * {@link XceliteSheet} object this writer is operating on.
@@ -86,7 +79,7 @@ public class SimpleSheetWriter extends AbstractSheetWriter<Collection<Object>> {
      * @since 1.0
      */
     @Override
-    public void writeRow(Collection data, Row excelRow, int rowIndex) {
+    public void writeRow(Collection<Object> data, Row excelRow, int rowIndex) {
         final AtomicInteger j = new AtomicInteger(0);
         data.forEach(column -> {
             Cell cell = excelRow.createCell(j.intValue());

@@ -25,16 +25,17 @@ import org.apache.poi.ss.usermodel.Workbook;
  *
  * @since 1.0
  */
-@Getter
 public final class CellStyles {
 
     private static final String DEFAULT_DATE_FORMAT = "ddd mmm dd hh:mm:ss yyy";
 
     private final Workbook workbook;
+    @Getter
     private CellStyle boldStyle;
+    @Getter
     private CellStyle dateStyle;
 
-    public CellStyles(Workbook workbook) {
+    CellStyles(Workbook workbook) {
         this.workbook = workbook;
         initStyles();
     }

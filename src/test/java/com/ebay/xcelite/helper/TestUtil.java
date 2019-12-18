@@ -5,10 +5,23 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.junit.jupiter.api.Assertions;
 
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestUtil {
+
+    public static File getTestDataFile(String filePath) throws Exception {
+        String lPath = filePath;
+        if (!lPath.startsWith("/"))
+            lPath = "/" + lPath;
+        URL u = TestUtil.class.getResource(lPath);
+        Path path = Paths.get(u.toURI());
+        return path.toFile();
+    }
 
     public static void testColumnsForPoiRow(Row r, List<String> columnNames) {
         List<String> lColNames = new ArrayList<>(columnNames);

@@ -100,18 +100,14 @@ public abstract class AbstractSheetWriter<T> extends AbstractDataMarshaller impl
             type = dataType;
         }
         if (type.equals(Date.class)) {
-            cell.setCellType(CellType.NUMERIC);
             cell.setCellValue((Date) fieldValueObj);
         } else if ((type.equals(Boolean.class))
                 || (type.equals(boolean.class))){
-            cell.setCellType(CellType.BOOLEAN);
             cell.setCellValue((Boolean) fieldValueObj);
         } else if ((Number.class.isAssignableFrom(type))
                 || (fieldValueObj instanceof Number))  {
-            cell.setCellType(CellType.NUMERIC);
             cell.setCellValue(((Number) fieldValueObj).doubleValue());
         } else {
-            cell.setCellType(CellType.STRING);
             cell.setCellValue(fieldValueObj.toString());
         }
     }

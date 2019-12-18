@@ -81,7 +81,6 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
 
     @SuppressWarnings("unchecked")
     @Override
-    @SneakyThrows
     public Collection<T> read() {
         List<T> data = new ArrayList<>();
         int lastNonEmptyRowId = 0;
@@ -158,7 +157,7 @@ public abstract class AbstractSheetReader<T> extends AbstractDataMarshaller impl
     }
 
     @SneakyThrows
-    protected T handleEmptyRow(Row excelRow) {
+    private T handleEmptyRow(Row excelRow) {
         T object;
         switch (options.getMissingRowPolicy()) {
             case THROW:

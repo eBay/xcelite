@@ -81,8 +81,6 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
     @Override
     void validateColumns() {}
 
-
-    @SneakyThrows
     @Override
     public Collection<Object> fillObject(Row excelRow) {
         Collection<Object> row = getNewObject();
@@ -96,7 +94,6 @@ public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
     }
 
     @Override
-    @SneakyThrows
     Collection<Object> getNewObject(){
         return new ArrayList<>();
     }
