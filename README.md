@@ -303,15 +303,15 @@ Add xcelite as a dependency:
 <dependency>
 	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.2.5</version>
+	<version>1.4.0</version>
 </dependency>
 ```
 
 #### Using Xcelite in Your Gradle Project
 Add xcelite as a dependency:
 ```gradle
-compile group: 'io.xcelite.spreadsheet', name: 'xcelite', version: '1.2.5'
+compile group: 'io.xcelite.spreadsheet', name: 'xcelite', version: '1.4.0'
 ```
 
 #### Using Xcelite with other build systems
-See https://mvnrepository.com/artifact/io.xcelite.spreadsheet/xcelite/1.2.5
+See https://mvnrepository.com/artifact/io.xcelite.spreadsheet/xcelite/1.4.0
