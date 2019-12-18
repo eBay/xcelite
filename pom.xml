@@ -3,7 +3,7 @@
 
 	<groupId>io.xcelite.spreadsheet</groupId>
 	<artifactId>xcelite</artifactId>
-	<version>1.4.0-SNAPSHOT</version>
+	<version>1.4.0</version>
 	<packaging>jar</packaging>
 
 	<name>xcelite</name>
@@ -31,7 +31,7 @@
 	</licenses>
 
 	<scm>
-		<tag>master</tag>
+		<tag>xcelite-1.4.0</tag>
 		<connection>scm:git:git://github.com/xcelite-io/xcelite.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com:xcelite-io/xcelite.git</developerConnection>
 		<url>https://github.com/xcelite-io/xcelite</url>
