@@ -16,116 +16,52 @@
 package com.ebay.xcelite.column;
 
 import com.ebay.xcelite.converters.ColumnValueConverter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
- * Represents a Column object which holds all data about the Excel column.
- * 
+ * Represents a column object which holds all data about the Excel column.
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 29, 2013
- * 
+ * @since 1.0
+ * created Aug 29, 2013
  */
+@Data
+@EqualsAndHashCode(of="name")
 public class Col implements Comparable<Col> {
 
-  private final String name;
-  private String fieldName;
-  private Class<?> type;
-  private String dataFormat;
-  private Class<? extends ColumnValueConverter<?, ?>> converter;
-  private boolean isAnyColumn = false;
+    private final String name;
+    private String fieldName;
+    private Class<?> type;
+    private String dataFormat;
+    private Class<? extends ColumnValueConverter<?, ?>> converter;
+    private boolean isAnyColumn = false;
 
-  public Col(String name) {
-    this(name, null);
-  }
+    public Col(String name) {
+        this(name, null);
+    }
 
-  public Col(String name, String fieldName) {
-    this.name = name;
-    this.fieldName = fieldName;
-    type = String.class;
-  }
+    public Col(String name, String fieldName) {
+        this.name = name;
+        this.fieldName = fieldName;
+        type = String.class;
+    }
 
-  @Override
-  public String toString() {
-    return "name=" + name + ",fieldName=" + fieldName + ",type=" + type + ",converter=" + converter;
-  }
+    @Override
+    public String toString() {
+        return "name=" + name + ",fieldName=" + fieldName + ",type=" + type + ",converter=" + converter;
+    }
 
-  public void copyTo(Col col) {
-    col.fieldName = fieldName;
-    col.type = type;
-    col.dataFormat = dataFormat;
-    col.converter = converter;
-  }
+    public void copyTo(Col col) {
+        col.fieldName = fieldName;
+        col.type = type;
+        col.dataFormat = dataFormat;
+        col.converter = converter;
+    }
 
-  public Class<?> getType() {
-    return type;
-  }
 
-  public void setType(Class<?> type) {
-    this.type = type;
-  }
-
-  public String getFieldName() {
-    return fieldName;
-  }
-
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getDataFormat() {
-    return dataFormat;
-  }
-
-  public void setDataFormat(String dataFormat) {
-    this.dataFormat = dataFormat;
-  }
-
-  public Class<? extends ColumnValueConverter<?, ?>> getConverter() {
-    return converter;
-  }
-
-  public void setConverter(Class<? extends ColumnValueConverter<?, ?>> converter) {
-    this.converter = converter;
-  }
-
-  public boolean isAnyColumn() {
-    return isAnyColumn;
-  }
-
-  public void setAnyColumn(boolean isAnyColumn) {
-    this.isAnyColumn = isAnyColumn;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Col other = (Col) obj;
-    if (name == null) {
-      if (other.name != null)
-        return false;
-    } else if (!name.equals(other.name))
-      return false;
-    return true;
-  }
-
-  @Override
-  public int compareTo(Col o) {
-    return this.getName().compareTo(o.getName());
-  }
+    @Override
+    public int compareTo(Col col) {
+        return this.getName().compareTo(col.getName());
+    }
 }

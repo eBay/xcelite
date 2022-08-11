@@ -15,30 +15,30 @@
 */
 package com.ebay.xcelite.converters;
 
-import java.util.Collection;
-
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
+
 /**
- * Serializes a Collection object to a VT separated String. 
+ * Serializes a Collection object to a VT separated String.
  * Deserializes a VT separated String to an ArrayList. If a different Collection is required
  * other than {@link java.util.ArrayList}, extend this class to override {@link #getCollection(Iterable)} method.
- * 
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 14, 2013
- * 
+ * @since 1.0
+ * created Sep 14, 2013
  */
 public class VTColumnValueConverter extends DelimiterColumnValueConverter {
 
-  private static final String VT = "\013";
-  
-  @Override
-  protected String getDelimiter() {
-    return VT;
-  }
+    private static final String VT = "\013";
 
-  @Override
-  protected Collection<?> getCollection(Iterable<?> iterable) {
-    return Lists.newArrayList(iterable);
-  }
+    @Override
+    protected String getDelimiter() {
+        return VT;
+    }
+
+    @Override
+    protected Collection<?> getCollection(Iterable<?> iterable) {
+        return Lists.newArrayList(iterable);
+    }
 }

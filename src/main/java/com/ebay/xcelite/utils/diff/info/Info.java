@@ -20,12 +20,14 @@ package com.ebay.xcelite.utils.diff.info;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 21, 2013
- * 
+ * @since 1.0
+ * created Nov 21, 2013
  */
 public interface Info<T> {
 
-  Files files();
-  Sheets sheets();
-  Collections<T> collections();
+    StringTuple files();
+
+    Sheets sheets();
+
+    Collections<T> collections();
 }

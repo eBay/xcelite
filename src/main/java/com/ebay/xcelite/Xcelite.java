@@ -15,149 +15,222 @@
 */
 package com.ebay.xcelite;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.ebay.xcelite.exceptions.XceliteException;
+import com.ebay.xcelite.options.XceliteOptions;
 import com.ebay.xcelite.sheet.XceliteSheet;
 import com.ebay.xcelite.sheet.XceliteSheetImpl;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Optional.ofNullable;
 
 /**
- * Class description...
- * 
+ * Main class of the Xcelite package. A Xcelite object is constructed on an Excel
+ * file and wraps a POI {@link org.apache.poi.ss.usermodel.Workbook} to allow ORM-like
+ * operations on the workbooks' sheets.
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 9, 2013
- * 
+ * @since 1.0
+ * created Nov 9, 2013
  */
 public class Xcelite {
 
-  private final Workbook workbook;
-  private File file;
+    private final Workbook workbook;
 
-  public Xcelite() {
-    workbook = new XSSFWorkbook();
-  }
+    //TODO Version 2.0: remove this member variable together with write();
+    private File file;
 
-  public Xcelite(File file) {
-    try {
-      this.file = file;
-      workbook = new XSSFWorkbook(new FileInputStream(file));
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    @Getter
+    protected XceliteOptions options;
+
+    /**
+     * Create a Xcelite object containing a newly-created POI-workbook
+     * and having default {@link XceliteOptions}.
+     */
+    @SneakyThrows
+    public Xcelite() {
+        workbook = WorkbookFactory.create(true);
+        options = new XceliteOptions();
     }
-  }
 
-  /**
-   * Creates new sheet.
-   * 
-   * @return XceliteSheet object
-   */
-  public XceliteSheet createSheet() {
-    return new XceliteSheetImpl(workbook.createSheet(), file);
-  }
-
-  /**
-   * Creates new sheet with specified name.
-   * 
-   * @param name the sheet name   * 
-   * @return XceliteSheet object
-   */
-  public XceliteSheet createSheet(String name) {
-    return new XceliteSheetImpl(workbook.createSheet(name), file);
-  }
-
-  /**
-   * Gets the sheet at the specified index.
-   * 
-   * @param sheetIndex the sheet index
-   * @return XceliteSheet object
-   */
-  public XceliteSheet getSheet(int sheetIndex) {
-    Sheet sheet = workbook.getSheetAt(sheetIndex);
-    if (sheet == null) {
-      throw new XceliteException(String.format("Could not find sheet at index %s", sheetIndex));
+    /**
+     * Create a Xcelite object containing a newly-created POI-workbook
+     * and having custom {@link XceliteOptions} via the `options`
+     * parameter.
+     * @param options Custom options to use on all
+     * {@link com.ebay.xcelite.reader.SheetReader} and
+     * {@link com.ebay.xcelite.writer.SheetWriter} objects derived from
+     * this Xcelite instance
+     */
+    public Xcelite(XceliteOptions options) {
+        this();
+        this.options = options;
     }
-    return new XceliteSheetImpl(sheet, file);
-  }
 
-  /**
-   * Gets the sheet with the specified index.
-   * 
-   * @param sheetIndex the sheet name
-   * @return XceliteSheet object
-   */
-  public XceliteSheet getSheet(String sheetName) {
-    Sheet sheet = workbook.getSheet(sheetName);
-    if (sheet == null) {
-      throw new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName));
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.InputStream}
+     * and having default {@link XceliteOptions}.
+     * @param inputStream the InputStream to read data from
+     */
+    public Xcelite(InputStream inputStream) {
+        this(inputStream, new XceliteOptions());
     }
-    return new XceliteSheetImpl(sheet, file);
-  }
 
-  /**
-   * Saves data to the same file given in construction. If no such file
-   * specified an exception is thrown.
-   */
-  public void write() {
-    if (file == null) {
-      throw new XceliteException("No file given in Xcelite object construction. Consider using method write(file)");
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.InputStream} and having custom {@link XceliteOptions}
+     * via the `options` parameter.
+     * @param inputStream the InputStream to read data from
+     * @param options Custom options to use on all
+     * {@link com.ebay.xcelite.reader.SheetReader} and
+     * {@link com.ebay.xcelite.writer.SheetWriter} objects derived from
+     * this Xcelite instance
+     */
+    @SneakyThrows
+    public Xcelite(InputStream inputStream, XceliteOptions options) {
+        if (!inputStream.markSupported()) {
+            inputStream = new PushbackInputStream(inputStream, 8);
+        }
+        workbook = WorkbookFactory.create(inputStream);
+        this.options = options;
     }
-    write(file);
-  }
 
-  /**
-   * Saves data to a new file.
-   * 
-   * @param file the file to save the data into
-   */
-  public void write(File file) {
-    FileOutputStream out = null;
-    try {
-      out = new FileOutputStream(file, false);
-      workbook.write(out);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (out != null)
-        try {
-          out.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
+    /**
+     * Create a Xcelite object reading its POI-workbook from an
+     * {@link java.io.File}
+     * and having default {@link XceliteOptions}.
+     * @param file the File to read data from
+     */
+    @SneakyThrows
+    public Xcelite(File file) {
+        this.file = file;
+        FileInputStream fi = new FileInputStream(file);
+        workbook = WorkbookFactory.create(fi);
+        fi.close();
+    }
+
+    /**
+     * Creates a new {@link com.ebay.xcelite.sheet.XceliteSheet} without a name.
+     *
+     * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
+     */
+    public XceliteSheet createSheet() {
+        return new XceliteSheetImpl(workbook.createSheet(), options);
+    }
+
+    /**
+     * Creates a new {@link com.ebay.xcelite.sheet.XceliteSheet} with specified name.
+     *
+     * @param name the sheet name
+     * @return XceliteSheet newly created {@link com.ebay.xcelite.sheet.XceliteSheet}
+     */
+    public XceliteSheet createSheet(String name) {
+        return new XceliteSheetImpl(workbook.createSheet(name), options);
+    }
+
+    /**
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} at
+     * the specified index and the {@link XceliteOptions options} from
+     * this Xcelite instance.
+     *
+     * @param sheetIndex the sheet index
+     * @return XceliteSheet object
+     */
+    public XceliteSheet getSheet(int sheetIndex) {
+        return ofNullable(workbook.getSheetAt(sheetIndex))
+                .map(s -> new XceliteSheetImpl(s, options))
+                .orElseThrow(() -> new XceliteException(String.format("Could not find sheet at index %s", sheetIndex)));
+    }
+
+    /**
+     * Gets the {@link com.ebay.xcelite.sheet.XceliteSheet} with
+     * the specified name and the {@link XceliteOptions options} from
+     * this Xcelite instance.
+     *
+     * @param sheetName the sheet name
+     * @return XceliteSheet object
+     */
+    public XceliteSheet getSheet(String sheetName) {
+        return ofNullable(workbook.getSheet(sheetName))
+                .map(s -> new XceliteSheetImpl(s, options))
+                .orElseThrow(() -> new XceliteException(String.format("Could not find sheet named \"%s\"", sheetName)));
+    }
+
+    /**
+     * Returns all sheets.
+     *
+     * @return the list of sheets (a list of {@link XceliteSheet} objects)
+     * or throws a {@link XceliteException} if no sheets exist
+     */
+    // TODO for version 2.0, remove the exception, return empty list
+    public List<XceliteSheet> getSheets() {
+        if (workbook.getNumberOfSheets() == 0) {
+            throw new XceliteException("Could not find any sheet");
+        }
+
+        List<XceliteSheet> xceliteSheets = new ArrayList<>();
+        workbook.sheetIterator().forEachRemaining(
+                sheet -> xceliteSheets.add(new XceliteSheetImpl(sheet)));
+
+        return xceliteSheets;
+    }
+
+    /**
+     * Saves data to the input file.
+     *
+     * @deprecated since 1.2. When reading the Workbook from an {@link java.io.InputStream},
+     * eg. from a web service, member `file` will be null, causing an Exception.
+     * Use the explicit methods to write to a {@link java.io.File} or {@link java.io.OutputStream}
+     */
+    @SneakyThrows
+    @Deprecated
+    public void write() {
+        write(file);
+    }
+
+    /**
+     * Saves data to a {@link java.io.File}.
+     *
+     * @param file the {@link java.io.File} to save the data into
+     */
+    @SneakyThrows
+    public void write(File file) {
+        try (FileOutputStream out = new FileOutputStream(file, false)) {
+            write(out);
         }
     }
-  }
-  
-  /**
-   * Gets the excel file as byte array.
-   * 
-   * @return byte array which represents the excel file
-   */
-  public byte[] getBytes() {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try {
-      workbook.write(baos);
-    } catch (IOException e) {
-      new RuntimeException(e);
-    } finally {
-      if (baos != null)
-        try {
-          baos.close();
-        } catch (IOException e) {
-          new RuntimeException(e);
+
+    /**
+     * Saves data to a new {@link java.io.OutputStream}.
+     *
+     * @param out the {@link java.io.OutputStream} to save the data into
+     */
+    @SneakyThrows
+    public void write(OutputStream out) {
+        workbook.write(out);
+    }
+
+    /**
+     * Gets the excel file as byte array.
+     *
+     * @return byte array which represents the excel file
+     */
+    @SneakyThrows
+    public byte[] getBytes() {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            write(byteArrayOutputStream);
+            return byteArrayOutputStream.toByteArray();
         }
     }
-    return baos.toByteArray();
-  }
+
+    public void setOptions(XceliteOptions options) {
+        this.options = new XceliteOptions(options);
+    }
 }

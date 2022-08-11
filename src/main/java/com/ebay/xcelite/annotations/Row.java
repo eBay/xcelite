@@ -21,19 +21,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation use for configuring the bean class.
- * 
+ * Annotation used for configuring the bean class.
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 20, 2013
+ * @since 1.0
+ * created Aug 20, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 public @interface Row {
 
-  /**
-   * Specifies the order for the Columns in excel file. The colsOrder is a list
-   * of fields annotated with the {@link com.ebay.xcelite.annotations.Column
-   * Column} annotation. Once specified, all Column fields must be listed.
-   */
-  String[] colsOrder() default {};
+    /**
+     * Specifies the order for the Columns in excel file. The colsOrder is a list
+     * of fields annotated with the {@link com.ebay.xcelite.annotations.Column
+     * Column} annotation. Once specified, all Column fields must be listed.
+     * @since 1.0
+     */
+    String[] colsOrder() default {};
 }
