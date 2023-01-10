@@ -71,14 +71,13 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-	<!--	<maven.compiler.release>1.8</maven.compiler.release> -->
-		<apache-poi.version>4.1.1</apache-poi.version>
-                <google-guava.version>31.1-jre</google-guava.version>
-		<org.reflections.version>0.9.11</org.reflections.version>
+		<apache-poi.version>4.1.2</apache-poi.version>
+		<google-guava.version>31.1-jre</google-guava.version>
+		<org.reflections.version>0.10.2</org.reflections.version>
 		<commons-collections.version>4.4</commons-collections.version>
-		<org.projectlombok.version>1.18.10</org.projectlombok.version>
+		<org.projectlombok.version>1.18.24</org.projectlombok.version>
 		<findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
-		<junit.version>5.5.2</junit.version>
+		<junit.version>5.9.0</junit.version>
 	</properties>
 
 	<build>
@@ -266,7 +265,7 @@
 		<dependency>
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
-			<version>4.8.53</version>
+			<version>4.8.154</version>
 		</dependency>
 
 		<dependency>
@@ -302,16 +301,6 @@
 		</dependency>
 
 	</dependencies>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
-			</plugin>
-		</plugins>
-	</reporting>
 
 	<profiles>
 		<profile>
