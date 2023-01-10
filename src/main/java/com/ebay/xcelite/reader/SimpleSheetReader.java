@@ -15,60 +15,86 @@
 */
 package com.ebay.xcelite.reader;
 
+import com.ebay.xcelite.exceptions.EmptyRowException;
+import com.ebay.xcelite.options.XceliteOptions;
+import com.ebay.xcelite.sheet.XceliteSheet;
+import com.ebay.xcelite.sheet.XceliteSheetImpl;
+import lombok.SneakyThrows;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-
-import com.ebay.xcelite.sheet.XceliteSheet;
-import com.google.common.collect.Lists;
+import static com.ebay.xcelite.policies.MissingRowPolicy.SKIP;
 
 /**
- * Class description...
- * 
+ * Implementation of the {@link SheetReader} interface that returns the contents
+ * of an Excel sheet as a two-dimensional data structure of simple Java objects.
+ *
+ * By default, a BeanSheetReader copies over the {@link XceliteOptions options} from the
+ * {@link com.ebay.xcelite.sheet.XceliteSheet} it is constructed on. This means the
+ * options set on the sheet become the default options for the SheetReader, but it can
+ * modify option properties locally. However, the user may use the
+ * {@link #SimpleSheetReader(XceliteSheet, XceliteOptions)} constructor to
+ * use - for one reader only - a completely different set of options.
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 8, 2013
- * 
+ * @since 1.0
+ * created Nov 8, 2013
  */
-public class SimpleSheetReader extends SheetReaderAbs<Collection<Object>> {
+public class SimpleSheetReader extends AbstractSheetReader<Collection<Object>> {
+    @Override
+    public boolean expectsHeaderRow(){return false;}
 
-  public SimpleSheetReader(XceliteSheet sheet) {
-    super(sheet, false);
-  }
-
-  @Override
-  public Collection<Collection<Object>> read() {
-    List<Collection<Object>> rows = Lists.newArrayList();
-    Iterator<Row> rowIterator = sheet.getNativeSheet().iterator();
-    boolean firstRow = true;
-    while (rowIterator.hasNext()) {      
-      Row excelRow = rowIterator.next();
-      if (firstRow && skipHeader) {
-        firstRow = false;
-        continue;
-      }
-      List<Object> row = Lists.newArrayList();
-      Iterator<Cell> cellIterator = excelRow.cellIterator();
-      boolean blankRow = true;
-      while (cellIterator.hasNext()) {
-        Object value = readValueFromCell(cellIterator.next());
-        if (blankRow && value != null && !String.valueOf(value).isEmpty()) {
-          blankRow = false;
-        }
-        row.add(value);
-      }
-      if (blankRow) continue;
-      boolean keepRow = true;
-      for (RowPostProcessor<Collection<Object>> rowPostProcessor : rowPostProcessors) {
-        keepRow = rowPostProcessor.process(row);
-        if (!keepRow) break;
-      }
-      if (keepRow) {
-        rows.add(row);
-      }
+    /**
+     * Construct a SimpleSheetReader with custom options. The Reader will create
+     * a copy of the options object, therefore later changes of this object will not
+     * influence the behavior of this reader
+     *
+     * @param sheet the {@link XceliteSheet} to read from
+     * @param options the {@link XceliteOptions} to configure the reader
+     */
+    public SimpleSheetReader(XceliteSheet sheet, XceliteOptions options) {
+        super(sheet, options);
     }
-    return rows;
-  }
+
+    /**
+     * Construct a SimpleSheetReader with options from the {@link XceliteSheet}
+     * @param sheet the {@link XceliteSheet} to read from
+     */
+    public SimpleSheetReader(XceliteSheet sheet) {
+        this(sheet, sheet.getOptions());
+    }
+
+    /**
+     * No-Op for SimpleSheetReader, we don't handle headers
+     */
+    @Override
+    void buildHeader(Row row) {}
+
+    /**
+     * No-Op for SimpleSheetReader, we don't handle headers
+     */
+    @Override
+    void validateColumns() {}
+
+    @Override
+    public Collection<Object> fillObject(Row excelRow) {
+        Collection<Object> row = getNewObject();
+        Iterator<Cell> cellIterator = excelRow.cellIterator();
+
+        while (cellIterator.hasNext()) {
+            Object value = readValueFromCell(cellIterator.next());
+            row.add(value);
+        }
+        return row;
+    }
+
+    @Override
+    Collection<Object> getNewObject(){
+        return new ArrayList<>();
+    }
 }

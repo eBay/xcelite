@@ -15,48 +15,58 @@
 */
 package com.ebay.xcelite.annotations;
 
+import com.ebay.xcelite.annotate.NoConverterClass;
+import com.ebay.xcelite.converters.ColumnValueConverter;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.ebay.xcelite.annotate.NoConverterClass;
-import com.ebay.xcelite.converters.ColumnValueConverter;
-
 /**
- * Annotation to annotate a field to represent a column in excel file.
- * 
+ * Annotation to annotate a field to represent a column in Excel file.
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Aug 29, 2013
- * 
+ * @since 1.0
+ * created Aug 29, 2013
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
+@Target({ElementType.FIELD})
 public @interface Column {
-  
-  /**
-   * The actual name of the column that will be written to excel file. If no
-   * name specified, the annotated field name will be taken.
-   */
-  String name() default "";
 
-  /**
-   * If true, ignores the actual field type and serializes the field value as
-   * String. Otherwise, uses the actual field type when writing the data.
-   */
-  boolean ignoreType() default false;
+    /**
+     * The actual name of the column that will be written to excel file. If no
+     * name specified, the name of the field will be taken.
+     * @since 1.0
+     */
+    String name() default "";
 
-  /**
-   * The cell format to use when writing the data to excel file. Default is no
-   * format.
-   */
-  String dataFormat() default "";
+    /**
+     * If true, ignores the actual field type and serializes the field value as
+     * String. Otherwise, uses the actual field type when writing the data.
+     * @since 1.0
+     */
+    boolean ignoreType() default false;
 
-  /**
-   * Converter class to use when serializing/deserializing the data. Class must
-   * implement
-   * {@link com.ebay.xcelite.converters.ColumnValueConverter
-   * ColumnValueConverter}. Default is no converter.
-   */
-  Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;
+    /**
+     * The cell format to use when writing the data to excel file. Default is no
+     * format.
+     * @since 1.0
+     */
+    String dataFormat() default "";
+
+    /**
+     * If true, no exception is thrown if the column is missing in the target Excel file
+     * @since 1.2
+     */
+    boolean optional() default false;
+
+    /**
+     * Converter class to use when serializing/deserializing the data. Class must
+     * implement
+     * {@link com.ebay.xcelite.converters.ColumnValueConverter
+     * ColumnValueConverter}. Default is no converter.
+     * @since 1.0
+     */
+    Class<? extends ColumnValueConverter<?, ?>> converter() default NoConverterClass.class;
 }

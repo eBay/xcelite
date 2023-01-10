@@ -15,33 +15,37 @@
 */
 package com.ebay.xcelite.styles;
 
-import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Workbook;
 
-import com.google.common.collect.Maps;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Class description...
- * 
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 9, 2013
- * 
+ * @since 1.0
+ * created Sep 9, 2013
  */
 public final class CellStylesBank {
+    private Workbook workbook;
 
-  private static Map<Workbook, CellStyles> cellStylesMap;
-
-  static {
-    cellStylesMap = Maps.newHashMap();
-  }
-
-  public static CellStyles get(Workbook workbook) {
-    if (cellStylesMap.containsKey(workbook)) {
-      return cellStylesMap.get(workbook);
+    public CellStylesBank(Workbook workbook) {
+        this.workbook = workbook;
     }
-    CellStyles cellStyles = new CellStyles(workbook);
-    cellStylesMap.put(workbook, cellStyles);
-    return cellStyles;
-  }
+
+    private static Map<Workbook, CellStyles> cellStylesMap;
+
+    static {
+        cellStylesMap = new HashMap<>();
+    }
+
+    public CellStyles get() {
+        if (cellStylesMap.containsKey(workbook)) {
+            return cellStylesMap.get(workbook);
+        }
+        CellStyles cellStyles = new CellStyles(workbook);
+        cellStylesMap.put(workbook, cellStyles);
+        return cellStyles;
+    }
 }

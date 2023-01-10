@@ -19,20 +19,20 @@ import com.ebay.xcelite.converters.ColumnValueConverter;
 
 /**
  * Marker class.
- * 
+ *
  * @author kharel (kharel@ebay.com)
- * @creation_date Sep 12, 2013
- * 
+ * @since 1.0
+ * created Sep 12, 2013
  */
 public final class NoConverterClass implements ColumnValueConverter<Object, Object> {
 
-  @Override
-  public Object serialize(Object value) {
-    return value;
-  }
+    @Override
+    public Object serialize(Object value) {
+        return value;
+    }
 
-  @Override
-  public Object deserialize(Object value) {
-    return value;
-  }
+    @Override
+    public Object deserialize(Object value) {
+        return value;
+    }
 }

@@ -21,25 +21,25 @@ import java.util.Collection;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 20, 2013
- * 
+ * @since 1.0
+ * created Nov 20, 2013
  */
 public class NewLineDecorator<T> {
-  
-  private static final String NEW_LINE = System.getProperty("line.separator");
-  
-  private final Collection<T> collection;
-  
-  public NewLineDecorator(Collection<T> collection) {
-    this.collection = collection;
-  }
-  
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (T t : collection) {
-      sb.append(t + NEW_LINE);      
+
+    private static final String NEW_LINE = System.getProperty("line.separator");
+
+    private final Collection<T> collection;
+
+    public NewLineDecorator(Collection<T> collection) {
+        this.collection = collection;
     }
-    return sb.toString();
-  }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (T t: collection) {
+            sb.append(t).append(NEW_LINE);
+        }
+        return sb.toString();
+    }
 }

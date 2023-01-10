@@ -21,10 +21,10 @@ import com.ebay.xcelite.utils.diff.info.Info;
  * Class description...
  *
  * @author kharel (kharel@ebay.com)
- * @creation_date Nov 21, 2013
- * 
+ * @since 1.0
+ * created Nov 21, 2013
  */
 public interface ReportGenerator {
 
-  <T> String generateReport(Info<T> info);
+    <T> String generateReport(Info<T> info);
 }
